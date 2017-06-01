@@ -1,0 +1,9 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net46</TargetFramework>
+    <AssemblyName>Unbreakable.Runtime</AssemblyName>
+    <RootNamespace>Unbreakable.Runtime</RootNamespace>
+  </PropertyGroup>
+
+</Project>
