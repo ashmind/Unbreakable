@@ -3,7 +3,6 @@ using System.IO;
 using System.Reflection;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Unbreakable.Runtime;
 using Xunit;
 using Xunit.Abstractions;
@@ -50,10 +49,6 @@ namespace Unbreakable.Tests {
             new Rewriter().Rewrite(assemblySourceStream, assemblyTargetStream);
 
             return GetStandardMethod(assemblyTargetStream);
-        }
-
-        private static SyntaxTree Parse(string text) {
-            return CSharpSyntaxTree.ParseText(text.Replace("                ", ""));
         }
         
         private static MemoryStream Compile(string code) {

@@ -1,20 +1,30 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
+using System.Threading;
 
 namespace Unbreakable.Runtime {
     public class Guard {
-        private readonly int _stackBaseline;
+        private long _stackBaseline;
 
         public Guard() {
-            _stackBaseline = new StackTrace().FrameCount;
         }
 
         public void Stack() {
-            var stackSize = new StackTrace().FrameCount;
-            if (stackSize - _stackBaseline > 10)
+            var stackCurrent = GetCurrentLocationInStack();
+            if (_stackBaseline == 0)
+                Interlocked.CompareExchange(ref _stackBaseline, stackCurrent, 0);
+
+            if (_stackBaseline - stackCurrent > 10000)
                 throw new StackLimitException("Stack limit reached.");
         }
 
         public void Duration() {
+
+        }
+
+        private unsafe long GetCurrentLocationInStack() {
+            byte* local = stackalloc byte[1];
+            return (long)local;
         }
     }
 }
