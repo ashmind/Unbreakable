@@ -3,7 +3,7 @@ using System.Runtime.Serialization;
 
 namespace Unbreakable.Runtime {
     [Serializable]
-    public class StackLimitException : Exception {
+    public class StackLimitException : GuardException {
         public StackLimitException() {}
         public StackLimitException(string message) : base(message) {}
         public StackLimitException(string message, Exception inner) : base(message, inner) {}

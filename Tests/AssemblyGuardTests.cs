@@ -8,17 +8,17 @@ using Xunit;
 using Xunit.Abstractions;
 
 namespace Unbreakable.Tests {
-    public class RewriterTests {
+    public class AssemblyGuardTests {
         private delegate object Invoke(params object[] args);
         private readonly ITestOutputHelper _output;
 
-        public RewriterTests(ITestOutputHelper output) {
+        public AssemblyGuardTests(ITestOutputHelper output) {
             _output = output;
         }
 
         [Fact]
         public void Rewrite_PreservesSimpleLogic() {
-            var m = GetMethodAfterRewrite(@"
+            var m = GetWrappedMethodAfterRewrite(@"
                 class C {
                     string M(int a) {
                         return ""x"" + a.ToString();
@@ -31,24 +31,41 @@ namespace Unbreakable.Tests {
         [Theory]
         [InlineData("void M() { M(); }")]
         [InlineData("void M() { M2(); } void M2() { M(); }")]
-        public void Rewrite_PreventsStackOverflow(string methodsCode) {
-            var m = GetMethodAfterRewrite(@"
+        public void Rewrite_PreventsStackOverflow(string code) {
+            var m = GetWrappedMethodAfterRewrite(@"
                 class C {
-                    " + methodsCode + @"
+                    " + code + @"
                 }"
             );
             var exception = Assert.Throws<TargetInvocationException>(() => m());
             Assert.IsType<StackLimitException>(exception.InnerException);
         }
 
-        private static Invoke GetMethodAfterRewrite(string code) {
+        [Theory]
+        [InlineData("void M() { while(true) {} }")]
+        public void Rewrite_EnforcesTimeLimit(string code) {
+            var m = GetWrappedMethodAfterRewrite(@"
+                class C {
+                    " + code + @"
+                }"
+            );
+            var exception = Assert.Throws<TargetInvocationException>(() => m());
+            Assert.IsType<TimeLimitException>(exception.InnerException);
+        }
+
+        private static Invoke GetWrappedMethodAfterRewrite(string code) {
             var assemblySourceStream = Compile(code);
             var assemblyTargetStream = new MemoryStream();
 
             assemblySourceStream.Seek(0, SeekOrigin.Begin);
-            new Rewriter().Rewrite(assemblySourceStream, assemblyTargetStream);
+            var token = AssemblyGuard.Rewrite(assemblySourceStream, assemblyTargetStream);
 
-            return GetStandardMethod(assemblyTargetStream);
+            return args => {
+                using (token.Scope()) {
+                    var method = GetStandardMethod(assemblyTargetStream);
+                    return method(args);
+                }
+            };
         }
         
         private static MemoryStream Compile(string code) {
