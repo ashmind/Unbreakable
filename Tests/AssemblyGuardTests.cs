@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using Microsoft.CodeAnalysis;
@@ -43,13 +44,16 @@ namespace Unbreakable.Tests {
 
         [Theory]
         [InlineData("void M() { while(true) {} }")]
+        [InlineData("void M() { again: try { while(true) {} } catch { goto again; } }")]
         public void Rewrite_EnforcesTimeLimit(string code) {
             var m = GetWrappedMethodAfterRewrite(@"
                 class C {
                     " + code + @"
                 }"
             );
+            var watch = Stopwatch.StartNew();
             var exception = Assert.Throws<TargetInvocationException>(() => m());
+            _output.WriteLine("Time: {0:F2}ms", (double)watch.ElapsedTicks / TimeSpan.TicksPerMillisecond);
             Assert.IsType<TimeLimitException>(exception.InnerException);
         }
 

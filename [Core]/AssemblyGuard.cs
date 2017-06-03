@@ -71,8 +71,11 @@ namespace Unbreakable {
 
             for (var i = 4; i < instructions.Count; i++) {
                 var instruction = instructions[i];
+                var code = instruction.OpCode.Code;
                 var flowControl = instruction.OpCode.FlowControl;
                 if (flowControl == FlowControl.Next || flowControl == FlowControl.Return)
+                    continue;
+                if (instruction.Operand is Instruction target && target.Offset > instruction.Offset)
                     continue;
 
                 il.InsertBefore(instruction, il.Create(OpCodes.Ldloc, guardVariable));
