@@ -49,20 +49,20 @@ namespace Unbreakable.Tests {
         [Theory]
         [InlineData("void M() { M(); }")]
         [InlineData("void M() { M2(); } void M2() { M(); }")]
-        public void Rewrite_PreventsStackOverflow(string code) {
+        public void Rewrite_CausesStackGuardException_InsteadOfStackOverflow(string code) {
             var m = GetWrappedMethodAfterRewrite(@"
                 class C {
                     " + code + @"
                 }"
             );
             var exception = Assert.Throws<TargetInvocationException>(() => m());
-            Assert.IsType<StackLimitException>(exception.InnerException);
+            Assert.IsType<StackGuardException>(exception.InnerException);
         }
 
         [Theory]
         [InlineData("void M() { while(true) {} }")]
         [InlineData("void M() { again: try { while(true) {} } catch { goto again; } }")]
-        public void Rewrite_EnforcesTimeLimit(string code) {
+        public void Rewrite_CausesTimeGuardException_IfMethodRunsOverDuration(string code) {
             var m = GetWrappedMethodAfterRewrite(@"
                 class C {
                     " + code + @"
@@ -71,7 +71,7 @@ namespace Unbreakable.Tests {
             var watch = Stopwatch.StartNew();
             var exception = Assert.Throws<TargetInvocationException>(() => m());
             _output.WriteLine("Time: {0:F2}ms", (double)watch.ElapsedTicks / TimeSpan.TicksPerMillisecond);
-            Assert.IsType<TimeLimitException>(exception.InnerException);
+            Assert.IsType<TimeGuardException>(exception.InnerException);
         }
 
         private static Invoke GetWrappedMethodAfterRewrite(string code) {

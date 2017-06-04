@@ -32,14 +32,14 @@ namespace Unbreakable.Runtime {
                 Interlocked.CompareExchange(ref _stackBaseline, stackCurrent, 0);
 
             if (_stackBaseline - stackCurrent > 10000)
-                throw new StackLimitException("Stack limit reached.");
+                throw new StackGuardException("Stack limit reached.");
         }
 
         private void EnsureTime() {
             if (!_stopwatch.IsRunning)
                 _stopwatch.Start();
             if (_stopwatch.ElapsedTicks > Temp_AllowedTicks)
-                throw new TimeLimitException("Time limit reached.");
+                throw new TimeGuardException("Time limit reached.");
         }
 
         private void EnsureEnabled() {
