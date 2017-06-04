@@ -2,6 +2,7 @@
 using System.IO;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using Mono.Collections.Generic;
 using Unbreakable.Internal;
 using Unbreakable.Runtime.Internal;
 
@@ -16,9 +17,12 @@ namespace Unbreakable {
                 var guardInstanceField = EmitGuardInstance(module, id);
                 var guard = new GuardReferences(guardInstanceField, module);
 
+                CecilApiValidator.ValidateDefinition(module, settings.Filter);
                 foreach (var type in module.Types) {
+                    CecilApiValidator.ValidateDefinition(type, settings.Filter);
                     foreach (var method in type.Methods) {
-                        ValidateApiAndRewriteMethod(method, guard, settings);
+                        CecilApiValidator.ValidateDefinition(method, settings.Filter);
+                        ValidateAndRewriteMethod(method, guard, settings);
                     }
                 }
             }
@@ -26,7 +30,7 @@ namespace Unbreakable {
             assembly.Write(assemblyTargetStream);
             return new RuntimeGuardToken(id);
         }
-
+        
         private static FieldDefinition EmitGuardInstance(ModuleDefinition module, Guid id) {
             var instanceType = new TypeDefinition(
                 "<Unbreakable>", "<RuntimeGuardInstance>",
@@ -53,7 +57,10 @@ namespace Unbreakable {
             return instanceField;
         }
 
-        private static void ValidateApiAndRewriteMethod(MethodDefinition method, GuardReferences guard, AssemblyGuardSettings settings) {
+        private static void ValidateAndRewriteMethod(MethodDefinition method, GuardReferences guard, AssemblyGuardSettings settings) {
+            if ((method.Attributes & MethodAttributes.PInvokeImpl) == MethodAttributes.PInvokeImpl)
+                throw new UnsafeGuardException($"Method {method} uses P/Invoke which is not allowed.");
+
             if (!method.HasBody)
                 return;
 
