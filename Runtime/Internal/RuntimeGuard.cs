@@ -12,6 +12,7 @@ namespace Unbreakable.Runtime.Internal {
         private readonly Stopwatch _stopwatch;
 
         private long _stackBytesLimit;
+        private long _arrayLengthLimit;
         private long _timeLimitTicks;
 
         public RuntimeGuard() {
@@ -27,6 +28,19 @@ namespace Unbreakable.Runtime.Internal {
         public void GuardJump() {
             EnsureActive();
             EnsureTime();
+        }
+
+        private void GuardNewArray(int size) {
+            EnsureActive();
+            EnsureTime();
+            if (size > _arrayLengthLimit)
+                throw new MemoryGuardException($"Array size is above the limit.");
+        }
+
+        // required for simpler representation in IL
+        public static int GuardNewArrayFlowThrough(int size, RuntimeGuard guard) {
+            guard.GuardNewArray(size);
+            return size;
         }
 
         private void EnsureStack() {
@@ -59,6 +73,7 @@ namespace Unbreakable.Runtime.Internal {
             _active = true;
 
             _stackBytesLimit = settings.StackBytesLimit;
+            _arrayLengthLimit = settings.ArrayLengthLimit;
             _timeLimitTicks = settings.TimeLimit.Ticks;
 
             _stackBaseline = 0;                        

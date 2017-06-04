@@ -77,11 +77,19 @@ namespace Unbreakable.Internal {
         }
 
         private class NamespaceRule {
+            public NamespaceRule(ApiAccess access = ApiAccess.Neutral) {
+                Access = access;
+            }
+
             public ApiAccess Access { get; set; }
             public IDictionary<string, TypeRule> TypeRules { get; } = new Dictionary<string, TypeRule>();
         }
 
         private class TypeRule {
+            public TypeRule(ApiAccess access = ApiAccess.Neutral) {
+                Access = access;
+            }
+
             public ApiAccess Access { get; set; }
             public IDictionary<string, ApiAccess> MemberRules { get; } = new Dictionary<string, ApiAccess>();
         }

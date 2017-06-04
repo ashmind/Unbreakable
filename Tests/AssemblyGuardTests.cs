@@ -17,21 +17,23 @@ namespace Unbreakable.Tests {
             _output = output;
         }
 
-        [Fact]
-        public void Rewrite_PreservesSimpleLogic() {
+        [Theory]
+        [InlineData(@"return ""x"" + a.ToString();", "x1")]
+        [InlineData(@"return (new string[] { ""x"", ""y"" })[a];", "y")]
+        public void Rewrite_PreservesStandardLogic(string code, string expected) {
             var m = GetWrappedMethodAfterRewrite(@"
                 class C {
                     string M(int a) {
-                        return ""x"" + a.ToString();
+                        " + code + @"
                     }
                 }"
             );
-            Assert.Equal("x1", m(1));
+            Assert.Equal(expected, m(1));
         }
 
         [Theory]
         [InlineData("Console.WriteLine('x');")]
-        [InlineData("this.GetType();")]
+        [InlineData("this.GetType().GetProperties();")]
         public void Rewrite_ThrowsApiGuardException_IfDeniedApiIsUsed(string code) {
             var compiled = Compile(@"
                 using System;
@@ -72,6 +74,18 @@ namespace Unbreakable.Tests {
             var exception = Assert.Throws<TargetInvocationException>(() => m());
             _output.WriteLine("Time: {0:F2}ms", (double)watch.ElapsedTicks / TimeSpan.TicksPerMillisecond);
             Assert.IsType<TimeGuardException>(exception.InnerException);
+        }
+
+        [Theory]
+        [InlineData("byte[] M() { return new byte[10000000]; }")]
+        public void Rewrite_CausesMemoryGuardException_WhenAllocatingLargeArray(string code) {
+            var m = GetWrappedMethodAfterRewrite(@"
+                class C {
+                    " + code + @"
+                }"
+            );
+            var exception = Assert.Throws<TargetInvocationException>(() => m());
+            Assert.IsType<MemoryGuardException>(exception.InnerException);
         }
 
         private static Invoke GetWrappedMethodAfterRewrite(string code) {

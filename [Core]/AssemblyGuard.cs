@@ -76,6 +76,13 @@ namespace Unbreakable {
                 var instruction = instructions[i];
                 CecilApiValidator.ValidateInstruction(instruction, settings.Filter);
                 var code = instruction.OpCode.Code;
+                if (code == Code.Newarr) {
+                    il.InsertBefore(instruction, il.Create(OpCodes.Ldloc, guardVariable));
+                    il.InsertBefore(instruction, il.Create(OpCodes.Call, guard.GuardNewArrayMethod));
+                    i += 2;
+                    continue;
+                }
+
                 var flowControl = instruction.OpCode.FlowControl;
                 if (flowControl == FlowControl.Next || flowControl == FlowControl.Return)
                     continue;
@@ -93,11 +100,13 @@ namespace Unbreakable {
                 InstanceField = instanceField;
                 GuardEnterMethod = module.Import(typeof(RuntimeGuard).GetMethod(nameof(RuntimeGuard.GuardEnter)));
                 GuardJumpMethod = module.Import(typeof(RuntimeGuard).GetMethod(nameof(RuntimeGuard.GuardJump)));
+                GuardNewArrayMethod = module.Import(typeof(RuntimeGuard).GetMethod(nameof(RuntimeGuard.GuardNewArrayFlowThrough)));
             }
 
             public FieldDefinition InstanceField { get; }
             public MethodReference GuardEnterMethod { get; }
             public MethodReference GuardJumpMethod { get; }
+            public MethodReference GuardNewArrayMethod { get; }
         }
     }
 }

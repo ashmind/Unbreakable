@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Web.Mvc;
 using AppDomainToolkit;
@@ -21,8 +23,13 @@ namespace Unbreakable.Demo.Controllers {
                 }
             }
         ".Replace("            ", "").Trim();
+        private static readonly IReadOnlyCollection<MetadataReference> MetadataReferences = new MetadataReference[] {
+            MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
+            MetadataReference.CreateFromFile(typeof(Enumerable).Assembly.Location),
+        };
 
         private static readonly RecyclableMemoryStreamManager MemoryStreamManager = new RecyclableMemoryStreamManager();
+        
 
         [Route("")]
         public ActionResult Index() {
@@ -48,7 +55,7 @@ namespace Unbreakable.Demo.Controllers {
                 var compilation = CSharpCompilation.Create(
                     "_",
                     new[] { CSharpSyntaxTree.ParseText(code) },
-                    new[] { MetadataReference.CreateFromFile(typeof(object).Assembly.Location) },
+                    MetadataReferences,
                     new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
                 );
                 using (var assemblyStream = MemoryStreamManager.GetStream())
