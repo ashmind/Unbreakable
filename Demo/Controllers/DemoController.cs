@@ -4,9 +4,11 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Web.Mvc;
 using AppDomainToolkit;
 using AshMind.Extensions;
+using LZStringCSharp;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.IO;
@@ -32,9 +34,11 @@ namespace Unbreakable.Demo.Controllers {
         
 
         [Route("")]
-        public ActionResult Index() {
+        public ActionResult Index(string code = null) {
             return View(new DemoViewModel {
-                Code = DefaultCode
+                Code = code != null ? LZString.DecompressFromBase64(code) : DefaultCode,
+                Result = (string)TempData["result"],
+                Duration = (TimeSpan?)TempData["duration"]
             });
         }
 
@@ -43,11 +47,10 @@ namespace Unbreakable.Demo.Controllers {
         [ValidateInput(false)]
         public ActionResult Test(string code) {
             var stopwatch = Stopwatch.StartNew();
-            return View("Index", new DemoViewModel {
-                Code = code,
-                Result = Run(code),
-                Duration = stopwatch.Elapsed
-            });
+            TempData["result"] = Run(code);
+            TempData["duration"] = stopwatch.Elapsed;
+
+            return RedirectToAction("Index", new { code = LZString.CompressToBase64(code) });
         }
 
         private string Run(string code) {

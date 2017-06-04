@@ -24,7 +24,6 @@ namespace Unbreakable {
             }
 
             assembly.Write(assemblyTargetStream);
-            assembly.Write(@"d:\Development\VS 2017\Unbreakable\_.dll");
             return new RuntimeGuardToken(id);
         }
 

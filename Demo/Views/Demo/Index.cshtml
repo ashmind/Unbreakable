@@ -6,14 +6,14 @@
 
 @using (Html.BeginForm("Test", "Demo")) {
   <div class="code-wrapper">
-    @Html.TextArea("code", Model.Code)
+    <textarea name="code">@Model.Code</textarea>
   </div>
   <button type="submit">Run</button>
 }
-<pre>
-Duration: @((int)Model.Duration.TotalMilliseconds)ms
+<pre>@if (Model.Duration != null) {<text>
+Duration: @((int?)Model.Duration?.TotalMilliseconds)ms
 Result: @Model.Result
-</pre>
+</text>}</pre>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.26.0/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.26.0/mode/clike/clike.js"></script>

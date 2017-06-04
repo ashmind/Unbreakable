@@ -20,7 +20,7 @@ form {
     flex: 1 0 auto;
     flex-direction: column;
     min-height: 200px;
-    max-height: 400px;
+    max-height: 500px;
 }
 
 .code-wrapper {
@@ -30,11 +30,15 @@ form {
 }
 
 .code-wrapper > * {
-    position: absolute;
+    position: absolute !important;
     left: 0;
     right: 0;
     top: 0;
     bottom: 0;
+}
+
+.CodeMirror {
+    height: auto !important;
 }
 
 button {
