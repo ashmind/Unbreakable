@@ -66,11 +66,11 @@ namespace Unbreakable.Demo.Controllers {
                 using (var assemblyStream = MemoryStreamManager.GetStream())
                 using (var rewrittenStream = MemoryStreamManager.GetStream()) {
                     var compilationResult = compilation.Emit(assemblyStream);
-                    compilationStopwatch.Stop();
                     if (!compilationResult.Success)
                         return resultModel(string.Join("\r\n", compilationResult.Diagnostics));
                     assemblyStream.Seek(0, SeekOrigin.Begin);
                     var guardToken = AssemblyGuard.Rewrite(assemblyStream, rewrittenStream);
+                    compilationStopwatch.Stop();
                     var currentSetup = AppDomain.CurrentDomain.SetupInformation;
                     using (var context = AppDomainContext.Create(new AppDomainSetup {
                         ApplicationBase = currentSetup.ApplicationBase,
