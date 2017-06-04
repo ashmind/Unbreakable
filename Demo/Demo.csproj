@@ -11,14 +11,12 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Views\**\*.*" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\**\*.*" />
-  </ItemGroup>
-  <ItemGroup>
+    <None Remove="Content\**\*.*" />
     <None Remove="Global.asax" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Views\**\*.*" />
+    <Content Include="Content\**\*.*" />
     <Content Include="Global.asax" />
   </ItemGroup>
   <ItemGroup>
