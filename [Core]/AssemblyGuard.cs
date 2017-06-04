@@ -2,11 +2,14 @@
 using System.IO;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using Unbreakable.Internal;
 using Unbreakable.Runtime;
 
 namespace Unbreakable {
-    public class AssemblyGuard {
-        public static RuntimeGuardToken Rewrite(Stream assemblySourceStream, Stream assemblyTargetStream) {
+    public static class AssemblyGuard {
+        public static RuntimeGuardToken Rewrite(Stream assemblySourceStream, Stream assemblyTargetStream, AssemblyGuardSettings settings = null) {
+            settings = settings ?? AssemblyGuardSettings.Default;
+
             var id = Guid.NewGuid();
             var assembly = AssemblyDefinition.ReadAssembly(assemblySourceStream);
             foreach (var module in assembly.Modules) {
@@ -15,7 +18,7 @@ namespace Unbreakable {
 
                 foreach (var type in module.Types) {
                     foreach (var method in type.Methods) {
-                        RewriteMethod(method, guard);
+                        ValidateApiAndRewriteMethod(method, guard, settings);
                     }
                 }
             }
@@ -51,7 +54,7 @@ namespace Unbreakable {
             return instanceField;
         }
 
-        private static void RewriteMethod(MethodDefinition method, GuardReferences guard) {
+        private static void ValidateApiAndRewriteMethod(MethodDefinition method, GuardReferences guard, AssemblyGuardSettings settings) {
             if (!method.HasBody)
                 return;
 
@@ -71,6 +74,7 @@ namespace Unbreakable {
 
             for (var i = 4; i < instructions.Count; i++) {
                 var instruction = instructions[i];
+                CecilApiValidator.ValidateInstruction(instruction, settings.Filter);
                 var code = instruction.OpCode.Code;
                 var flowControl = instruction.OpCode.FlowControl;
                 if (flowControl == FlowControl.Next || flowControl == FlowControl.Return)

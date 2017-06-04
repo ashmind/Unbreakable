@@ -30,6 +30,23 @@ namespace Unbreakable.Tests {
         }
 
         [Theory]
+        [InlineData("Console.WriteLine('x');")]
+        [InlineData("this.GetType();")]
+        public void Rewrite_ThrowsApiGuardException_IfDeniedApiIsUsed(string code) {
+            var compiled = Compile(@"
+                using System;
+                class C {
+                    void M() {
+                        " + code + @"
+                    }
+                }"
+            );
+            Assert.Throws<ApiGuardException>(
+                () => AssemblyGuard.Rewrite(compiled, new MemoryStream())
+            );
+        }
+
+        [Theory]
         [InlineData("void M() { M(); }")]
         [InlineData("void M() { M2(); } void M2() { M(); }")]
         public void Rewrite_PreventsStackOverflow(string code) {
@@ -60,8 +77,7 @@ namespace Unbreakable.Tests {
         private static Invoke GetWrappedMethodAfterRewrite(string code) {
             var assemblySourceStream = Compile(code);
             var assemblyTargetStream = new MemoryStream();
-
-            assemblySourceStream.Seek(0, SeekOrigin.Begin);
+                        
             var token = AssemblyGuard.Rewrite(assemblySourceStream, assemblyTargetStream);
 
             return args => {
@@ -83,6 +99,7 @@ namespace Unbreakable.Tests {
             var stream = new MemoryStream();
             var result = compilation.Emit(stream);
             Assert.True(result.Success, string.Join("\r\n", result.Diagnostics));
+            stream.Seek(0, SeekOrigin.Begin);
             return stream;
         }
 
