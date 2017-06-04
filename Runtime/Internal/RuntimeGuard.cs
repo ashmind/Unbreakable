@@ -13,7 +13,7 @@ namespace Unbreakable.Runtime.Internal {
 
         private long _stackBytesLimit;
         private long _arrayLengthLimit;
-        private long _timeLimitTicks;
+        private long _timeLimitStopwatchTicks;
 
         public RuntimeGuard() {
             _stopwatch = new Stopwatch();
@@ -55,8 +55,8 @@ namespace Unbreakable.Runtime.Internal {
         private void EnsureTime() {
             if (!_stopwatch.IsRunning)
                 _stopwatch.Start();
-            if (_stopwatch.ElapsedTicks > _timeLimitTicks)
-                throw new TimeGuardException("Time limit reached.");
+            if (_stopwatch.ElapsedTicks > _timeLimitStopwatchTicks)
+                throw new TimeGuardException($"Time limit reached.");
         }
 
         private void EnsureActive() {
@@ -74,9 +74,9 @@ namespace Unbreakable.Runtime.Internal {
 
             _stackBytesLimit = settings.StackBytesLimit;
             _arrayLengthLimit = settings.ArrayLengthLimit;
-            _timeLimitTicks = settings.TimeLimit.Ticks;
+            _timeLimitStopwatchTicks = (long)(settings.TimeLimit.TotalSeconds * Stopwatch.Frequency);
 
-            _stackBaseline = 0;                        
+            _stackBaseline = 0;
             _stopwatch.Stop();
             _stopwatch.Reset();
         }
