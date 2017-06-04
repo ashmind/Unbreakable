@@ -2,6 +2,7 @@
 using Unbreakable.Internal;
 
 namespace Unbreakable {
+    [Serializable]
     public struct RuntimeGuardToken {
         internal RuntimeGuardToken(Guid guid) {
             Guid = guid;
