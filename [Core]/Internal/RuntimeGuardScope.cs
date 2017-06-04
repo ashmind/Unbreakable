@@ -1,17 +1,17 @@
 ﻿using System;
-using Unbreakable.Runtime;
+using Unbreakable.Runtime.Internal;
 
 namespace Unbreakable.Internal {
     internal class RuntimeGuardScope : IDisposable {
         private readonly Guid _guid;
 
-        public RuntimeGuardScope(RuntimeGuardToken token) {
+        public RuntimeGuardScope(RuntimeGuardToken token, RuntimeGuardSettings settings) {
             _guid = token.Guid;
-            RuntimeGuardInstances.Prepare(_guid);
+            RuntimeGuardInstances.Start(_guid, settings);
         }
 
         public void Dispose() {
-            RuntimeGuardInstances.Disable(_guid);
+            RuntimeGuardInstances.Stop(_guid);
         }
     }
 }

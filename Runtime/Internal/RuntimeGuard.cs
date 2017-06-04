@@ -1,28 +1,31 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Threading;
 
-namespace Unbreakable.Runtime {
+namespace Unbreakable.Runtime.Internal {
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public class RuntimeGuard {
-        private const long Temp_AllowedTicks = 500 * TimeSpan.TicksPerMillisecond;
-
-        private bool _enabled;
+        private bool _active;
 
         private long _stackBaseline;
-        private Stopwatch _stopwatch;
+        private readonly Stopwatch _stopwatch;
+
+        private long _stackBytesLimit;
+        private long _timeLimitTicks;
 
         public RuntimeGuard() {
             _stopwatch = new Stopwatch();
         }
 
         public void GuardEnter() {
-            EnsureEnabled();
+            EnsureActive();
             EnsureStack();
             EnsureTime();
         }
 
         public void GuardJump() {
-            EnsureEnabled();
+            EnsureActive();
             EnsureTime();
         }
 
@@ -31,19 +34,19 @@ namespace Unbreakable.Runtime {
             if (_stackBaseline == 0)
                 Interlocked.CompareExchange(ref _stackBaseline, stackCurrent, 0);
 
-            if (_stackBaseline - stackCurrent > 10000)
+            if (_stackBaseline - stackCurrent > _stackBytesLimit)
                 throw new StackGuardException("Stack limit reached.");
         }
 
         private void EnsureTime() {
             if (!_stopwatch.IsRunning)
                 _stopwatch.Start();
-            if (_stopwatch.ElapsedTicks > Temp_AllowedTicks)
+            if (_stopwatch.ElapsedTicks > _timeLimitTicks)
                 throw new TimeGuardException("Time limit reached.");
         }
 
-        private void EnsureEnabled() {
-            if (!_enabled)
+        private void EnsureActive() {
+            if (!_active)
                 throw new GuardException(GuardException.NoScopeMessage);
         }
 
@@ -52,15 +55,19 @@ namespace Unbreakable.Runtime {
             return (long)local;
         }
 
-        internal void Reset() {
-            _stackBaseline = 0;
-            _enabled = true;
+        internal void Start(IRuntimeGuardSettings settings) {
+            _active = true;
+
+            _stackBytesLimit = settings.StackBytesLimit;
+            _timeLimitTicks = settings.TimeLimit.Ticks;
+
+            _stackBaseline = 0;                        
             _stopwatch.Stop();
             _stopwatch.Reset();
         }
 
-        internal void Disable() {
-            _enabled = false;
+        internal void Stop() {
+            _active = false;
         }
     }
 }

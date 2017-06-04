@@ -3,7 +3,7 @@ using System.IO;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Unbreakable.Internal;
-using Unbreakable.Runtime;
+using Unbreakable.Runtime.Internal;
 
 namespace Unbreakable {
     public static class AssemblyGuard {

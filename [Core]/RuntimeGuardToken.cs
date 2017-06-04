@@ -9,8 +9,8 @@ namespace Unbreakable {
 
         internal Guid Guid { get; }
 
-        public IDisposable Scope() {
-            return new RuntimeGuardScope(this);
+        public IDisposable Scope(RuntimeGuardSettings settings = default(RuntimeGuardSettings)) {
+            return new RuntimeGuardScope(this, settings ?? RuntimeGuardSettings.Default);
         }
     }
 }
