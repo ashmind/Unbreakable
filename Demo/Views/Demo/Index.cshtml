@@ -10,9 +10,12 @@
   </div>
   <button type="submit">Run</button>
 }
-<pre>@if (Model.Duration != null) {<text>
-Duration: @((int)Model.Duration.Value.TotalMilliseconds)ms
-Result: @Model.Result
+<pre>@if (Model.Result != null) {<text>
+Compilation: @((int)Model.Result.CompilationTime.TotalMilliseconds)ms
+Execution:   @((int)Model.Result.ExecutionTime.TotalMilliseconds)ms
+Total:       @((int)Model.Result.TotalTime.TotalMilliseconds)ms
+
+@Model.Result.Output
 </text>}</pre>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.26.0/codemirror.min.js"></script>

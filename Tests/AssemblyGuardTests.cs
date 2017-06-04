@@ -47,9 +47,10 @@ namespace Unbreakable.Tests {
                 () => AssemblyGuard.Rewrite(compiled, new MemoryStream())
             );
         }
-        
+
         [Fact]
         public void Rewrite_ThrowsUnsafeGuardException_IfPInvokeIsUsed() {
+            // case by Igal Tabachnik (@hmemcpy) 
             var compiled = Compile(@"
                 using System.Runtime.InteropServices;
                 static class X {

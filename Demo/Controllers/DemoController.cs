@@ -36,8 +36,7 @@ namespace Unbreakable.Demo.Controllers {
         public ActionResult Index(string code = null) {
             return View(new DemoViewModel {
                 Code = code != null ? LZString.DecompressFromBase64(code) : DefaultCode,
-                Result = (string)TempData["result"],
-                Duration = (TimeSpan?)TempData["duration"]
+                Result = (ResultViewModel)TempData["result"],
             });
         }
 
@@ -45,15 +44,19 @@ namespace Unbreakable.Demo.Controllers {
         [Route("Test")]
         [ValidateInput(false)]
         public ActionResult Test(string code) {
-            var stopwatch = Stopwatch.StartNew();
             TempData["result"] = Run(code);
-            TempData["duration"] = stopwatch.Elapsed;
-
             return RedirectToAction("Index", new { code = LZString.CompressToBase64(code) });
         }
 
-        private string Run(string code) {
+        private ResultViewModel Run(string code) {
+            var totalStopwatch = Stopwatch.StartNew();
+            var compilationStopwatch = new Stopwatch();
+            var executionStopwatch = new Stopwatch();
+
+            ResultViewModel resultModel(string output) => new ResultViewModel(output, compilationStopwatch.Elapsed, executionStopwatch.Elapsed, totalStopwatch.Elapsed);
+
             try {
+                compilationStopwatch.Start();
                 var compilation = CSharpCompilation.Create(
                     "_",
                     new[] { CSharpSyntaxTree.ParseText(code) },
@@ -63,8 +66,9 @@ namespace Unbreakable.Demo.Controllers {
                 using (var assemblyStream = MemoryStreamManager.GetStream())
                 using (var rewrittenStream = MemoryStreamManager.GetStream()) {
                     var compilationResult = compilation.Emit(assemblyStream);
+                    compilationStopwatch.Stop();
                     if (!compilationResult.Success)
-                        return string.Join("\r\n", compilationResult.Diagnostics);
+                        return resultModel(string.Join("\r\n", compilationResult.Diagnostics));
                     assemblyStream.Seek(0, SeekOrigin.Begin);
                     var guardToken = AssemblyGuard.Rewrite(assemblyStream, rewrittenStream);
                     var currentSetup = AppDomain.CurrentDomain.SetupInformation;
@@ -73,13 +77,15 @@ namespace Unbreakable.Demo.Controllers {
                         PrivateBinPath = currentSetup.PrivateBinPath
                     })) {
                         context.LoadAssembly(LoadMethod.LoadFrom, Assembly.GetExecutingAssembly().GetAssemblyFile().FullName);
+                        executionStopwatch.Start();
                         var result = RemoteFunc.Invoke(context.Domain, rewrittenStream, guardToken, RemoteRun);
-                        return result?.ToString();
+                        executionStopwatch.Stop();
+                        return resultModel(result?.ToString());
                     }
                 }
             }
             catch (Exception ex) {
-                return ex.ToString();
+                return resultModel(ex.ToString());
             }
         }
 
