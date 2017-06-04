@@ -11,7 +11,7 @@
   <button type="submit">Run</button>
 }
 <pre>@if (Model.Duration != null) {<text>
-Duration: @((int?)Model.Duration?.TotalMilliseconds)ms
+Duration: @((int)Model.Duration.Value.TotalMilliseconds)ms
 Result: @Model.Result
 </text>}</pre>
 
