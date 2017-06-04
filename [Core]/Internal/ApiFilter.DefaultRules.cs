@@ -30,7 +30,6 @@ namespace Unbreakable.Internal {
                         { nameof(UInt64), new TypeRule(ApiAccess.Allowed) },
                         { nameof(Object), new TypeRule(ApiAccess.Allowed) },
                         { nameof(String), new TypeRule(ApiAccess.Allowed) },
-                        { nameof(Type), new TypeRule(ApiAccess.Allowed) },
                         { "Void", new TypeRule(ApiAccess.Allowed) },
                     }
                 } },
