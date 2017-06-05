@@ -10,6 +10,10 @@ using BindingFlags = System.Reflection.BindingFlags;
 namespace Unbreakable {
     public static class AssemblyGuard {
         public static RuntimeGuardToken Rewrite(Stream assemblySourceStream, Stream assemblyTargetStream, AssemblyGuardSettings settings = null) {
+            Argument.NotNull(nameof(assemblySourceStream), assemblySourceStream);
+            Argument.NotNull(nameof(assemblyTargetStream), assemblyTargetStream);
+            if (assemblyTargetStream == assemblySourceStream) // Cecil limitation? Causes some weird issues.
+                throw new ArgumentException("Target stream must be different from source stream.", nameof(assemblyTargetStream));
             settings = settings ?? AssemblyGuardSettings.Default;
 
             var id = Guid.NewGuid();
@@ -20,18 +24,14 @@ namespace Unbreakable {
 
                 CecilApiValidator.ValidateDefinition(module, settings.Filter);
                 foreach (var type in module.Types) {
-                    CecilApiValidator.ValidateDefinition(type, settings.Filter);
-                    foreach (var method in type.Methods) {
-                        CecilApiValidator.ValidateDefinition(method, settings.Filter);
-                        ValidateAndRewriteMethod(method, guard, settings);
-                    }
+                    ValidateAndRewriteType(type, guard, settings);
                 }
             }
 
             assembly.Write(assemblyTargetStream);
             return new RuntimeGuardToken(id);
         }
-        
+
         private static FieldDefinition EmitGuardInstance(ModuleDefinition module, Guid id) {
             var instanceType = new TypeDefinition(
                 "<Unbreakable>", "<RuntimeGuardInstance>",
@@ -56,6 +56,17 @@ namespace Unbreakable {
 
             module.Types.Add(instanceType);
             return instanceField;
+        }
+
+        private static void ValidateAndRewriteType(TypeDefinition type, GuardReferences guard, AssemblyGuardSettings settings) {
+            CecilApiValidator.ValidateDefinition(type, settings.Filter);
+            foreach (var nested in type.NestedTypes) {
+                ValidateAndRewriteType(nested, guard, settings);
+            }
+            foreach (var method in type.Methods) {
+                CecilApiValidator.ValidateDefinition(method, settings.Filter);
+                ValidateAndRewriteMethod(method, guard, settings);
+            }
         }
 
         private static void ValidateAndRewriteMethod(MethodDefinition method, GuardReferences guard, AssemblyGuardSettings settings) {

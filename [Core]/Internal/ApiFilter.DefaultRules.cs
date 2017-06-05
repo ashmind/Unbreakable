@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace Unbreakable.Internal {
     partial class ApiFilter {
@@ -45,6 +46,11 @@ namespace Unbreakable.Internal {
                 { "System.IO", new NamespaceRule(ApiAccess.Denied) },
                 { "System.Reflection", new NamespaceRule(ApiAccess.Denied) },
                 { "System.Runtime", new NamespaceRule(ApiAccess.Denied) },
+                { "System.Runtime.CompilerServices", new NamespaceRule(ApiAccess.Neutral) {
+                    TypeRules = {
+                        { nameof(CompilerGeneratedAttribute), new TypeRule(ApiAccess.Allowed) }
+                    }
+                } },
                 { "System.Threading", new NamespaceRule(ApiAccess.Denied) },
 
                 { "Unbreakable", new NamespaceRule(ApiAccess.Denied) },

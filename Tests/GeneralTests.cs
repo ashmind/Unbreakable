@@ -32,15 +32,14 @@ namespace Unbreakable.Tests {
         }
 
         [Theory]
-        [InlineData("Console.WriteLine('x');")]
-        [InlineData("this.GetType().GetProperties();")]
+        [InlineData("void M() { Console.WriteLine('x'); }")]
+        [InlineData("void M() { this.GetType(); }")]
+        [InlineData("class N { void M() { GC.Collect(); } }")]
         public void ThrowsAssemblyGuardException_ForDeniedApi(string code) {
             var compiled = Compile(@"
                 using System;
                 class C {
-                    void M() {
-                        " + code + @"
-                    }
+                    " + code + @"
                 }"
             );
             Assert.Throws<AssemblyGuardException>(
