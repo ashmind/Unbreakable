@@ -2,9 +2,10 @@
 using System.IO;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
-using Mono.Collections.Generic;
 using Unbreakable.Internal;
 using Unbreakable.Runtime.Internal;
+
+using BindingFlags = System.Reflection.BindingFlags;
 
 namespace Unbreakable {
     public static class AssemblyGuard {
@@ -59,7 +60,12 @@ namespace Unbreakable {
 
         private static void ValidateAndRewriteMethod(MethodDefinition method, GuardReferences guard, AssemblyGuardSettings settings) {
             if ((method.Attributes & MethodAttributes.PInvokeImpl) == MethodAttributes.PInvokeImpl)
-                throw new UnsafeGuardException($"Method {method} uses P/Invoke which is not allowed.");
+                throw new AssemblyGuardException($"Method {method} uses P/Invoke which is not allowed.");
+
+            foreach (var @override in method.Overrides) {
+                if (@override.DeclaringType.FullName == "System.Object" && @override.Name == "Finalize")
+                    throw new AssemblyGuardException($"Method {method} is a finalizer which is not allowed.");
+            }
 
             if (!method.HasBody)
                 return;

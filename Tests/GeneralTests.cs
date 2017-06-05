@@ -9,18 +9,18 @@ using Xunit;
 using Xunit.Abstractions;
 
 namespace Unbreakable.Tests {
-    public class AssemblyGuardTests {
+    public class GeneralTests {
         private delegate object Invoke(params object[] args);
         private readonly ITestOutputHelper _output;
 
-        public AssemblyGuardTests(ITestOutputHelper output) {
+        public GeneralTests(ITestOutputHelper output) {
             _output = output;
         }
 
         [Theory]
         [InlineData(@"return ""x"" + a.ToString();", "x1")]
         [InlineData(@"return (new string[] { ""x"", ""y"" })[a];", "y")]
-        public void Rewrite_PreservesStandardLogic(string code, string expected) {
+        public void PreservesStandardLogic(string code, string expected) {
             var m = GetWrappedMethodAfterRewrite(@"
                 class C {
                     string M(int a) {
@@ -34,7 +34,7 @@ namespace Unbreakable.Tests {
         [Theory]
         [InlineData("Console.WriteLine('x');")]
         [InlineData("this.GetType().GetProperties();")]
-        public void Rewrite_ThrowsApiGuardException_IfDeniedApiIsUsed(string code) {
+        public void ThrowsAssemblyGuardException_ForDeniedApi(string code) {
             var compiled = Compile(@"
                 using System;
                 class C {
@@ -43,14 +43,14 @@ namespace Unbreakable.Tests {
                     }
                 }"
             );
-            Assert.Throws<ApiGuardException>(
+            Assert.Throws<AssemblyGuardException>(
                 () => AssemblyGuard.Rewrite(compiled, new MemoryStream())
             );
         }
 
         [Fact]
-        public void Rewrite_ThrowsUnsafeGuardException_IfPInvokeIsUsed() {
-            // case by Igal Tabachnik (@hmemcpy) 
+        public void ThrowsAssemblyGuardException_ForPInvoke() {
+            // found by Igal Tabachnik (@hmemcpy) 
             var compiled = Compile(@"
                 using System.Runtime.InteropServices;
                 static class X {
@@ -58,15 +58,29 @@ namespace Unbreakable.Tests {
                     static extern void ExitProcess(int uExitCode);
                 }
             ");
-            Assert.Throws<UnsafeGuardException>(
+            Assert.Throws<AssemblyGuardException>(
                 () => AssemblyGuard.Rewrite(compiled, new MemoryStream())
             );
         }
 
+        [Fact]
+        public void ThrowsAssemblyGuardException_ForFinalizers() {
+            // found by George Pollard‏ (@porges)
+            var compiled = Compile(@"
+                class X {
+                    ~X() {}
+                }
+            ");
+            Assert.Throws<AssemblyGuardException>(
+                () => AssemblyGuard.Rewrite(compiled, new MemoryStream())
+            );
+        }
+
+
         [Theory]
         [InlineData("void M() { M(); }")]
         [InlineData("void M() { M2(); } void M2() { M(); }")]
-        public void Rewrite_CausesStackGuardException_InsteadOfStackOverflow(string code) {
+        public void ThrowsStackGuardException_InsteadOfStackOverflow(string code) {
             var m = GetWrappedMethodAfterRewrite(@"
                 class C {
                     " + code + @"
@@ -79,7 +93,7 @@ namespace Unbreakable.Tests {
         [Theory]
         [InlineData("void M() { while(true) {} }")]
         [InlineData("void M() { again: try { while(true) {} } catch { goto again; } }")]
-        public void Rewrite_CausesTimeGuardException_IfMethodRunsOverDuration(string code) {
+        public void ThrowsTimeGuardException_IfMethodRunsOverDuration(string code) {
             var m = GetWrappedMethodAfterRewrite(@"
                 class C {
                     " + code + @"
@@ -93,7 +107,7 @@ namespace Unbreakable.Tests {
 
         [Theory]
         [InlineData("byte[] M() { return new byte[10000000]; }")]
-        public void Rewrite_CausesMemoryGuardException_WhenAllocatingLargeArray(string code) {
+        public void ThrowsMemoryGuardException_WhenAllocatingLargeArray(string code) {
             var m = GetWrappedMethodAfterRewrite(@"
                 class C {
                     " + code + @"

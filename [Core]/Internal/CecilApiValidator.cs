@@ -57,11 +57,11 @@ namespace Unbreakable.Internal {
             var result = filter.Filter(type.Namespace, type.Name, memberName, memberType);
             switch (result) {
                 case ApiFilterResult.DeniedNamespace:
-                    throw new ApiGuardException($"Namespace {type.Namespace} is not allowed.");
+                    throw new AssemblyGuardException($"Namespace {type.Namespace} is not allowed.");
                 case ApiFilterResult.DeniedType:
-                    throw new ApiGuardException($"Type {type.FullName} is not allowed.");
+                    throw new AssemblyGuardException($"Type {type.FullName} is not allowed.");
                 case ApiFilterResult.DeniedMember:
-                    throw new ApiGuardException($"{memberType:G} {type.FullName}.{memberName} is not allowed.");
+                    throw new AssemblyGuardException($"{memberType:G} {type.FullName}.{memberName} is not allowed.");
                 case ApiFilterResult.Allowed:
                     return;
                 default:
