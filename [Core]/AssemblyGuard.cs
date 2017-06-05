@@ -5,8 +5,6 @@ using Mono.Cecil.Cil;
 using Unbreakable.Internal;
 using Unbreakable.Runtime.Internal;
 
-using BindingFlags = System.Reflection.BindingFlags;
-
 namespace Unbreakable {
     public static class AssemblyGuard {
         public static RuntimeGuardToken Rewrite(Stream assemblySourceStream, Stream assemblyTargetStream, AssemblyGuardSettings settings = null) {
@@ -70,6 +68,9 @@ namespace Unbreakable {
         }
 
         private static void ValidateAndRewriteMethod(MethodDefinition method, GuardReferences guard, AssemblyGuardSettings settings) {
+            if (method.DeclaringType == guard.InstanceField.DeclaringType)
+                return;
+
             if ((method.Attributes & MethodAttributes.PInvokeImpl) == MethodAttributes.PInvokeImpl)
                 throw new AssemblyGuardException($"Method {method} uses P/Invoke which is not allowed.");
 
@@ -81,8 +82,7 @@ namespace Unbreakable {
             if (!method.HasBody)
                 return;
 
-            if (method.DeclaringType == guard.InstanceField.DeclaringType)
-                return;
+            ValidateMehodLocalsSize(method, settings);
 
             var il = method.Body.GetILProcessor();
             var guardVariable = new VariableDefinition(guard.InstanceField.FieldType);
@@ -116,6 +116,15 @@ namespace Unbreakable {
                 il.InsertBefore(instruction, il.Create(OpCodes.Call, guard.GuardJumpMethod));
                 i += 2;
             }
+        }
+
+        private static void ValidateMehodLocalsSize(MethodDefinition method, AssemblyGuardSettings settings) {
+            var size = 0;
+            foreach (var local in method.Body.Variables) {
+                size += TypeSizeCalculator.GetSize(local.VariableType);
+            }
+            if (size > settings.MethodLocalsSizeLimit)
+                throw new AssemblyGuardException($"Size of locals in method {method} exceeds allowed limit.");
         }
 
         private struct GuardReferences {
