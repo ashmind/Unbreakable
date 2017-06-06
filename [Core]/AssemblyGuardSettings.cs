@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System;
+using System.Runtime.InteropServices;
 using JetBrains.Annotations;
 using Unbreakable.Internal;
 
@@ -10,7 +11,7 @@ namespace Unbreakable {
 
         public AssemblyGuardSettings() {
             _apiFilter = new ApiFilter(SafeDefaultApiRules.Create());
-            MethodLocalsSizeLimit = Marshal.SizeOf<int>() * 10;
+            MethodLocalsSizeLimit = Marshal.SizeOf<IntPtr>() * 10;
         }
 
         [NotNull] public IApiFilter ApiFilter => _apiFilter;
