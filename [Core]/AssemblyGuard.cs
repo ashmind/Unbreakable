@@ -57,6 +57,10 @@ namespace Unbreakable {
         }
 
         private static void ValidateAndRewriteType(TypeDefinition type, GuardReferences guard, AssemblyGuardSettings settings) {
+            // Ensures we don't have to suspect each System.Int32 (etc) to be a user-defined type
+            if (type.Namespace == "System" || type.Namespace.StartsWith("System.", StringComparison.Ordinal))
+                throw new AssemblyGuardException($"Custom types cannot be defined in system namespace {type.Namespace}.");
+
             CecilApiValidator.ValidateDefinition(type, settings.ApiFilter);
             foreach (var nested in type.NestedTypes) {
                 ValidateAndRewriteType(nested, guard, settings);

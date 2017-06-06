@@ -14,12 +14,12 @@ namespace Unbreakable.Internal {
         public static int GetSize(TypeReference reference) {
             if (!reference.IsValueType)
                 return IntPtr.Size;
+            
+            if (PrimitiveTypeSizes.TryGetValue(reference.FullName, out var size))
+                return size;
 
-            if (!(reference is TypeDefinition definition)) {
-                if (PrimitiveTypeSizes.TryGetValue(reference.FullName, out var size))
-                    return size;
+            if (!(reference is TypeDefinition definition))
                 definition = reference.Resolve();
-            }
             return GetSizeOfValueType(definition);
         }
 

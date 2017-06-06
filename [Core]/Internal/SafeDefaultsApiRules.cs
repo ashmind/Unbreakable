@@ -37,6 +37,9 @@ namespace Unbreakable.Internal {
 
                 .Type(nameof(Object), ApiAccess.Allowed)
                 .Type(nameof(String), ApiAccess.Allowed)
+                .Type(nameof(DateTime), ApiAccess.Allowed)
+                .Type(nameof(DateTimeKind), ApiAccess.Allowed)
+                .Type(nameof(DateTimeOffset), ApiAccess.Allowed)
                 .Type(typeof(void).Name, ApiAccess.Allowed)
                 .Type(nameof(Nullable), ApiAccess.Allowed)
                 .Type(typeof(Nullable<>).Name, ApiAccess.Allowed);

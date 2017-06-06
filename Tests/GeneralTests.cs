@@ -24,8 +24,10 @@ namespace Unbreakable.Tests {
             delegate int F();
             int M(int a) => ((F)(() => a + 1))();
         ", 2)]
+        [InlineData(@"bool M(int a) => DateTime.Now.Ticks > 0;", true)] // crash, discovered by Valery Sarkisov‏ (@VSarkisov)
         public void PreservesStandardLogic(string code, object expected) {
             var m = GetWrappedMethodAfterRewrite(@"
+                using System;
                 class C {
                     " + code + @"
                 }"
@@ -45,6 +47,19 @@ namespace Unbreakable.Tests {
                     " + code + @"
                 }"
             );
+            Assert.Throws<AssemblyGuardException>(
+                () => AssemblyGuard.Rewrite(compiled, new MemoryStream())
+            );
+        }
+
+        [Theory]
+        [InlineData("System")]
+        [InlineData("System.Runtime")]
+        public void ThrowsAssemblyGuardException_ForCustomTypesInSystemNamespaces(string @namespace) {
+            // found by Llewellyn Pritchard (@leppie)
+            var compiled = Compile(@"
+                namespace " + @namespace + @" { class C {} }
+            ");
             Assert.Throws<AssemblyGuardException>(
                 () => AssemblyGuard.Rewrite(compiled, new MemoryStream())
             );
@@ -157,7 +172,7 @@ namespace Unbreakable.Tests {
         }
 
         [Theory]
-        [InlineData("byte[] M() { return new byte[10000000]; }")]
+        [InlineData("byte[] M() { return new byte[100000]; }")]
         public void ThrowsMemoryGuardException_WhenAllocatingLargeArray(string code) {
             var m = GetWrappedMethodAfterRewrite(@"
                 class C {
