@@ -28,6 +28,8 @@ namespace Unbreakable.Internal {
             // TODO: Explicit struct layout?
             var size = 0;
             foreach (var field in definition.Fields) {
+                if (field.IsStatic)
+                    continue;
                 size += GetSize(field.FieldType);
             }
             return size;

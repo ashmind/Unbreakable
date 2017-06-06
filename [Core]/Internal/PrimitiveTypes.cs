@@ -15,7 +15,10 @@ namespace Unbreakable.Internal {
             typeof(char),
             typeof(float),
             typeof(double),
-            typeof(bool)
+            typeof(bool),
+
+            typeof(IntPtr),
+            typeof(UIntPtr)
         };
     }
 }

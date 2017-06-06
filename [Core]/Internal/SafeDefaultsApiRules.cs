@@ -42,6 +42,8 @@ namespace Unbreakable.Internal {
                 .Type(typeof(Nullable<>).Name, ApiAccess.Allowed);
 
             foreach (var type in PrimitiveTypes.List) {
+                if (type == typeof(IntPtr) || type == typeof(UIntPtr))
+                    continue;
                 system.Type(type.Name, ApiAccess.Allowed);
             }
         }

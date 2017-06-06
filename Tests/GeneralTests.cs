@@ -35,6 +35,7 @@ namespace Unbreakable.Tests {
         [InlineData("void M() { Console.WriteLine('x'); }")]
         [InlineData("void M() { this.GetType(); }")]
         [InlineData("class N { void M() { GC.Collect(); } }")]
+        [InlineData("void M() { var x = new IntPtr(0); }")] // crash, discovered by Alexandre Mutel‏ (@xoofx)
         public void ThrowsAssemblyGuardException_ForDeniedApi(string code) {
             var compiled = Compile(@"
                 using System;
@@ -70,21 +71,6 @@ namespace Unbreakable.Tests {
                     ~X() {}
                 }
             ");
-            Assert.Throws<AssemblyGuardException>(
-                () => AssemblyGuard.Rewrite(compiled, new MemoryStream())
-            );
-        }
-
-        [Fact]
-        public void ThrowsAssemblyGuardException_ForDelegateBeginEndInvoke() {
-            // found by Llewellyn Pritchard‏ (@leppie), Tereza Tomcova (@the-ress)
-            var compiled = Compile(@"
-                using System;
-                class C {
-                    delegate void D();
-                    void M() { D d = () => {}; d.BeginInvoke(null, null); }
-                }"
-            );
             Assert.Throws<AssemblyGuardException>(
                 () => AssemblyGuard.Rewrite(compiled, new MemoryStream())
             );
