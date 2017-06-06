@@ -87,6 +87,8 @@ namespace Unbreakable {
                 return;
 
             ValidateMehodLocalsSize(method, settings);
+            if (method.Body.Instructions.Count == 0)
+                return; // weird, but happens with 'extern'
 
             var il = method.Body.GetILProcessor();
             var guardVariable = new VariableDefinition(guard.InstanceField.FieldType);

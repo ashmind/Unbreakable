@@ -24,7 +24,7 @@ namespace Unbreakable.Tests {
             delegate int F();
             int M(int a) => ((F)(() => a + 1))();
         ", 2)]
-        [InlineData(@"bool M(int a) => DateTime.Now.Ticks > 0;", true)] // crash, discovered by Valery Sarkisov‏ (@VSarkisov)
+        [InlineData(@"bool M(int a) => DateTime.Now.Ticks > 0;", true)] // crash, found by Valery Sarkisov‏ (@VSarkisov)
         public void PreservesStandardLogic(string code, object expected) {
             var m = GetWrappedMethodAfterRewrite(@"
                 using System;
@@ -35,11 +35,29 @@ namespace Unbreakable.Tests {
             Assert.Equal(expected, m(1));
         }
 
+        [Fact]
+        public void AllowsExternMethods() {
+            // crash, found by Alexandre Mutel‏ (@xoofx)
+            var compiled = Compile(@"
+                class C
+                {
+                    static extern void Extern();
+                    int M()
+                    {
+                        Extern();
+                        return 0;
+                    }
+                }
+            ");
+            // Assert.DoesNotThrow
+            AssemblyGuard.Rewrite(compiled, new MemoryStream());
+        }
+
         [Theory]
         [InlineData("void M() { Console.WriteLine('x'); }")]
         [InlineData("void M() { this.GetType(); }")]
         [InlineData("class N { void M() { GC.Collect(); } }")]
-        [InlineData("void M() { var x = new IntPtr(0); }")] // crash, discovered by Alexandre Mutel‏ (@xoofx)
+        [InlineData("void M() { var x = new IntPtr(0); }")] // crash, found by Alexandre Mutel‏ (@xoofx)
         public void ThrowsAssemblyGuardException_ForDeniedApi(string code) {
             var compiled = Compile(@"
                 using System;
