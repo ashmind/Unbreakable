@@ -2,8 +2,6 @@
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 
-using MemberTypes = System.Reflection.MemberTypes;
-
 namespace Unbreakable.Internal {
     internal static class CecilApiValidator {
         public static void ValidateDefinition(ModuleDefinition definition, IApiFilter filter) {
@@ -39,11 +37,11 @@ namespace Unbreakable.Internal {
             switch (reference) {
                 case MethodReference m:
                     EnsureAllowed(filter, m.ReturnType);
-                    EnsureAllowed(filter, m.DeclaringType, m.Name, MemberTypes.Method);
+                    EnsureAllowed(filter, m.DeclaringType, m.Name);
                     break;
                 case FieldReference f:
                     EnsureAllowed(filter, f.FieldType);
-                    EnsureAllowed(filter, f.DeclaringType, f.Name, MemberTypes.Field);
+                    EnsureAllowed(filter, f.DeclaringType, f.Name);
                     break;
                 case TypeReference t:
                     EnsureAllowed(filter, t);
@@ -53,15 +51,15 @@ namespace Unbreakable.Internal {
             }
         }
 
-        private static void EnsureAllowed(IApiFilter filter, TypeReference type, string memberName = null, MemberTypes memberType = 0) {
-            var result = filter.Filter(type.Namespace, type.Name, memberName, memberType);
+        private static void EnsureAllowed(IApiFilter filter, TypeReference type, string memberName = null) {
+            var result = filter.Filter(type.Namespace, type.Name, memberName);
             switch (result) {
                 case ApiFilterResult.DeniedNamespace:
                     throw new AssemblyGuardException($"Namespace {type.Namespace} is not allowed.");
                 case ApiFilterResult.DeniedType:
                     throw new AssemblyGuardException($"Type {type.FullName} is not allowed.");
                 case ApiFilterResult.DeniedMember:
-                    throw new AssemblyGuardException($"{memberType:G} {type.FullName}.{memberName} is not allowed.");
+                    throw new AssemblyGuardException($"Member {type.FullName}.{memberName} is not allowed.");
                 case ApiFilterResult.Allowed:
                     return;
                 default:

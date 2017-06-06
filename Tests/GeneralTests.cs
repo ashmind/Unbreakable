@@ -76,6 +76,21 @@ namespace Unbreakable.Tests {
         }
 
         [Fact]
+        public void ThrowsAssemblyGuardException_ForDelegateBeginEndInvoke() {
+            // found by Llewellyn Pritchard‏ (@leppie), Tereza Tomcova (@the-ress)
+            var compiled = Compile(@"
+                using System;
+                class C {
+                    delegate void D();
+                    void M() { D d = () => {}; d.BeginInvoke(null, null); }
+                }"
+            );
+            Assert.Throws<AssemblyGuardException>(
+                () => AssemblyGuard.Rewrite(compiled, new MemoryStream())
+            );
+        }
+
+        [Fact]
         public void ThrowsAssemblyGuardException_ForLocalsThatExceedSizeLimit() {
             // found by Stanislav Lukeš‏ (@exyi)
             var compiled = Compile(@"

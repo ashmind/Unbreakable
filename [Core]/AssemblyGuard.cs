@@ -20,7 +20,7 @@ namespace Unbreakable {
                 var guardInstanceField = EmitGuardInstance(module, id);
                 var guard = new GuardReferences(guardInstanceField, module);
 
-                CecilApiValidator.ValidateDefinition(module, settings.Filter);
+                CecilApiValidator.ValidateDefinition(module, settings.ApiFilter);
                 foreach (var type in module.Types) {
                     ValidateAndRewriteType(type, guard, settings);
                 }
@@ -57,12 +57,12 @@ namespace Unbreakable {
         }
 
         private static void ValidateAndRewriteType(TypeDefinition type, GuardReferences guard, AssemblyGuardSettings settings) {
-            CecilApiValidator.ValidateDefinition(type, settings.Filter);
+            CecilApiValidator.ValidateDefinition(type, settings.ApiFilter);
             foreach (var nested in type.NestedTypes) {
                 ValidateAndRewriteType(nested, guard, settings);
             }
             foreach (var method in type.Methods) {
-                CecilApiValidator.ValidateDefinition(method, settings.Filter);
+                CecilApiValidator.ValidateDefinition(method, settings.ApiFilter);
                 ValidateAndRewriteMethod(method, guard, settings);
             }
         }
@@ -97,7 +97,7 @@ namespace Unbreakable {
 
             for (var i = 4; i < instructions.Count; i++) {
                 var instruction = instructions[i];
-                CecilApiValidator.ValidateInstruction(instruction, settings.Filter);
+                CecilApiValidator.ValidateInstruction(instruction, settings.ApiFilter);
                 var code = instruction.OpCode.Code;
                 if (code == Code.Newarr) {
                     il.InsertBefore(instruction, il.Create(OpCodes.Ldloc, guardVariable));

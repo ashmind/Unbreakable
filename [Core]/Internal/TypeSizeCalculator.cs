@@ -15,7 +15,7 @@ namespace Unbreakable.Internal {
             if (!reference.IsValueType)
                 return IntPtr.Size;
 
-            if (!(reference is TypeDefinition definition)) {                
+            if (!(reference is TypeDefinition definition)) {
                 if (PrimitiveTypeSizes.TryGetValue(reference.FullName, out var size))
                     return size;
                 definition = reference.Resolve();

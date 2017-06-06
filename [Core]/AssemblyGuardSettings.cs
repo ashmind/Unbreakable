@@ -1,17 +1,26 @@
-﻿using System.Collections.Generic;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
+using JetBrains.Annotations;
 using Unbreakable.Internal;
 
 namespace Unbreakable {
     public class AssemblyGuardSettings {
-        public static AssemblyGuardSettings Default { get; } = new AssemblyGuardSettings();
+        internal static AssemblyGuardSettings Default { get; } = new AssemblyGuardSettings();
+
+        private ApiFilter _apiFilter;
 
         public AssemblyGuardSettings() {
-            Filter = new ApiFilter();
+            _apiFilter = new ApiFilter(SafeDefaultsApiRules.Create());
             MethodLocalsSizeLimit = Marshal.SizeOf<int>() * 10;
         }
 
-        public IApiFilterSettings Filter { get; }
+        [NotNull] public IApiFilter ApiFilter => _apiFilter;
+
+        [NotNull]
+        public ApiRules ApiRules {
+            get => _apiFilter.Rules;
+            set => _apiFilter.Rules = Argument.NotNull(nameof(value), value);
+        }
+
         public int MethodLocalsSizeLimit { get; }
     }
 }
