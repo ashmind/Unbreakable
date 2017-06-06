@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 using Unbreakable.Rules;
 
 namespace Unbreakable.Internal {
-    internal static class SafeDefaultsApiRules {
+    internal static class SafeDefaultApiRules {
         public static ApiRules Create() {
             return new ApiRules()
                 .Namespace(nameof(System), ApiAccess.Neutral, SetupSystem)
@@ -46,6 +46,12 @@ namespace Unbreakable.Internal {
                     continue;
                 system.Type(type.Name, ApiAccess.Allowed);
             }
+        }
+
+        internal static TypeApiRule CreateForCompilerGeneratedDelegate() {
+            return new TypeApiRule(ApiAccess.Neutral)
+                .Member(".ctor", ApiAccess.Allowed)
+                .Member("Invoke", ApiAccess.Allowed);
         }
     }
 }

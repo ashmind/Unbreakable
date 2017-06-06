@@ -12,7 +12,7 @@ namespace Unbreakable.Rules {
         public ApiAccess Access { get; internal set; }
         public IReadOnlyDictionary<string, ApiAccess> Members => (IReadOnlyDictionary<string, ApiAccess>)_members;
 
-        public void Member(string name, ApiAccess access) {
+        public TypeApiRule Member(string name, ApiAccess access) {
             Argument.NotNullOrEmpty(nameof(name), name);
             if (access == ApiAccess.Neutral)
                 throw new ArgumentOutOfRangeException(nameof(access), "Neutral access is not allowed at member level.");
@@ -20,6 +20,7 @@ namespace Unbreakable.Rules {
                 throw new InvalidOperationException($"Member access ({access}) cannot exceed type access ({Access}).");
 
             _members[name] = access;
+            return this;
         }
     }
 }

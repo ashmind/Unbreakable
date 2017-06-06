@@ -18,14 +18,16 @@ namespace Unbreakable.Tests {
         }
 
         [Theory]
-        [InlineData(@"return ""x"" + a.ToString();", "x1")]
-        [InlineData(@"return (new string[] { ""x"", ""y"" })[a];", "y")]
-        public void PreservesStandardLogic(string code, string expected) {
+        [InlineData(@"string M(int a) => ""x"" + a.ToString();", "x1")]
+        [InlineData(@"int M(int a) => (new[] { a, 2, 3 })[1];", 2)]
+        [InlineData(@"
+            delegate int F();
+            int M(int a) => ((F)(() => a + 1))();
+        ", 2)]
+        public void PreservesStandardLogic(string code, object expected) {
             var m = GetWrappedMethodAfterRewrite(@"
                 class C {
-                    string M(int a) {
-                        " + code + @"
-                    }
+                    " + code + @"
                 }"
             );
             Assert.Equal(expected, m(1));
@@ -41,6 +43,21 @@ namespace Unbreakable.Tests {
                 using System;
                 class C {
                     " + code + @"
+                }"
+            );
+            Assert.Throws<AssemblyGuardException>(
+                () => AssemblyGuard.Rewrite(compiled, new MemoryStream())
+            );
+        }
+
+        [Fact]
+        public void ThrowsAssemblyGuardException_ForDelegateBeginEndInvoke() {
+            // found by Llewellyn Pritchard (@leppie)
+            var compiled = Compile(@"
+                using System;
+                class C {
+                    delegate void D();
+                    void M() { D d = () => {}; d.BeginInvoke(null, null); }
                 }"
             );
             Assert.Throws<AssemblyGuardException>(

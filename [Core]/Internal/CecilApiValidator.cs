@@ -26,9 +26,6 @@ namespace Unbreakable.Internal {
             if (!(instruction.Operand is MemberReference reference))
                 return;
 
-            if (reference is IMemberDefinition)
-                return;
-
             ValidateMemberReference(reference, filter);
         }
 
@@ -36,12 +33,12 @@ namespace Unbreakable.Internal {
             var type = reference.DeclaringType;
             switch (reference) {
                 case MethodReference m:
-                    EnsureAllowed(filter, m.ReturnType);
                     EnsureAllowed(filter, m.DeclaringType, m.Name);
+                    EnsureAllowed(filter, m.ReturnType);
                     break;
                 case FieldReference f:
-                    EnsureAllowed(filter, f.FieldType);
                     EnsureAllowed(filter, f.DeclaringType, f.Name);
+                    EnsureAllowed(filter, f.FieldType);
                     break;
                 case TypeReference t:
                     EnsureAllowed(filter, t);
@@ -52,7 +49,13 @@ namespace Unbreakable.Internal {
         }
 
         private static void EnsureAllowed(IApiFilter filter, TypeReference type, string memberName = null) {
-            var result = filter.Filter(type.Namespace, type.Name, memberName);
+            var typeKind = ApiFilterTypeKind.External;
+            if (type is TypeDefinition typeDefinition) {
+                if (!IsDelegateDefinition(typeDefinition))
+                    return;
+                typeKind = ApiFilterTypeKind.CompilerGeneratedDelegate;
+            }
+            var result = filter.Filter(type.Namespace, type.Name, typeKind, memberName);
             switch (result) {
                 case ApiFilterResult.DeniedNamespace:
                     throw new AssemblyGuardException($"Namespace {type.Namespace} is not allowed.");
@@ -65,6 +68,15 @@ namespace Unbreakable.Internal {
                 default:
                     throw new NotSupportedException($"Unknown filter result {result}.");
             }
+        }
+
+        private static bool IsDelegateDefinition(TypeDefinition type) {
+            return type.BaseType != null
+                && (
+                    type.BaseType.FullName == "System.MulticastDelegate"
+                    ||
+                    type.BaseType.FullName == "System.Delegate"
+                );
         }
     }
 }

@@ -9,7 +9,7 @@ namespace Unbreakable {
         private ApiFilter _apiFilter;
 
         public AssemblyGuardSettings() {
-            _apiFilter = new ApiFilter(SafeDefaultsApiRules.Create());
+            _apiFilter = new ApiFilter(SafeDefaultApiRules.Create());
             MethodLocalsSizeLimit = Marshal.SizeOf<int>() * 10;
         }
 

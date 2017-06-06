@@ -8,7 +8,7 @@ namespace Unbreakable {
     public class ApiRules {
         private readonly IDictionary<string, NamespaceApiRule> _namespaces = new Dictionary<string, NamespaceApiRule>();
 
-        public static ApiRules SafeDefaults() => SafeDefaultsApiRules.Create();
+        public static ApiRules SafeDefaults() => SafeDefaultApiRules.Create();
 
         internal ApiRules() {
         }
@@ -26,6 +26,7 @@ namespace Unbreakable {
             return this;
         }
 
+        public TypeApiRule CompilerGeneratedDelegate { get; } = SafeDefaultApiRules.CreateForCompilerGeneratedDelegate();
         public IReadOnlyDictionary<string, NamespaceApiRule> Namespaces => (IReadOnlyDictionary<string, NamespaceApiRule>)_namespaces;
     }
 }
