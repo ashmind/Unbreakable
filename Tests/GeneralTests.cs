@@ -190,8 +190,12 @@ namespace Unbreakable.Tests {
         }
 
         [Theory]
-        [InlineData("byte[] M() { return new byte[100000]; }")]
-        public void ThrowsMemoryGuardException_WhenAllocatingLargeArray(string code) {
+        [InlineData("byte[] M() { return new byte[100000]; }", false)]
+        [InlineData("byte[] M() { return new byte[(long)int.MaxValue + 1]; }", true)]
+        public void ThrowsMemoryGuardException_WhenAllocatingLargeArray(string code, bool requiresX64) {
+            if (requiresX64)
+                Assert.True(IntPtr.Size == 8, "This test can only be run in x64.");
+
             var m = GetWrappedMethodAfterRewrite(@"
                 class C {
                     " + code + @"

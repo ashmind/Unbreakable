@@ -30,15 +30,15 @@ namespace Unbreakable.Runtime.Internal {
             EnsureTime();
         }
 
-        private void GuardNewArray(int size) {
+        private void GuardNewArray(IntPtr size) {
             EnsureActive();
             EnsureTime();
-            if (size > _arrayLengthLimit)
+            if (size.ToInt64() > _arrayLengthLimit)
                 throw new MemoryGuardException($"Array size is above the limit.");
         }
 
         // required for simpler representation in IL
-        public static int GuardNewArrayFlowThrough(int size, RuntimeGuard guard) {
+        public static IntPtr GuardNewArrayFlowThrough(IntPtr size, RuntimeGuard guard) {
             guard.GuardNewArray(size);
             return size;
         }
