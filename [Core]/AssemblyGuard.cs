@@ -27,6 +27,7 @@ namespace Unbreakable {
             }
 
             assembly.Write(assemblyTargetStream);
+            //assembly.Write($@"d:\Temp\unbreakable\{Guid.NewGuid()}.dll");
             return new RuntimeGuardToken(id);
         }
 
@@ -109,7 +110,7 @@ namespace Unbreakable {
                 CecilApiValidator.ValidateInstruction(instruction, settings.ApiFilter);
                 var code = instruction.OpCode.Code;
                 if (code == Code.Newarr) {
-                    il.InsertBefore(instruction, il.Create(OpCodes.Ldloc, guardVariable));
+                    InsertBeforeAndAdjustIfNeeded(il, instruction, il.Create(OpCodes.Ldloc, guardVariable));
                     il.InsertBefore(instruction, il.Create(OpCodes.Call, guard.GuardNewArrayMethod));
                     i += 2;
                     continue;
@@ -121,9 +122,27 @@ namespace Unbreakable {
                 if (instruction.Operand is Instruction target && target.Offset > instruction.Offset)
                     continue;
 
-                il.InsertBefore(instruction, il.Create(OpCodes.Ldloc, guardVariable));
+                InsertBeforeAndAdjustIfNeeded(il, instruction, il.Create(OpCodes.Ldloc, guardVariable));
                 il.InsertBefore(instruction, il.Create(OpCodes.Call, guard.GuardJumpMethod));
                 i += 2;
+            }
+        }
+
+        private static void InsertBeforeAndAdjustIfNeeded(ILProcessor il, Instruction original, Instruction before) {
+            il.InsertBefore(original, before);
+            foreach (var instruction in il.Body.Instructions) {
+                if (instruction.Operand == original)
+                    instruction.Operand = before;
+            }
+
+            if (!il.Body.HasExceptionHandlers)
+                return;
+
+            foreach (var handler in il.Body.ExceptionHandlers) {
+                if (handler.TryEnd == original)
+                    handler.TryEnd = before;
+                if (handler.HandlerEnd == original)
+                    handler.HandlerEnd = before;
             }
         }
 
