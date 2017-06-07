@@ -14,6 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Roslyn\Roslyn.csproj" />
     <ProjectReference Include="..\Runtime\Runtime.csproj" />
     <ProjectReference Include="..\[Core]\[Core].csproj" />
   </ItemGroup>
