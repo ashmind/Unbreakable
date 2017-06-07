@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using System.IO;
 using System.Reflection;
 using Unbreakable.Runtime;
 using Xunit;
@@ -8,7 +7,6 @@ using Xunit.Abstractions;
 
 namespace Unbreakable.Tests {
     public class TimeGuardTests {
-        private delegate object Invoke(params object[] args);
         private readonly ITestOutputHelper _output;
 
         public TimeGuardTests(ITestOutputHelper output) {
