@@ -7,11 +7,11 @@ using System.Reflection;
 using System.Web.Mvc;
 using AppDomainToolkit;
 using AshMind.Extensions;
-using LZStringCSharp;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.IO;
 using Unbreakable.Demo.Models;
+using Unbreakable.Roslyn;
 
 namespace Unbreakable.Demo.Controllers {
     [RoutePrefix("")]
@@ -30,22 +30,23 @@ namespace Unbreakable.Demo.Controllers {
         };
 
         private static readonly RecyclableMemoryStreamManager MemoryStreamManager = new RecyclableMemoryStreamManager();
-        
 
+        [HttpGet]
         [Route("")]
-        public ActionResult Index(string code = null) {
+        public ActionResult Index() {
             return View(new DemoViewModel {
-                Code = code != null ? LZString.DecompressFromBase64(code) : DefaultCode,
-                Result = (ResultViewModel)TempData["result"],
+                Code = DefaultCode
             });
         }
 
         [HttpPost]
-        [Route("Test")]
+        [Route("")]
         [ValidateInput(false)]
-        public ActionResult Test(string code) {
-            TempData["result"] = Run(code);
-            return RedirectToAction("Index", new { code = LZString.CompressToBase64(code) });
+        public ActionResult Index(string code) {
+            return View("Index", new DemoViewModel {
+                Code = code,
+                Result = Run(code),
+            });
         }
 
         private ResultViewModel Run(string code) {
@@ -57,6 +58,7 @@ namespace Unbreakable.Demo.Controllers {
 
             try {
                 compilationStopwatch.Start();
+                CSharpRoslynGuard.Validate(code);
                 var compilation = CSharpCompilation.Create(
                     "_",
                     new[] { CSharpSyntaxTree.ParseText(code) },
