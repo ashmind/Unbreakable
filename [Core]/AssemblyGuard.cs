@@ -61,6 +61,9 @@ namespace Unbreakable {
             if (type.Namespace == "System" || type.Namespace.StartsWith("System.", StringComparison.Ordinal))
                 throw new AssemblyGuardException($"Custom types cannot be defined in system namespace {type.Namespace}.");
 
+            if ((type.Attributes & TypeAttributes.ExplicitLayout) == TypeAttributes.ExplicitLayout)
+                throw new AssemblyGuardException($"Type {type} has explicit layout which is not allowed.");
+
             CecilApiValidator.ValidateDefinition(type, settings.ApiFilter);
             foreach (var nested in type.NestedTypes) {
                 ValidateAndRewriteType(nested, guard, settings);
