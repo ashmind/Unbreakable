@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Linq;
+using System.Text;
 using Unbreakable.Roslyn;
 using Xunit;
 
@@ -15,6 +16,16 @@ namespace Unbreakable.Tests {
                     }
                 }
             }";
+
+            // Assert.DoesNotThrow
+            CSharpRoslynGuard.Validate(code);
+        }
+
+        [Fact]
+        public void Allows_ReasonableFluentCall() {
+            var code = @"
+                X.M().M().M().M().M().M().M()
+            ";
 
             // Assert.DoesNotThrow
             CSharpRoslynGuard.Validate(code);
@@ -37,6 +48,15 @@ namespace Unbreakable.Tests {
 
             Assert.Throws<RoslynGuardException>(
                 () => CSharpRoslynGuard.Validate(builder.ToString())
+            );
+        }
+
+        [Fact]
+        public void ThrowsGuardException_ForLongFluentCall() {
+            // https://github.com/dotnet/roslyn/issues/9795
+            var code = string.Join(".", Enumerable.Repeat("M()", 1000));
+            Assert.Throws<RoslynGuardException>(
+                () => CSharpRoslynGuard.Validate(code)
             );
         }
     }

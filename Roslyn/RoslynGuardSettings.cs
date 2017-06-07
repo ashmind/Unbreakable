@@ -6,5 +6,6 @@ namespace Unbreakable.Roslyn {
         [NotNull] internal static RoslynGuardSettings Default { get; } = new RoslynGuardSettings();
 
         public int NestingLevelLimit { get; set; } = 50;
+        public int DotCountLimit { get; set; } = 100;
     }
 }
