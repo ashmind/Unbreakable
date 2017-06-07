@@ -1,9 +1,10 @@
 ﻿using System;
+using JetBrains.Annotations;
 using Unbreakable.Runtime.Internal;
 
 namespace Unbreakable {
     public class RuntimeGuardSettings : IRuntimeGuardSettings {
-        public static RuntimeGuardSettings Default { get; } = new RuntimeGuardSettings();
+        [NotNull] internal static RuntimeGuardSettings Default { get; } = new RuntimeGuardSettings();
 
         public RuntimeGuardSettings() {
             StackBytesLimit = 1024;

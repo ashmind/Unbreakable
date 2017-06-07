@@ -5,7 +5,7 @@ using Unbreakable.Internal;
 
 namespace Unbreakable {
     public class AssemblyGuardSettings {
-        internal static AssemblyGuardSettings Default { get; } = new AssemblyGuardSettings();
+        [NotNull] internal static AssemblyGuardSettings Default { get; } = new AssemblyGuardSettings();
 
         private ApiFilter _apiFilter;
 

@@ -27,7 +27,7 @@ namespace Unbreakable.Tests {
         [InlineData("void M() { this.GetType(); }")]
         [InlineData("class N { void M() { GC.Collect(); } }")]
         [InlineData("void M() { var x = new IntPtr(0); }")] // crash, found by Alexandre Mutel‏ (@xoofx)
-        public void ThrowsAssemblyGuardException_ForDeniedApi(string code) {
+        public void ThrowsGuardException_ForDeniedApi(string code) {
             var compiled = TestHelper.Compile(@"
                 using System;
                 class C {
@@ -42,7 +42,7 @@ namespace Unbreakable.Tests {
         [Theory]
         [InlineData("System")]
         [InlineData("System.Runtime")]
-        public void ThrowsAssemblyGuardException_ForCustomTypesInSystemNamespaces(string @namespace) {
+        public void ThrowsGuardException_ForCustomTypesInSystemNamespaces(string @namespace) {
             // found by Llewellyn Pritchard (@leppie)
             var compiled = TestHelper.Compile(@"
                 namespace " + @namespace + @" { class C {} }
@@ -53,7 +53,7 @@ namespace Unbreakable.Tests {
         }
 
         [Fact]
-        public void ThrowsAssemblyGuardException_ForDelegateBeginEndInvoke() {
+        public void ThrowsGuardException_ForDelegateBeginEndInvoke() {
             // found by Llewellyn Pritchard (@leppie)
             var compiled = TestHelper.Compile(@"
                 using System;
@@ -68,7 +68,7 @@ namespace Unbreakable.Tests {
         }
 
         [Fact]
-        public void ThrowsAssemblyGuardException_ForPInvoke() {
+        public void ThrowsGuardException_ForPInvoke() {
             // found by Igal Tabachnik (@hmemcpy) 
             var compiled = TestHelper.Compile(@"
                 using System.Runtime.InteropServices;
@@ -83,7 +83,7 @@ namespace Unbreakable.Tests {
         }
 
         [Fact]
-        public void ThrowsAssemblyGuardException_ForFinalizers() {
+        public void ThrowsGuardException_ForFinalizers() {
             // found by George Pollard‏ (@porges)
             var compiled = TestHelper.Compile(@"
                 class X {
@@ -96,7 +96,7 @@ namespace Unbreakable.Tests {
         }
 
         [Fact]
-        public void ThrowsAssemblyGuardException_ForLocalsThatExceedSizeLimit() {
+        public void ThrowsGuardException_ForLocalsThatExceedSizeLimit() {
             // found by Stanislav Lukeš‏ (@exyi)
             var compiled = TestHelper.Compile(@"
                 using System;
@@ -131,7 +131,7 @@ namespace Unbreakable.Tests {
         }
 
         [Fact]
-        public void ThrowsAssemblyGuardException_ForExplicitStructLayout() {
+        public void ThrowsGuardException_ForExplicitStructLayout() {
             // found by Alexandre Mutel (@xoofx) 
             var compiled = TestHelper.Compile(@"
                 using System.Runtime.InteropServices;

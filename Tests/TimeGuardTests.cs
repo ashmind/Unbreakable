@@ -20,7 +20,7 @@ namespace Unbreakable.Tests {
         [InlineData("void M() { again: try { while(true) {} } catch { goto again; } }")]
         // found by Alexandre Mutel (@xoofx)
         [InlineData("void M() { again: try { while(true) {} } catch {} goto again; }")]
-        public void ThrowsTimeGuardException_IfMethodRunsOverDuration(string code) {
+        public void ThrowsGuardException_IfMethodRunsOverDuration(string code) {
             var m = TestHelper.RewriteAndGetMethodWrappedInScope(@"
                 class C {
                     " + code + @"
