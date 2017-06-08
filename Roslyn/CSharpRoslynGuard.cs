@@ -12,13 +12,21 @@
             var dotCount = 0;
             foreach (var @char in code) {
                 switch (@char) {
-                    case '{': nestingLevel += 1; break;
-                    case '}': nestingLevel -= 1; break;
-                    case '(': nestingLevel += 1; break;
-                    case ')': nestingLevel -= 1; break;
-                    case '[': nestingLevel += 1; break;
-                    case ']': nestingLevel -= 1; break;
-                    case '.': dotCount += 1; break;
+                    case '{':
+                    case '(':
+                    case '[':
+                        nestingLevel += 1;
+                        break;
+
+                    case '}':
+                    case ')':
+                    case ']':
+                        nestingLevel -= 1;
+                        break;
+
+                    case '.':
+                        dotCount += 1;
+                        break;
                 }
 
                 if (nestingLevel > settings.NestingLevelLimit)

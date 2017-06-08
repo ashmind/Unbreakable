@@ -39,10 +39,10 @@ namespace Unbreakable.Tests {
             // https://github.com/dotnet/roslyn/issues/20062
             // found by Valery Sarkisov‏(@VSarkisov)
             var builder = new StringBuilder();
-            for (var i = 0; i < 100; i++) {
+            for (var i = 0; i < 500; i++) {
                 builder.Append(prefix).Append(i).Append(open);
             }
-            for (var i = 0; i < 100; i++) {
+            for (var i = 0; i < 500; i++) {
                 builder.Append(close);
             }
 
