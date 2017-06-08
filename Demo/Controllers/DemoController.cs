@@ -52,9 +52,16 @@ namespace Unbreakable.Demo.Controllers {
         private ResultViewModel Run(string code) {
             var totalStopwatch = Stopwatch.StartNew();
             var compilationStopwatch = new Stopwatch();
+            var rewriteStopwatch = new Stopwatch();
             var executionStopwatch = new Stopwatch();
 
-            ResultViewModel resultModel(string output) => new ResultViewModel(output, compilationStopwatch.Elapsed, executionStopwatch.Elapsed, totalStopwatch.Elapsed);
+            ResultViewModel resultModel(string output) => new ResultViewModel(
+                output,
+                compilationStopwatch.Elapsed,
+                rewriteStopwatch.Elapsed,
+                executionStopwatch.Elapsed,
+                totalStopwatch.Elapsed
+            );
 
             try {
                 compilationStopwatch.Start();
@@ -68,11 +75,13 @@ namespace Unbreakable.Demo.Controllers {
                 using (var assemblyStream = MemoryStreamManager.GetStream())
                 using (var rewrittenStream = MemoryStreamManager.GetStream()) {
                     var compilationResult = compilation.Emit(assemblyStream);
+                    compilationStopwatch.Stop();
                     if (!compilationResult.Success)
                         return resultModel(string.Join("\r\n", compilationResult.Diagnostics));
                     assemblyStream.Seek(0, SeekOrigin.Begin);
+                    rewriteStopwatch.Start();
                     var guardToken = AssemblyGuard.Rewrite(assemblyStream, rewrittenStream);
-                    compilationStopwatch.Stop();
+                    rewriteStopwatch.Stop();
                     var currentSetup = AppDomain.CurrentDomain.SetupInformation;
                     using (var context = AppDomainContext.Create(new AppDomainSetup {
                         ApplicationBase = currentSetup.ApplicationBase,

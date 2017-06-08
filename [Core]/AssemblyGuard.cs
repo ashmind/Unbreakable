@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Runtime.InteropServices;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Unbreakable.Internal;
@@ -90,7 +91,7 @@ namespace Unbreakable {
             if (!method.HasBody)
                 return;
 
-            ValidateMehodLocalsSize(method, settings);
+            ValidateMethodLocalsSize(method, settings);
             if (method.Body.Instructions.Count == 0)
                 return; // weird, but happens with 'extern'
 
@@ -104,10 +105,11 @@ namespace Unbreakable {
             il.InsertBefore(start, il.Create(OpCodes.Dup));
             il.InsertBefore(start, il.Create(OpCodes.Stloc, guardVariable));
             il.InsertBefore(start, il.Create(OpCodes.Call, guard.GuardEnterMethod));
-
+            
             for (var i = 4; i < instructions.Count; i++) {
                 var instruction = instructions[i];
                 CecilApiValidator.ValidateInstruction(instruction, settings.ApiFilter);
+                ValidateInstructionStackSize(instruction, method, settings);
                 var code = instruction.OpCode.Code;
                 if (code == Code.Newarr) {
                     InsertBeforeAndAdjustIfNeeded(il, instruction, il.Create(OpCodes.Ldloc, guardVariable));
@@ -146,13 +148,54 @@ namespace Unbreakable {
             }
         }
 
-        private static void ValidateMehodLocalsSize(MethodDefinition method, AssemblyGuardSettings settings) {
+        private static void ValidateMethodLocalsSize(MethodDefinition method, AssemblyGuardSettings settings) {
             var size = 0;
             foreach (var local in method.Body.Variables) {
                 size += TypeSizeCalculator.GetSize(local.VariableType);
             }
             if (size > settings.MethodLocalsSizeLimit)
                 throw new AssemblyGuardException($"Size of locals in method {method} exceeds allowed limit.");
+        }
+
+        private static void ValidateInstructionStackSize(Instruction instruction, MethodDefinition method, AssemblyGuardSettings settings) {
+            if (instruction.OpCode.StackBehaviourPush == StackBehaviour.Push0)
+                return;
+
+            var estimatedSize = EstimateSizeOfPush(instruction, method);
+            if (estimatedSize > settings.MethodStackPushSizeLimit)
+                throw new AssemblyGuardException($"Stack push size in method {method} exceeds allowed limit.");
+        }
+
+        private static int EstimateSizeOfPush(Instruction instruction, MethodDefinition method) {
+            TypeReference GetParameterType(MethodDefinition m, int index) {
+                if (!m.IsStatic) {
+                    if (index == 0)
+                        return m.DeclaringType;
+                    index -= 1;
+                }
+                return m.Parameters[index].ParameterType;
+            }
+            int GetSize(TypeReference t) => TypeSizeCalculator.GetSize(t);
+
+            switch (instruction.OpCode.Code) {
+                case Code.Ldarg_0: return GetSize(GetParameterType(method, 0));
+                case Code.Ldarg_1: return GetSize(GetParameterType(method, 1));
+                case Code.Ldarg_2: return GetSize(GetParameterType(method, 2));
+                case Code.Ldarg_3: return GetSize(GetParameterType(method, 3));
+                case Code.Ldloc_0: return GetSize(method.Body.Variables[0].VariableType);
+                case Code.Ldloc_1: return GetSize(method.Body.Variables[1].VariableType);
+                case Code.Ldloc_2: return GetSize(method.Body.Variables[2].VariableType);
+                case Code.Ldloc_3: return GetSize(method.Body.Variables[3].VariableType);
+            }
+
+            switch (instruction.Operand) {
+                case FieldReference f: return GetSize(f.FieldType);
+                case MethodReference m: return GetSize(m.ReturnType);
+                case VariableDefinition v: return GetSize(v.VariableType);
+                case ParameterDefinition p: return GetSize(p.ParameterType);
+                case object o when o != null && o.GetType().IsPrimitive: return Marshal.SizeOf(o);
+                default: return sizeof(long); // estimate
+            }
         }
 
         private struct GuardReferences {

@@ -12,6 +12,7 @@
 }
 <pre>@if (Model.Result != null) {<text>
 Compilation: @((int)Model.Result.CompilationTime.TotalMilliseconds)ms
+Rewrite:     @((int)Model.Result.RewriteTime.TotalMilliseconds)ms
 Execution:   @((int)Model.Result.ExecutionTime.TotalMilliseconds)ms
 Total:       @((int)Model.Result.TotalTime.TotalMilliseconds)ms
 
