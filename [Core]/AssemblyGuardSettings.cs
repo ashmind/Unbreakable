@@ -11,8 +11,8 @@ namespace Unbreakable {
 
         public AssemblyGuardSettings() {
             _apiFilter = new ApiFilter(SafeDefaultApiRules.Create());
-            MethodLocalsSizeLimit = Marshal.SizeOf<IntPtr>() * 10;
-            MethodStackPushSizeLimit = Marshal.SizeOf<IntPtr>() * 5;
+            MethodLocalsSizeLimit = IntPtr.Size * 10;
+            MethodStackPushSizeLimit = 64;
         }
 
         [NotNull] public IApiFilter ApiFilter => _apiFilter;

@@ -95,18 +95,29 @@ namespace Unbreakable {
             if (method.Body.Instructions.Count == 0)
                 return; // weird, but happens with 'extern'
 
+            var isStaticConstructor = method.Name == ".cctor" && method.IsStatic && method.IsRuntimeSpecialName;
             var il = method.Body.GetILProcessor();
             var guardVariable = new VariableDefinition(guard.InstanceField.FieldType);
             il.Body.Variables.Add(guardVariable);
 
             var instructions = il.Body.Instructions;
             var start = instructions[0];
-            il.InsertBefore(start, il.Create(OpCodes.Ldsfld, guard.InstanceField));
-            il.InsertBefore(start, il.Create(OpCodes.Dup));
-            il.InsertBefore(start, il.Create(OpCodes.Stloc, guardVariable));
-            il.InsertBefore(start, il.Create(OpCodes.Call, guard.GuardEnterMethod));
-            
-            for (var i = 4; i < instructions.Count; i++) {
+            var skipFirst = 0;
+            if (!isStaticConstructor) {
+                il.InsertBefore(start, il.Create(OpCodes.Ldsfld, guard.InstanceField));
+                il.InsertBefore(start, il.Create(OpCodes.Dup));
+                il.InsertBefore(start, il.Create(OpCodes.Stloc, guardVariable));
+                il.InsertBefore(start, il.Create(OpCodes.Call, guard.GuardEnterMethod));
+                skipFirst = 4;
+            }
+            else {
+                // I don't check the stack in static constructors since their baseline is weird
+                il.InsertBefore(start, il.Create(OpCodes.Ldsfld, guard.InstanceField));
+                il.InsertBefore(start, il.Create(OpCodes.Stloc, guardVariable));
+                skipFirst = 2;
+            }
+
+            for (var i = skipFirst; i < instructions.Count; i++) {
                 var instruction = instructions[i];
                 CecilApiValidator.ValidateInstruction(instruction, settings.ApiFilter);
                 ValidateInstructionStackSize(instruction, method, settings);
@@ -117,6 +128,9 @@ namespace Unbreakable {
                     i += 2;
                     continue;
                 }
+
+                if (isStaticConstructor && IsCallToUserCode(instruction, method.Module.Assembly))
+                    throw new AssemblyGuardException($"Static constructor {method} cannot perform calls to user code (stack check limitation).");
 
                 var flowControl = instruction.OpCode.FlowControl;
                 if (flowControl == FlowControl.Next || flowControl == FlowControl.Return)
@@ -196,6 +210,12 @@ namespace Unbreakable {
                 case object o when o != null && o.GetType().IsPrimitive: return Marshal.SizeOf(o);
                 default: return sizeof(long); // estimate
             }
+        }
+
+        private static bool IsCallToUserCode(Instruction instruction, AssemblyDefinition userCodeAssembly) {
+            var code = instruction.OpCode.Code;
+            return (code == Code.Call || code == Code.Calli || code == Code.Callvirt)
+                && ((MethodReference)instruction.Operand).Module.Assembly == userCodeAssembly;
         }
 
         private struct GuardReferences {
