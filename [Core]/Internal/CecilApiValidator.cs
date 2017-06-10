@@ -1,6 +1,7 @@
 ﻿using System;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using Unbreakable.Rules;
 
 namespace Unbreakable.Internal {
     internal static class CecilApiValidator {
@@ -22,49 +23,51 @@ namespace Unbreakable.Internal {
             }
         }
 
-        public static void ValidateInstruction(Instruction instruction, IApiFilter filter) {
+        public static ApiMemberRule ValidateInstructionAndGetRule(Instruction instruction, IApiFilter filter) {
             if (!(instruction.Operand is MemberReference reference))
-                return;
+                return null;
 
-            ValidateMemberReference(reference, filter);
+            return ValidateMemberReference(reference, filter);
         }
 
-        private static void ValidateMemberReference(MemberReference reference, IApiFilter filter) {
+        private static ApiMemberRule ValidateMemberReference(MemberReference reference, IApiFilter filter) {
             var type = reference.DeclaringType;
             switch (reference) {
-                case MethodReference m:
-                    EnsureAllowed(filter, m.DeclaringType, m.Name);
+                case MethodReference m: {
+                    var memberRule = EnsureAllowed(filter, m.DeclaringType, m.Name);
                     EnsureAllowed(filter, m.ReturnType);
-                    break;
-                case FieldReference f:
-                    EnsureAllowed(filter, f.DeclaringType, f.Name);
+                    return memberRule;
+                }
+                case FieldReference f: {
+                    var memberRule = EnsureAllowed(filter, f.DeclaringType, f.Name);
                     EnsureAllowed(filter, f.FieldType);
-                    break;
+                    return memberRule;
+                }
                 case TypeReference t:
                     EnsureAllowed(filter, t);
-                    break;
+                    return null;
                 default:
                     throw new NotSupportedException("Unexpected member type '" + reference.GetType() + "'.");
             }
         }
 
-        private static void EnsureAllowed(IApiFilter filter, TypeReference type, string memberName = null) {
+        private static ApiMemberRule EnsureAllowed(IApiFilter filter, TypeReference type, string memberName = null) {
             var typeKind = ApiFilterTypeKind.External;
             if (type is TypeDefinition typeDefinition) {
                 if (!IsDelegateDefinition(typeDefinition))
-                    return;
+                    return null;
                 typeKind = ApiFilterTypeKind.CompilerGeneratedDelegate;
             }
             var result = filter.Filter(type.Namespace, type.Name, typeKind, memberName);
-            switch (result) {
-                case ApiFilterResult.DeniedNamespace:
+            switch (result.Kind) {
+                case ApiFilterResultKind.DeniedNamespace:
                     throw new AssemblyGuardException($"Namespace {type.Namespace} is not allowed.");
-                case ApiFilterResult.DeniedType:
+                case ApiFilterResultKind.DeniedType:
                     throw new AssemblyGuardException($"Type {type.FullName} is not allowed.");
-                case ApiFilterResult.DeniedMember:
+                case ApiFilterResultKind.DeniedMember:
                     throw new AssemblyGuardException($"Member {type.FullName}.{memberName} is not allowed.");
-                case ApiFilterResult.Allowed:
-                    return;
+                case ApiFilterResultKind.Allowed:
+                    return result.MemberRule;
                 default:
                     throw new NotSupportedException($"Unknown filter result {result}.");
             }

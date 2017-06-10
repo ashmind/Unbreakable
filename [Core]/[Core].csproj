@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="Rules\Internal\ApiMemberRewriterContext.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Argument" Version="1.0.3" />
     <PackageReference Include="JetBrains.Annotations" Version="10.4.0" />
     <PackageReference Include="Mono.Cecil" Version="0.9.6.4" />

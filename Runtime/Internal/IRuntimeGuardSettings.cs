@@ -3,7 +3,7 @@
 namespace Unbreakable.Runtime.Internal {
     internal interface IRuntimeGuardSettings {
         int StackBytesLimit { get; }
-        int ArrayLengthLimit { get; }
+        long AllocatedCountTotalLimit { get; }
         TimeSpan TimeLimit { get; }
     }
 }

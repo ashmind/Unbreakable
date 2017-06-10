@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Unbreakable.Rules;
+using Unbreakable.Rules.Rewriters;
 
 namespace Unbreakable.Internal {
     internal static class SafeDefaultApiRules {
@@ -22,7 +23,7 @@ namespace Unbreakable.Internal {
                 .Namespace("Unbreakable.Runtime", ApiAccess.Denied);
         }
 
-        private static void SetupSystem(NamespaceApiRule system) {
+        private static void SetupSystem(ApiNamespaceRule system) {
             system
                 .Type(nameof(Activator), ApiAccess.Denied)
                 .Type(nameof(AppContext), ApiAccess.Denied)
@@ -36,7 +37,9 @@ namespace Unbreakable.Internal {
                 .Type(nameof(TypedReference), ApiAccess.Denied)
 
                 .Type(nameof(Object), ApiAccess.Allowed)
-                .Type(nameof(String), ApiAccess.Allowed)
+                .Type(nameof(String), ApiAccess.Allowed,
+                    t => t.Member(".ctor", ApiAccess.Allowed, new CountMemoryGuardRewriter())
+                )
                 .Type(nameof(DateTime), ApiAccess.Allowed)
                 .Type(nameof(DateTimeKind), ApiAccess.Allowed)
                 .Type(nameof(DateTimeOffset), ApiAccess.Allowed)
@@ -51,8 +54,8 @@ namespace Unbreakable.Internal {
             }
         }
 
-        internal static TypeApiRule CreateForCompilerGeneratedDelegate() {
-            return new TypeApiRule(ApiAccess.Neutral)
+        internal static ApiTypeRule CreateForCompilerGeneratedDelegate() {
+            return new ApiTypeRule(ApiAccess.Neutral)
                 .Member(".ctor", ApiAccess.Allowed)
                 .Member("Invoke", ApiAccess.Allowed);
         }

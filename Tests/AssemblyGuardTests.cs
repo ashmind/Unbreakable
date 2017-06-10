@@ -21,7 +21,6 @@ namespace Unbreakable.Tests {
             AssemblyGuard.Rewrite(compiled, new MemoryStream());
         }
 
-
         [Theory]
         [InlineData("void M() { Console.WriteLine('x'); }")]
         [InlineData("void M() { this.GetType(); }")]

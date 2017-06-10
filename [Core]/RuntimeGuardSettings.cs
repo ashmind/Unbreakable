@@ -8,12 +8,12 @@ namespace Unbreakable {
 
         public RuntimeGuardSettings() {
             StackBytesLimit = 1024;
-            ArrayLengthLimit = 100;
+            AllocatedCountTotalLimit = 100;
             TimeLimit = TimeSpan.FromMilliseconds(500);
         }
 
         public int StackBytesLimit { get; set; }
-        public int ArrayLengthLimit { get; set; }
+        public long AllocatedCountTotalLimit { get; set; }
         public TimeSpan TimeLimit { get; set; }
     }
 }

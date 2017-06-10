@@ -6,7 +6,7 @@ using Unbreakable.Rules;
 
 namespace Unbreakable {
     public class ApiRules {
-        private readonly IDictionary<string, NamespaceApiRule> _namespaces = new Dictionary<string, NamespaceApiRule>();
+        private readonly IDictionary<string, ApiNamespaceRule> _namespaces = new Dictionary<string, ApiNamespaceRule>();
 
         public static ApiRules SafeDefaults() => SafeDefaultApiRules.Create();
 
@@ -14,11 +14,11 @@ namespace Unbreakable {
         }
 
         [NotNull]
-        public ApiRules Namespace([NotNull] string @namespace, ApiAccess access, [CanBeNull] Action<NamespaceApiRule> setup = null) {
+        public ApiRules Namespace([NotNull] string @namespace, ApiAccess access, [CanBeNull] Action<ApiNamespaceRule> setup = null) {
             Argument.NotNullOrEmpty(nameof(@namespace), @namespace);
 
             if (!_namespaces.TryGetValue(@namespace, out var rule)) {
-                rule = new NamespaceApiRule();
+                rule = new ApiNamespaceRule();
                 _namespaces.Add(@namespace, rule);
             }
             rule.Access = access;
@@ -26,7 +26,7 @@ namespace Unbreakable {
             return this;
         }
 
-        public TypeApiRule CompilerGeneratedDelegate { get; } = SafeDefaultApiRules.CreateForCompilerGeneratedDelegate();
-        public IReadOnlyDictionary<string, NamespaceApiRule> Namespaces => (IReadOnlyDictionary<string, NamespaceApiRule>)_namespaces;
+        public ApiTypeRule CompilerGeneratedDelegate { get; } = SafeDefaultApiRules.CreateForCompilerGeneratedDelegate();
+        public IReadOnlyDictionary<string, ApiNamespaceRule> Namespaces => (IReadOnlyDictionary<string, ApiNamespaceRule>)_namespaces;
     }
 }

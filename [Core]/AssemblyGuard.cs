@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Unbreakable.Internal;
+using Unbreakable.Rules.Internal;
 using Unbreakable.Runtime.Internal;
 
 namespace Unbreakable {
@@ -19,7 +20,7 @@ namespace Unbreakable {
             var assembly = AssemblyDefinition.ReadAssembly(assemblySourceStream);
             foreach (var module in assembly.Modules) {
                 var guardInstanceField = EmitGuardInstance(module, id);
-                var guard = new GuardReferences(guardInstanceField, module);
+                var guard = new RuntimeGuardReferences(guardInstanceField, module);
 
                 CecilApiValidator.ValidateDefinition(module, settings.ApiFilter);
                 foreach (var type in module.Types) {
@@ -58,7 +59,7 @@ namespace Unbreakable {
             return instanceField;
         }
 
-        private static void ValidateAndRewriteType(TypeDefinition type, GuardReferences guard, AssemblyGuardSettings settings) {
+        private static void ValidateAndRewriteType(TypeDefinition type, RuntimeGuardReferences guard, AssemblyGuardSettings settings) {
             // Ensures we don't have to suspect each System.Int32 (etc) to be a user-defined type
             if (type.Namespace == "System" || type.Namespace.StartsWith("System.", StringComparison.Ordinal))
                 throw new AssemblyGuardException($"Custom types cannot be defined in system namespace {type.Namespace}.");
@@ -76,7 +77,7 @@ namespace Unbreakable {
             }
         }
 
-        private static void ValidateAndRewriteMethod(MethodDefinition method, GuardReferences guard, AssemblyGuardSettings settings) {
+        private static void ValidateAndRewriteMethod(MethodDefinition method, RuntimeGuardReferences guard, AssemblyGuardSettings settings) {
             if (method.DeclaringType == guard.InstanceField.DeclaringType)
                 return;
 
@@ -119,47 +120,40 @@ namespace Unbreakable {
 
             for (var i = skipFirst; i < instructions.Count; i++) {
                 var instruction = instructions[i];
-                CecilApiValidator.ValidateInstruction(instruction, settings.ApiFilter);
+                if (isStaticConstructor && IsCallToUserCode(instruction, method.Module.Assembly))
+                    throw new AssemblyGuardException($"Static constructor {method} cannot perform calls to user code (stack check limitation).");
+
+                var memberRule = CecilApiValidator.ValidateInstructionAndGetRule(instruction, settings.ApiFilter);
                 ValidateInstructionStackSize(instruction, method, settings);
                 var code = instruction.OpCode.Code;
                 if (code == Code.Newarr) {
-                    InsertBeforeAndAdjustIfNeeded(il, instruction, il.Create(OpCodes.Ldloc, guardVariable));
-                    il.InsertBefore(instruction, il.Create(OpCodes.Call, guard.GuardNewArrayMethod));
+                    il.InsertBeforeAndRetargetJumps(instruction, il.Create(OpCodes.Ldloc, guardVariable));
+                    il.InsertBefore(instruction, il.Create(OpCodes.Call, guard.GuardCountIntPtrMethod));
                     i += 2;
                     continue;
                 }
 
-                if (isStaticConstructor && IsCallToUserCode(instruction, method.Module.Assembly))
-                    throw new AssemblyGuardException($"Static constructor {method} cannot perform calls to user code (stack check limitation).");
+                if (memberRule != null && memberRule.Rewriter != null) {
+                    i += memberRule.RewriterAsInternal.Rewrite(
+                        instruction, new ApiMemberRewriterContext(il, guardVariable, guard)
+                    );
+                    if (i > 0)
+                        continue;
+                }
 
-                var flowControl = instruction.OpCode.FlowControl;
-                if (flowControl == FlowControl.Next || flowControl == FlowControl.Return)
-                    continue;
-                if (instruction.Operand is Instruction target && target.Offset > instruction.Offset)
+                if (!ShouldInsertJumpGuardBefore(instruction))
                     continue;
 
-                InsertBeforeAndAdjustIfNeeded(il, instruction, il.Create(OpCodes.Ldloc, guardVariable));
+                il.InsertBeforeAndRetargetJumps(instruction, il.CreateBestLdloc(guardVariable));
                 il.InsertBefore(instruction, il.Create(OpCodes.Call, guard.GuardJumpMethod));
                 i += 2;
             }
         }
 
-        private static void InsertBeforeAndAdjustIfNeeded(ILProcessor il, Instruction original, Instruction before) {
-            il.InsertBefore(original, before);
-            foreach (var instruction in il.Body.Instructions) {
-                if (instruction.Operand == original)
-                    instruction.Operand = before;
-            }
-
-            if (!il.Body.HasExceptionHandlers)
-                return;
-
-            foreach (var handler in il.Body.ExceptionHandlers) {
-                if (handler.TryEnd == original)
-                    handler.TryEnd = before;
-                if (handler.HandlerEnd == original)
-                    handler.HandlerEnd = before;
-            }
+        private static bool ShouldInsertJumpGuardBefore(Instruction instruction) {
+            var flowControl = instruction.OpCode.FlowControl;
+            return (flowControl != FlowControl.Next && flowControl != FlowControl.Return)
+                && !(instruction.Operand is Instruction target && target.Offset > instruction.Offset);
         }
 
         private static void ValidateMethodLocalsSize(MethodDefinition method, AssemblyGuardSettings settings) {
@@ -216,20 +210,6 @@ namespace Unbreakable {
             var code = instruction.OpCode.Code;
             return (code == Code.Call || code == Code.Calli || code == Code.Callvirt)
                 && ((MethodReference)instruction.Operand).Module.Assembly == userCodeAssembly;
-        }
-
-        private struct GuardReferences {
-            public GuardReferences(FieldDefinition instanceField, ModuleDefinition module) {
-                InstanceField = instanceField;
-                GuardEnterMethod = module.Import(typeof(RuntimeGuard).GetMethod(nameof(RuntimeGuard.GuardEnter)));
-                GuardJumpMethod = module.Import(typeof(RuntimeGuard).GetMethod(nameof(RuntimeGuard.GuardJump)));
-                GuardNewArrayMethod = module.Import(typeof(RuntimeGuard).GetMethod(nameof(RuntimeGuard.GuardNewArrayFlowThrough)));
-            }
-
-            public FieldDefinition InstanceField { get; }
-            public MethodReference GuardEnterMethod { get; }
-            public MethodReference GuardJumpMethod { get; }
-            public MethodReference GuardNewArrayMethod { get; }
         }
     }
 }

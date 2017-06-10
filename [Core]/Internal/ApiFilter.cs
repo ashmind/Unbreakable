@@ -3,7 +3,9 @@ using JetBrains.Annotations;
 using Unbreakable.Rules;
 
 namespace Unbreakable.Internal {
-    internal partial class ApiFilter : IApiFilter {
+    using static ApiFilterResultKind;
+
+    internal class ApiFilter : IApiFilter {
         public ApiFilter(ApiRules rules) {
             Rules = rules;
         }
@@ -12,14 +14,14 @@ namespace Unbreakable.Internal {
             Argument.NotNull(nameof(@namespace), @namespace);
             Argument.NotNullOrEmpty(nameof(typeName), typeName);
 
-            TypeApiRule typeRule;
+            ApiTypeRule typeRule;
             switch (typeKind) {
                 case ApiFilterTypeKind.External:
                     if (!Rules.Namespaces.TryGetValue(@namespace, out var namespaceRule) || namespaceRule.Access == ApiAccess.Denied)
-                        return ApiFilterResult.DeniedNamespace;
+                        return new ApiFilterResult(DeniedNamespace);
 
                     if (!namespaceRule.Types.TryGetValue(typeName, out typeRule))
-                        return namespaceRule.Access == ApiAccess.Allowed ? ApiFilterResult.Allowed : ApiFilterResult.DeniedType;
+                        return new ApiFilterResult(namespaceRule.Access == ApiAccess.Allowed ? Allowed : DeniedType);
                     break;
                 case ApiFilterTypeKind.CompilerGeneratedDelegate:
                     typeRule = Rules.CompilerGeneratedDelegate;
@@ -29,18 +31,18 @@ namespace Unbreakable.Internal {
             }
 
             if (typeRule.Access == ApiAccess.Denied)
-                return ApiFilterResult.DeniedType;
+                return new ApiFilterResult(DeniedType);
 
             if (memberName == null)
-                return ApiFilterResult.Allowed;
+                return new ApiFilterResult(Allowed);
 
-            if (!typeRule.Members.TryGetValue(memberName, out var memberAccess))
-                return typeRule.Access == ApiAccess.Allowed ? ApiFilterResult.Allowed : ApiFilterResult.DeniedMember;
+            if (!typeRule.Members.TryGetValue(memberName, out var memberRule))
+                return new ApiFilterResult(typeRule.Access == ApiAccess.Allowed ? Allowed : DeniedMember);
 
-            if (memberAccess == ApiAccess.Denied)
-                return ApiFilterResult.DeniedMember;
+            if (memberRule.Access == ApiAccess.Denied)
+                return new ApiFilterResult(DeniedMember, memberRule);
 
-            return ApiFilterResult.Allowed;
+            return new ApiFilterResult(Allowed, memberRule);
         }
 
         [NotNull]

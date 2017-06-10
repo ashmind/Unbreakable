@@ -10,9 +10,10 @@ namespace Unbreakable.Runtime.Internal {
 
         private long _stackBaseline;
         private readonly Stopwatch _stopwatch;
+        private long _allocatedCountTotal;
 
         private long _stackBytesLimit;
-        private long _arrayLengthLimit;
+        private long _allocatedCountTotalLimit;
         private long _timeLimitStopwatchTicks;
 
         public RuntimeGuard() {
@@ -29,18 +30,28 @@ namespace Unbreakable.Runtime.Internal {
             EnsureActive();
             EnsureTime();
         }
-
-        private void GuardNewArray(IntPtr size) {
+        
+        private void GuardCount(long count) {
             EnsureActive();
             EnsureTime();
-            if (size.ToInt64() > _arrayLengthLimit)
-                throw new MemoryGuardException($"Array size is above the limit.");
+            Interlocked.Add(ref _allocatedCountTotal, count);
+            if (_allocatedCountTotal > _allocatedCountTotalLimit)
+                throw new MemoryGuardException("Total size limit reached for collections and strings.");
         }
 
-        // required for simpler representation in IL
-        public static IntPtr GuardNewArrayFlowThrough(IntPtr size, RuntimeGuard guard) {
-            guard.GuardNewArray(size);
-            return size;
+        public static IntPtr GuardCountFlowThroughForIntPtr(IntPtr count, RuntimeGuard guard) {
+            guard.GuardCount(count.ToInt64());
+            return count;
+        }
+
+        public static int GuardCountFlowThroughForInt32(int count, RuntimeGuard guard) {
+            guard.GuardCount(count);
+            return count;
+        }
+
+        public static long GuardCountFlowThroughForInt64(long count, RuntimeGuard guard) {
+            guard.GuardCount(count);
+            return count;
         }
 
         private void EnsureStack() {
@@ -73,7 +84,7 @@ namespace Unbreakable.Runtime.Internal {
             _active = true;
 
             _stackBytesLimit = settings.StackBytesLimit;
-            _arrayLengthLimit = settings.ArrayLengthLimit;
+            _allocatedCountTotalLimit = settings.AllocatedCountTotalLimit;
             _timeLimitStopwatchTicks = (long)(settings.TimeLimit.TotalSeconds * Stopwatch.Frequency);
 
             _stackBaseline = 0;
