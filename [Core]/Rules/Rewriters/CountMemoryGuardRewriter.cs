@@ -6,6 +6,9 @@ using Unbreakable.Rules.Internal;
 
 namespace Unbreakable.Rules.Rewriters {
     public class CountMemoryGuardRewriter : IApiMemberRewriterInternal {
+        public static CountMemoryGuardRewriter ForCount { get; } = new CountMemoryGuardRewriter();
+        public static CountMemoryGuardRewriter ForCapacity { get; } = new CountMemoryGuardRewriter("capacity");
+
         private readonly string _countParameterName;
 
         public CountMemoryGuardRewriter(string countParameterName = "count") {

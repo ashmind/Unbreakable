@@ -12,6 +12,14 @@ namespace Unbreakable.Rules {
         public ApiAccess Access { get; internal set; }
         public IReadOnlyDictionary<string, ApiMemberRule> Members => (IReadOnlyDictionary<string, ApiMemberRule>)_members;
 
+        public ApiTypeRule Constructor(ApiAccess access) {
+            return Member(".ctor", access);
+        }
+
+        public ApiTypeRule Constructor(ApiAccess access, IApiMemberRewriter rewriter) {
+            return Member(".ctor", access, rewriter);
+        }
+
         public ApiTypeRule Member(string name, ApiAccess access) {
             return Member(name, access, null, false);
         }

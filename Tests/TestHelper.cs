@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using Microsoft.CodeAnalysis;
@@ -13,7 +14,10 @@ namespace Unbreakable.Tests {
             var compilation = CSharpCompilation.Create(
                 "_",
                 new[] { CSharpSyntaxTree.ParseText(code) },
-                new[] { MetadataReference.CreateFromFile(typeof(object).Assembly.Location) },
+                new[] {
+                    MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
+                    MetadataReference.CreateFromFile(typeof(Stack<>).Assembly.Location)
+                },
                 new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
             );
 
