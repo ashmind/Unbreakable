@@ -1,11 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Threading;
 using JetBrains.Annotations;
 using Unbreakable.Rules.Internal;
 
 namespace Unbreakable.Rules {
     public class ApiMemberRule {
         private ApiAccess _access;
-        private IApiMemberRewriterInternal _rewriter;
+        private IList<IApiMemberRewriterInternal> _rewriters;
 
         internal ApiMemberRule(ApiAccess access) {
             Access = access;
@@ -20,17 +22,35 @@ namespace Unbreakable.Rules {
             }
         }
 
-        [CanBeNull]
-        public IApiMemberRewriter Rewriter {
-            get => _rewriter;
-            set {
-                if (!(value is IApiMemberRewriterInternal @internal))
-                    throw new ArgumentException("Rewriter must implement internal interface IApiMemberRewriterInternal. Custom rewriters are not yet supported.", nameof(value));
-                _rewriter = @internal;
+        [NotNull]
+        public IReadOnlyCollection<IApiMemberRewriter> Rewriters {
+            get {
+                EnsureRewriters();
+                return (IReadOnlyCollection<IApiMemberRewriter>)_rewriters;
             }
         }
 
-        [CanBeNull]
-        internal IApiMemberRewriterInternal RewriterAsInternal => _rewriter;
+        [NotNull]
+        internal IReadOnlyCollection<IApiMemberRewriterInternal> InternalRewriters => (IReadOnlyCollection<IApiMemberRewriterInternal>)Rewriters;
+
+        [NotNull]
+        public ApiMemberRule AddRewriter([NotNull] IApiMemberRewriter rewriter) {
+            Argument.NotNull("rewriter", rewriter);
+            EnsureRewriters();
+            _rewriters.Add(Argument.Cast<IApiMemberRewriterInternal>(nameof(rewriter), rewriter));
+            return this;
+        }
+
+        [NotNull]
+        public ApiMemberRule RemoveRewriter([CanBeNull] IApiMemberRewriter rewriter) {
+            EnsureRewriters();
+            _rewriters.Remove((IApiMemberRewriterInternal)rewriter);
+            return this;
+        }
+
+        private void EnsureRewriters() {
+            if (_rewriters == null)
+                Interlocked.CompareExchange(ref _rewriters, new List<IApiMemberRewriterInternal>(), null);
+        }
     }
 }

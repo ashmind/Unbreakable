@@ -10,7 +10,8 @@ namespace Unbreakable {
 
         public static ApiRules SafeDefaults() => SafeDefaultApiRules.Create();
 
-        internal ApiRules() {
+        internal ApiRules(ApiTypeRule compilerGeneratedDelegate) {
+            CompilerGeneratedDelegate = compilerGeneratedDelegate;
         }
 
         [NotNull]
@@ -26,7 +27,7 @@ namespace Unbreakable {
             return this;
         }
 
-        public ApiTypeRule CompilerGeneratedDelegate { get; } = SafeDefaultApiRules.CreateForCompilerGeneratedDelegate();
+        public ApiTypeRule CompilerGeneratedDelegate { get; }
         public IReadOnlyDictionary<string, ApiNamespaceRule> Namespaces => (IReadOnlyDictionary<string, ApiNamespaceRule>)_namespaces;
     }
 }

@@ -11,8 +11,10 @@ namespace Unbreakable.Tests {
         [InlineData("(new string('a', 25)).Length + (new byte[25]).Length", 50)]
         [InlineData("(new byte[25]).Length + (new byte[25]).Length", 50)]
         [InlineData("(new System.Collections.Generic.List<string>(50)).Capacity", 50)]
+        [InlineData("string.Join(\"\", Enumerable.Repeat('a', 50)).Length", 50)]
         public void AllowsAllocations_IfWithinTotalCountLimit(string code, int expected) {
             var m = TestHelper.RewriteAndGetMethodWrappedInScope(@"
+                using System.Linq;
                 class C {
                     int M() => " + code + @";
                 }
@@ -50,6 +52,7 @@ namespace Unbreakable.Tests {
         [InlineData("Enumerable.Range(0, 10000).ToArray()")]
         [InlineData("Enumerable.Range(0, 10000).ToList()")]
         [InlineData("Enumerable.Range(0, 10000).ToDictionary(i => i)")]
+        [InlineData("string.Join(\",\", Enumerable.Range(0, 10000))")]
         public void ThrowsGuardException_WhenMaterializingLargeEnumerable(string expression) {
             // found by Tereza Tomcova (@the_ress)
             AssertThrowsMemoryGuard(expression);

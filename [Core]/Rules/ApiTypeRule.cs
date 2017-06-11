@@ -1,38 +1,51 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
+using JetBrains.Annotations;
 
 namespace Unbreakable.Rules {
     public class ApiTypeRule {
-        private readonly IDictionary<string, ApiMemberRule> _members = new Dictionary<string, ApiMemberRule>();
+        private IDictionary<string, ApiMemberRule> _members;
 
         internal ApiTypeRule(ApiAccess access = ApiAccess.Neutral) {
             Access = access;
         }
 
         public ApiAccess Access { get; internal set; }
-        public IReadOnlyDictionary<string, ApiMemberRule> Members => (IReadOnlyDictionary<string, ApiMemberRule>)_members;
-
-        public ApiTypeRule Constructor(ApiAccess access) {
-            return Member(".ctor", access);
+        [NotNull]
+        public IReadOnlyDictionary<string, ApiMemberRule> Members {
+            get {
+                EnsureMembers();
+                return (IReadOnlyDictionary<string, ApiMemberRule>)_members;
+            }
         }
 
-        public ApiTypeRule Constructor(ApiAccess access, IApiMemberRewriter rewriter) {
-            return Member(".ctor", access, rewriter);
+        [NotNull]
+        public ApiTypeRule Constructor(ApiAccess access, Action<ApiMemberRule> setup) {
+            return Member(".ctor", access, setup);
         }
 
-        public ApiTypeRule Member(string name, ApiAccess access) {
-            return Member(name, access, null, false);
+        [NotNull]
+        public ApiTypeRule Constructor(ApiAccess access, params IApiMemberRewriter[] rewriters) {
+            return Member(".ctor", access, rewriters);
         }
 
-        public ApiTypeRule Member(string name, ApiAccess access, IApiMemberRewriter rewriter) {
-            return Member(name, access, rewriter, true);
+        [NotNull]
+        public ApiTypeRule Member([NotNull] string name, ApiAccess access, Action<ApiMemberRule> setup) {
+            return Member(name, access, null, setup);
         }
 
-        public ApiTypeRule Member(string name, ApiAccess access, IApiMemberRewriter rewriter, bool shouldSetRewriter) {
+        [NotNull]
+        public ApiTypeRule Member([NotNull] string name, ApiAccess access, params IApiMemberRewriter[] rewriters) {
+            return Member(name, access, rewriters, null);
+        }
+
+        private ApiTypeRule Member(string name, ApiAccess access, IApiMemberRewriter[] rewriters, Action<ApiMemberRule> setup) {
             Argument.NotNullOrEmpty(nameof(name), name);
             if (Access == ApiAccess.Denied && access != ApiAccess.Denied)
                 throw new InvalidOperationException($"Member access ({access}) cannot exceed type access ({Access}).");
 
+            EnsureMembers();
             if (!_members.TryGetValue(name, out var member)) {
                 member = new ApiMemberRule(access);
                 _members.Add(name, member);
@@ -40,9 +53,25 @@ namespace Unbreakable.Rules {
             else {
                 member.Access = access;
             }
-            if (shouldSetRewriter)
-                member.Rewriter = rewriter;
+            if (rewriters != null) {
+                foreach (var rewriter in rewriters) {
+                    member.AddRewriter(rewriter);
+                }
+            }
+            setup?.Invoke(member);
             return this;
+        }
+
+        [NotNull]
+        public ApiTypeRule Other([NotNull] Action<ApiTypeRule> setup) {
+            Argument.NotNull("setup", setup);
+            setup(this);
+            return this;
+        }
+
+        private void EnsureMembers() {
+            if (_members == null)
+                Interlocked.CompareExchange(ref _members, new Dictionary<string, ApiMemberRule>(), null);
         }
     }
 }

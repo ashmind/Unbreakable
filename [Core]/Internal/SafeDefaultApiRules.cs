@@ -13,7 +13,7 @@ namespace Unbreakable.Internal {
             typeof(Func<>).Assembly.GetTypes().Where(t => t.Namespace == nameof(System) && t.BaseType == typeof(MulticastDelegate)).ToArray();
 
         public static ApiRules Create() {
-            return new ApiRules()
+            return new ApiRules(CreateTypeRuleForCompilerGeneratedDelegate())
                 .Namespace(nameof(System), Neutral, SetupSystem)
                 .Namespace("System.Collections.Generic", Neutral, SetupSystemCollectionsGeneric)
                 .Namespace("System.Linq", Neutral, SetupSystemLinq)
@@ -43,7 +43,11 @@ namespace Unbreakable.Internal {
                 .Type(nameof(TypedReference), Denied)
 
                 .Type(nameof(Object), Allowed)
-                .Type(nameof(String), Allowed, t => t.Constructor(Allowed, CountArgumentRewriter.Default))
+                .Type(nameof(String), Allowed,
+                    t => t.Constructor(Allowed, CountArgumentRewriter.Default)
+                          .Member(nameof(string.Join), Allowed, EnumerableArgumentRewriter.Collected)
+                          .Member(nameof(string.Concat), Allowed, EnumerableArgumentRewriter.Collected)
+                )
                 .Type(nameof(DateTime), Allowed)
                 .Type(nameof(DateTimeKind), Allowed)
                 .Type(nameof(DateTimeOffset), Allowed)
@@ -67,7 +71,10 @@ namespace Unbreakable.Internal {
                 .Type(typeof(Comparer<>).Name, Allowed)
                 .Type(typeof(Dictionary<,>).Name, Allowed, t => t.Constructor(Allowed, CountArgumentRewriter.ForCapacity))
                 .Type(typeof(EqualityComparer<>).Name, Allowed)
-                .Type(typeof(HashSet<>).Name, Allowed, t => t.Constructor(Allowed, CountArgumentRewriter.ForCapacity))
+                .Type(typeof(HashSet<>).Name, Allowed,
+                    t => t.Constructor(Allowed, CountArgumentRewriter.ForCapacity, EnumerableArgumentRewriter.Collected)
+                          .Other(SetupSetCommon)
+                )
                 .Type(typeof(ICollection<>).Name, Allowed)
                 .Type(typeof(IComparer<>).Name, Allowed)
                 .Type(typeof(IDictionary<,>).Name, Allowed)
@@ -78,17 +85,43 @@ namespace Unbreakable.Internal {
                 .Type(typeof(IReadOnlyCollection<>).Name, Allowed)
                 .Type(typeof(IReadOnlyDictionary<,>).Name, Allowed)
                 .Type(typeof(IReadOnlyList<>).Name, Allowed)
-                .Type(typeof(ISet<>).Name, Allowed)
+                .Type(typeof(ISet<>).Name, Allowed, t => t.Other(SetupSetCommon))
                 .Type(typeof(KeyNotFoundException).Name, Allowed)
                 .Type(typeof(KeyValuePair<,>).Name, Allowed)
-                .Type(typeof(LinkedList<>).Name, Allowed, t => t.Constructor(Allowed, CountArgumentRewriter.ForCapacity))
+                .Type(typeof(LinkedList<>).Name, Allowed,
+                    t => t.Constructor(Allowed, CountArgumentRewriter.ForCapacity, EnumerableArgumentRewriter.Collected)
+                )
                 .Type(typeof(LinkedListNode<>).Name, Allowed)
-                .Type(typeof(List<>).Name, Allowed, t => t.Constructor(Allowed, CountArgumentRewriter.ForCapacity))
-                .Type(typeof(Queue<>).Name, Allowed, t => t.Constructor(Allowed, CountArgumentRewriter.ForCapacity))
+                .Type(typeof(List<>).Name, Allowed,
+                    t => t.Constructor(Allowed, CountArgumentRewriter.ForCapacity, EnumerableArgumentRewriter.Collected)
+                          .Member(nameof(List<object>.AddRange), Allowed, EnumerableArgumentRewriter.Collected)
+                          .Member(nameof(List<object>.InsertRange), Allowed, EnumerableArgumentRewriter.Collected)
+                )
+                .Type(typeof(Queue<>).Name, Allowed,
+                    t => t.Constructor(Allowed, CountArgumentRewriter.ForCapacity, EnumerableArgumentRewriter.Collected)
+                )
                 .Type(typeof(SortedDictionary<,>).Name, Allowed, t => t.Constructor(Allowed, CountArgumentRewriter.ForCapacity))
                 .Type(typeof(SortedList<,>).Name, Allowed, t => t.Constructor(Allowed, CountArgumentRewriter.ForCapacity))
-                .Type(typeof(SortedSet<>).Name, Allowed, t => t.Constructor(Allowed, CountArgumentRewriter.ForCapacity))
-                .Type(typeof(Stack<>).Name, Allowed, t => t.Constructor(Allowed, CountArgumentRewriter.ForCapacity));
+                .Type(typeof(SortedSet<>).Name, Allowed,
+                    t => t.Constructor(Allowed, CountArgumentRewriter.ForCapacity, EnumerableArgumentRewriter.Collected)
+                          .Other(SetupSetCommon)
+                )
+                .Type(typeof(Stack<>).Name, Allowed,
+                    t => t.Constructor(Allowed, CountArgumentRewriter.ForCapacity, EnumerableArgumentRewriter.Collected)
+                );
+        }
+
+        private static void SetupSetCommon(ApiTypeRule set) {
+            set.Member(nameof(ISet<object>.UnionWith), Allowed, EnumerableArgumentRewriter.Collected)
+               .Member(nameof(ISet<object>.IntersectWith), Allowed, EnumerableArgumentRewriter.Iterated)
+               .Member(nameof(ISet<object>.ExceptWith), Allowed, EnumerableArgumentRewriter.Iterated)
+               .Member(nameof(ISet<object>.SymmetricExceptWith), Allowed, EnumerableArgumentRewriter.Iterated)
+               .Member(nameof(ISet<object>.IsSubsetOf), Allowed, EnumerableArgumentRewriter.Iterated)
+               .Member(nameof(ISet<object>.IsProperSubsetOf), Allowed, EnumerableArgumentRewriter.Iterated)
+               .Member(nameof(ISet<object>.IsSupersetOf), Allowed, EnumerableArgumentRewriter.Iterated)
+               .Member(nameof(ISet<object>.IsProperSupersetOf), Allowed, EnumerableArgumentRewriter.Iterated)
+               .Member(nameof(ISet<object>.Overlaps), Allowed, EnumerableArgumentRewriter.Iterated)
+               .Member(nameof(ISet<object>.SetEquals), Allowed, EnumerableArgumentRewriter.Iterated);
         }
 
         private static void SetupSystemLinq(ApiNamespaceRule linq) {
@@ -148,7 +181,7 @@ namespace Unbreakable.Internal {
                 );
         }
 
-        internal static ApiTypeRule CreateForCompilerGeneratedDelegate() {
+        private static ApiTypeRule CreateTypeRuleForCompilerGeneratedDelegate() {
             return new ApiTypeRule(Neutral)
                 .Constructor(Allowed)
                 .Member("Invoke", Allowed);

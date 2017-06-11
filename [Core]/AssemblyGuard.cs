@@ -122,11 +122,14 @@ namespace Unbreakable {
                     continue;
                 }
 
-                if (memberRule != null && memberRule.Rewriter != null) {
+                if (memberRule != null && memberRule.Rewriters.Count > 0) {
                     var instructionCountBefore = instructions.Count;
-                    var rewritten = memberRule.RewriterAsInternal.Rewrite(
-                        instruction, new ApiMemberRewriterContext(il, guardVariable, guard)
-                    );
+                    var rewritten = false;
+                    foreach (var rewriter in memberRule.InternalRewriters) {
+                        rewritten = rewriter.Rewrite(
+                            instruction, new ApiMemberRewriterContext(il, guardVariable, guard)
+                        ) || rewritten;
+                    }
                     if (rewritten) {
                         i += instructions.Count - instructionCountBefore;
                         continue;
