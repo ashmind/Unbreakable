@@ -29,14 +29,14 @@ namespace Unbreakable.Tests {
         public void ThrowsGuardException_WhenAllocatingLargeArray(string expression, bool requiresX64) {
             if (requiresX64)
                 Assert.True(IntPtr.Size == 8, "This test can only be run in x64.");
-            AssertThrowsMemoryGuard(expression);
+            AssertThrowsMemoryGuard("object M() => " + expression + ";");
         }
 
         [Theory]
         [InlineData("new string('a', 10000)")]
         public void ThrowsGuardException_WhenAllocatingLargeString(string expression) {
             // found by Julien Roncaglia (@vbfox)
-            AssertThrowsMemoryGuard(expression);
+            AssertThrowsMemoryGuard("object M() => " + expression + ";");
         }
 
         [Theory]
@@ -45,7 +45,7 @@ namespace Unbreakable.Tests {
         [InlineData("new Dictionary<string, string>(10000)")]
         [InlineData("new Queue<string>(10000)")]
         public void ThrowsGuardException_WhenAllocatingLargeCollections(string expression) {
-            AssertThrowsMemoryGuard(expression);
+            AssertThrowsMemoryGuard("object M() => " + expression + ";");
         }
 
         [Theory]
@@ -55,21 +55,28 @@ namespace Unbreakable.Tests {
         [InlineData("string.Join(\",\", Enumerable.Range(0, 10000))")]
         public void ThrowsGuardException_WhenMaterializingLargeEnumerable(string expression) {
             // found by Tereza Tomcova (@the_ress)
-            AssertThrowsMemoryGuard(expression);
+            AssertThrowsMemoryGuard("object M() => " + expression + ";");
+        }
+
+        [Theory]
+        [InlineData("var list = new List<int>(); for (var i = 0; i < 100000; i++) { list.Add(i); }")]
+        public void ThrowsGuardException_WhenAddingToListManyTimes(string code) {
+            // found by Tereza Tomcova (@the_ress)
+            AssertThrowsMemoryGuard("void M() { " + code + " }");
         }
 
         [Theory]
         [InlineData("(new[] { 0 }).Intersect(Enumerable.Range(0, 10000)).ToArray()")]
         public void ThrowsGuardException_WhenMatchingToLargeEnumerable(string expression) {
-            AssertThrowsMemoryGuard(expression);
+            AssertThrowsMemoryGuard("object M() => " + expression + ";");
         }
 
-        private static void AssertThrowsMemoryGuard(string expression) {
+        private static void AssertThrowsMemoryGuard(string code) {
             var m = TestHelper.RewriteAndGetMethodWrappedInScope(@"
                 using System.Collections.Generic;
                 using System.Linq;
                 class C {
-                    object M() => " + expression + @";
+                    " + code + @"
                 }
             ", "C", "M");
             var exception = Assert.Throws<TargetInvocationException>(() => m());

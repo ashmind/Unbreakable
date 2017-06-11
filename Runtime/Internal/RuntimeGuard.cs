@@ -43,7 +43,13 @@ namespace Unbreakable.Runtime.Internal {
             EnsureTime();
         }
 
-        public IEnumerable<T> GuardCollectedEnumerable<T>(IEnumerable<T> enumerable) {
+        public void GuardCount(long count) {
+            EnsureActive();
+            EnsureTime();
+            EnsureCount(count);
+        }
+
+        public IEnumerable<T> GuardEnumerableCollected<T>(IEnumerable<T> enumerable) {
             EnsureActive();
             foreach (var item in enumerable) {
                 EnsureTime();
@@ -52,18 +58,12 @@ namespace Unbreakable.Runtime.Internal {
             }
         }
 
-        public IEnumerable<T> GuardIteratedEnumerable<T>(IEnumerable<T> enumerable) {
+        public IEnumerable<T> GuardEnumerableIterated<T>(IEnumerable<T> enumerable) {
             EnsureActive();
             foreach (var item in enumerable) {
                 EnsureTime();
                 yield return item;
             }
-        }
-
-        private void GuardCount(long count) {
-            EnsureActive();
-            EnsureTime();
-            EnsureCount(count);
         }
 
         private void EnsureStack() {
@@ -123,27 +123,27 @@ namespace Unbreakable.Runtime.Internal {
         }
 
         public static class FlowThrough {
-            public static IEnumerable<T> GuardCollectedEnumerable<T>(IEnumerable<T> enumerable, RuntimeGuard guard) {
-                return guard.GuardCollectedEnumerable(enumerable);
-            }
-
-            public static IEnumerable<T> GuardIteratedEnumerable<T>(IEnumerable<T> enumerable, RuntimeGuard guard) {
-                return guard.GuardIteratedEnumerable(enumerable);
-            }
-
-            public static IntPtr GuardCountForIntPtr(IntPtr count, RuntimeGuard guard) {
+            public static IntPtr GuardCountIntPtr(IntPtr count, RuntimeGuard guard) {
                 guard.GuardCount(count.ToInt64());
                 return count;
             }
 
-            public static int GuardCountForInt32(int count, RuntimeGuard guard) {
+            public static int GuardCountInt32(int count, RuntimeGuard guard) {
                 guard.GuardCount(count);
                 return count;
             }
 
-            public static long GuardCountForInt64(long count, RuntimeGuard guard) {
+            public static long GuardCountInt64(long count, RuntimeGuard guard) {
                 guard.GuardCount(count);
                 return count;
+            }
+
+            public static IEnumerable<T> GuardEnumerableCollected<T>(IEnumerable<T> enumerable, RuntimeGuard guard) {
+                return guard.GuardEnumerableCollected(enumerable);
+            }
+
+            public static IEnumerable<T> GuardEnumerableIterated<T>(IEnumerable<T> enumerable, RuntimeGuard guard) {
+                return guard.GuardEnumerableIterated(enumerable);
             }
         }
     }

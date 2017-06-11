@@ -69,15 +69,18 @@ namespace Unbreakable.Internal {
         private static void SetupSystemCollectionsGeneric(ApiNamespaceRule collections) {
             collections
                 .Type(typeof(Comparer<>).Name, Allowed)
-                .Type(typeof(Dictionary<,>).Name, Allowed, t => t.Constructor(Allowed, CountArgumentRewriter.ForCapacity))
+                .Type(typeof(Dictionary<,>).Name, Allowed,
+                    t => t.Constructor(Allowed, CountArgumentRewriter.ForCapacity)
+                          .Other(SetupAdd)
+                )
                 .Type(typeof(EqualityComparer<>).Name, Allowed)
                 .Type(typeof(HashSet<>).Name, Allowed,
                     t => t.Constructor(Allowed, CountArgumentRewriter.ForCapacity, EnumerableArgumentRewriter.Collected)
                           .Other(SetupSetCommon)
                 )
-                .Type(typeof(ICollection<>).Name, Allowed)
+                .Type(typeof(ICollection<>).Name, Allowed, SetupAdd)
                 .Type(typeof(IComparer<>).Name, Allowed)
-                .Type(typeof(IDictionary<,>).Name, Allowed)
+                .Type(typeof(IDictionary<,>).Name, Allowed, SetupAdd)
                 .Type(typeof(IEnumerable<>).Name, Allowed)
                 .Type(typeof(IEnumerator<>).Name, Allowed)
                 .Type(typeof(IEqualityComparer<>).Name, Allowed)
@@ -96,18 +99,27 @@ namespace Unbreakable.Internal {
                     t => t.Constructor(Allowed, CountArgumentRewriter.ForCapacity, EnumerableArgumentRewriter.Collected)
                           .Member(nameof(List<object>.AddRange), Allowed, EnumerableArgumentRewriter.Collected)
                           .Member(nameof(List<object>.InsertRange), Allowed, EnumerableArgumentRewriter.Collected)
+                          .Other(SetupAdd)
                 )
                 .Type(typeof(Queue<>).Name, Allowed,
                     t => t.Constructor(Allowed, CountArgumentRewriter.ForCapacity, EnumerableArgumentRewriter.Collected)
+                          .Member(nameof(Queue<object>.Enqueue), Allowed, AddCallRewriter.Default)
                 )
-                .Type(typeof(SortedDictionary<,>).Name, Allowed, t => t.Constructor(Allowed, CountArgumentRewriter.ForCapacity))
-                .Type(typeof(SortedList<,>).Name, Allowed, t => t.Constructor(Allowed, CountArgumentRewriter.ForCapacity))
+                .Type(typeof(SortedDictionary<,>).Name, Allowed,
+                    t => t.Constructor(Allowed, CountArgumentRewriter.ForCapacity)
+                          .Other(SetupAdd)
+                )
+                .Type(typeof(SortedList<,>).Name, Allowed,
+                    t => t.Constructor(Allowed, CountArgumentRewriter.ForCapacity)
+                          .Other(SetupAdd)
+                )
                 .Type(typeof(SortedSet<>).Name, Allowed,
                     t => t.Constructor(Allowed, CountArgumentRewriter.ForCapacity, EnumerableArgumentRewriter.Collected)
                           .Other(SetupSetCommon)
                 )
                 .Type(typeof(Stack<>).Name, Allowed,
                     t => t.Constructor(Allowed, CountArgumentRewriter.ForCapacity, EnumerableArgumentRewriter.Collected)
+                          .Member(nameof(Stack<object>.Push), Allowed, AddCallRewriter.Default)
                 );
         }
 
@@ -121,7 +133,12 @@ namespace Unbreakable.Internal {
                .Member(nameof(ISet<object>.IsSupersetOf), Allowed, EnumerableArgumentRewriter.Iterated)
                .Member(nameof(ISet<object>.IsProperSupersetOf), Allowed, EnumerableArgumentRewriter.Iterated)
                .Member(nameof(ISet<object>.Overlaps), Allowed, EnumerableArgumentRewriter.Iterated)
-               .Member(nameof(ISet<object>.SetEquals), Allowed, EnumerableArgumentRewriter.Iterated);
+               .Member(nameof(ISet<object>.SetEquals), Allowed, EnumerableArgumentRewriter.Iterated)
+               .Other(SetupAdd);
+        }
+
+        private static void SetupAdd(ApiTypeRule type) {
+            type.Member("Add", Allowed, AddCallRewriter.Default);
         }
 
         private static void SetupSystemLinq(ApiNamespaceRule linq) {

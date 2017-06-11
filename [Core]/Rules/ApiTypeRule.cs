@@ -63,9 +63,10 @@ namespace Unbreakable.Rules {
         }
 
         [NotNull]
-        public ApiTypeRule Other([NotNull] Action<ApiTypeRule> setup) {
-            Argument.NotNull("setup", setup);
-            setup(this);
+        public ApiTypeRule Other(params Action<ApiTypeRule>[] setups) {
+            foreach (var setup in setups) {
+                setup(this);
+            }
             return this;
         }
 

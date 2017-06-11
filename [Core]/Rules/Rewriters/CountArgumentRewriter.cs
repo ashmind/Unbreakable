@@ -25,7 +25,7 @@ namespace Unbreakable.Rules.Rewriters {
 
             var il = context.IL;
             il.InsertBeforeAndRetargetJumps(instruction, il.CreateLdlocBest(context.RuntimeGuardVariable));
-            il.InsertBefore(instruction, il.CreateCall(context.RuntimeGuardReferences.GuardCountInt32Method));
+            il.InsertBefore(instruction, il.CreateCall(context.RuntimeGuardReferences.FlowThroughGuardCountInt32Method));
             return true;
         }
 

@@ -65,8 +65,8 @@ namespace Unbreakable.Rules.Rewriters {
             var il = context.IL;
             var elementType = ((GenericInstanceType)enumerableType).GenericArguments[0];
             var guardMethodDefinition = _collected
-                ? context.RuntimeGuardReferences.GuardCollectedEnumerableMethod
-                : context.RuntimeGuardReferences.GuardIteratedEnumerableMethod;
+                ? context.RuntimeGuardReferences.FlowThroughGuardEnumerableCollectedMethod
+                : context.RuntimeGuardReferences.FlowThroughGuardEnumerableIteratedMethod;
 
             var guardMethodInstance = new GenericInstanceMethod(guardMethodDefinition);
             guardMethodInstance.GenericArguments.Add(elementType);

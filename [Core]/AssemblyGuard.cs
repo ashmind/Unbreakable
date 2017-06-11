@@ -117,7 +117,7 @@ namespace Unbreakable {
                 var code = instruction.OpCode.Code;
                 if (code == Code.Newarr) {
                     il.InsertBeforeAndRetargetJumps(instruction, il.CreateLdlocBest(guardVariable));
-                    il.InsertBefore(instruction, il.CreateCall(guard.GuardCountIntPtrMethod));
+                    il.InsertBefore(instruction, il.CreateCall(guard.FlowThroughGuardCountIntPtrMethod));
                     i += 2;
                     continue;
                 }
