@@ -18,13 +18,14 @@ namespace Unbreakable {
 
             var id = Guid.NewGuid();
             var assembly = AssemblyDefinition.ReadAssembly(assemblySourceStream);
+            var apiValidator = new CecilApiValidator(settings.ApiFilter, assembly);
             foreach (var module in assembly.Modules) {
                 var guardInstanceField = EmitGuardInstance(module, id);
                 var guard = new RuntimeGuardReferences(guardInstanceField, module);
 
-                CecilApiValidator.ValidateDefinition(module, settings.ApiFilter);
+                apiValidator.ValidateDefinition(module);
                 foreach (var type in module.Types) {
-                    ValidateAndRewriteType(type, guard, settings);
+                    ValidateAndRewriteType(type, guard, apiValidator, settings);
                 }
             }
 
@@ -59,7 +60,7 @@ namespace Unbreakable {
             return instanceField;
         }
 
-        private static void ValidateAndRewriteType(TypeDefinition type, RuntimeGuardReferences guard, AssemblyGuardSettings settings) {
+        private static void ValidateAndRewriteType(TypeDefinition type, RuntimeGuardReferences guard, CecilApiValidator apiValidator, AssemblyGuardSettings settings) {
             // Ensures we don't have to suspect each System.Int32 (etc) to be a user-defined type
             if (type.Namespace == "System" || type.Namespace.StartsWith("System.", StringComparison.Ordinal))
                 throw new AssemblyGuardException($"Custom types cannot be defined in system namespace {type.Namespace}.");
@@ -67,17 +68,17 @@ namespace Unbreakable {
             if ((type.Attributes & TypeAttributes.ExplicitLayout) == TypeAttributes.ExplicitLayout)
                 throw new AssemblyGuardException($"Type {type} has an explicit layout which is not allowed.");
 
-            CecilApiValidator.ValidateDefinition(type, settings.ApiFilter);
+            apiValidator.ValidateDefinition(type);
             foreach (var nested in type.NestedTypes) {
-                ValidateAndRewriteType(nested, guard, settings);
+                ValidateAndRewriteType(nested, guard, apiValidator, settings);
             }
             foreach (var method in type.Methods) {
-                CecilApiValidator.ValidateDefinition(method, settings.ApiFilter);
-                ValidateAndRewriteMethod(method, guard, settings);
+                apiValidator.ValidateDefinition(method);
+                ValidateAndRewriteMethod(method, guard, apiValidator, settings);
             }
         }
 
-        private static void ValidateAndRewriteMethod(MethodDefinition method, RuntimeGuardReferences guard, AssemblyGuardSettings settings) {
+        private static void ValidateAndRewriteMethod(MethodDefinition method, RuntimeGuardReferences guard, CecilApiValidator apiValidator, AssemblyGuardSettings settings) {
             if (method.DeclaringType == guard.InstanceField.DeclaringType)
                 return;
 
@@ -103,48 +104,46 @@ namespace Unbreakable {
 
             var instructions = il.Body.Instructions;
             var start = instructions[0];
-            var skipFirst = 0;
-            if (!isStaticConstructor) {
-                il.InsertBefore(start, il.Create(OpCodes.Ldsfld, guard.InstanceField));
-                il.InsertBefore(start, il.Create(OpCodes.Dup));
-                il.InsertBefore(start, il.Create(OpCodes.Stloc, guardVariable));
-                il.InsertBefore(start, il.Create(OpCodes.Call, guard.GuardEnterMethod));
-                skipFirst = 4;
-            }
-            else {
-                // I don't check the stack in static constructors since their baseline is weird
-                il.InsertBefore(start, il.Create(OpCodes.Ldsfld, guard.InstanceField));
-                il.InsertBefore(start, il.Create(OpCodes.Stloc, guardVariable));
-                skipFirst = 2;
-            }
+            var skipFirst = 4;
+            il.InsertBefore(start, il.Create(OpCodes.Ldsfld, guard.InstanceField));
+            il.InsertBefore(start, il.Create(OpCodes.Dup));
+            il.InsertBefore(start, il.CreateStlocBest(guardVariable));
+            il.InsertBefore(start, il.Create(OpCodes.Call, isStaticConstructor ? guard.GuardEnterStaticConstructorMethod : guard.GuardEnterMethod));
 
             for (var i = skipFirst; i < instructions.Count; i++) {
                 var instruction = instructions[i];
-                if (isStaticConstructor && IsCallToUserCode(instruction, method.Module.Assembly))
-                    throw new AssemblyGuardException($"Static constructor {method} cannot perform calls to user code (stack check limitation).");
-
-                var memberRule = CecilApiValidator.ValidateInstructionAndGetRule(instruction, settings.ApiFilter);
+                var memberRule = apiValidator.ValidateInstructionAndGetRule(instruction);
                 ValidateInstructionStackSize(instruction, method, settings);
                 var code = instruction.OpCode.Code;
                 if (code == Code.Newarr) {
-                    il.InsertBeforeAndRetargetJumps(instruction, il.Create(OpCodes.Ldloc, guardVariable));
-                    il.InsertBefore(instruction, il.Create(OpCodes.Call, guard.GuardCountIntPtrMethod));
+                    il.InsertBeforeAndRetargetJumps(instruction, il.CreateLdlocBest(guardVariable));
+                    il.InsertBefore(instruction, il.CreateCall(guard.GuardCountIntPtrMethod));
                     i += 2;
                     continue;
                 }
 
                 if (memberRule != null && memberRule.Rewriter != null) {
-                    i += memberRule.RewriterAsInternal.Rewrite(
+                    var instructionCountBefore = instructions.Count;
+                    var rewritten = memberRule.RewriterAsInternal.Rewrite(
                         instruction, new ApiMemberRewriterContext(il, guardVariable, guard)
                     );
-                    if (i > 0)
+                    if (rewritten) {
+                        i += instructions.Count - instructionCountBefore;
                         continue;
+                    }
+                }
+
+                if (isStaticConstructor && instruction.OpCode.Code == Code.Ret) {
+                    il.InsertBeforeAndRetargetJumps(instruction, il.CreateLdlocBest(guardVariable));
+                    il.InsertBefore(instruction, il.CreateCall(guard.GuardExitStaticConstructorMethod));
+                    i += 2;
+                    continue;
                 }
 
                 if (!ShouldInsertJumpGuardBefore(instruction))
                     continue;
 
-                il.InsertBeforeAndRetargetJumps(instruction, il.CreateBestLdloc(guardVariable));
+                il.InsertBeforeAndRetargetJumps(instruction, il.CreateLdlocBest(guardVariable));
                 il.InsertBefore(instruction, il.Create(OpCodes.Call, guard.GuardJumpMethod));
                 i += 2;
             }

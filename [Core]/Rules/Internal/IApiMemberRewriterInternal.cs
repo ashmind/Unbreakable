@@ -7,6 +7,6 @@ using Mono.Cecil.Cil;
 
 namespace Unbreakable.Rules.Internal {
     internal interface IApiMemberRewriterInternal : IApiMemberRewriter {
-        int Rewrite(Instruction instruction, ApiMemberRewriterContext context);
+        bool Rewrite(Instruction instruction, ApiMemberRewriterContext context);
     }
 }

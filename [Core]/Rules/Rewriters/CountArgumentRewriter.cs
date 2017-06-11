@@ -5,28 +5,28 @@ using Unbreakable.Internal;
 using Unbreakable.Rules.Internal;
 
 namespace Unbreakable.Rules.Rewriters {
-    public class CountMemoryGuardRewriter : IApiMemberRewriterInternal {
-        public static CountMemoryGuardRewriter ForCount { get; } = new CountMemoryGuardRewriter();
-        public static CountMemoryGuardRewriter ForCapacity { get; } = new CountMemoryGuardRewriter("capacity");
+    public class CountArgumentRewriter : IApiMemberRewriterInternal {
+        public static CountArgumentRewriter Default { get; } = new CountArgumentRewriter();
+        public static CountArgumentRewriter ForCapacity { get; } = new CountArgumentRewriter("capacity");
 
         private readonly string _countParameterName;
 
-        public CountMemoryGuardRewriter(string countParameterName = "count") {
+        public CountArgumentRewriter(string countParameterName = "count") {
             _countParameterName = countParameterName;
         }
 
-        int IApiMemberRewriterInternal.Rewrite(Instruction instruction, ApiMemberRewriterContext context) {
+        bool IApiMemberRewriterInternal.Rewrite(Instruction instruction, ApiMemberRewriterContext context) {
             var method = ((MethodReference)instruction.Operand).Resolve();
             var countParameter = GetCountParameter(method);
             if (countParameter == null)
-                return 0;
+                return false;
             if (countParameter.Index < method.Parameters.Count - 1)
-                throw new NotSupportedException($"{nameof(CountMemoryGuardRewriter)} does not support method {method} because count is not the last argument.");
+                throw new NotSupportedException($"{nameof(CountArgumentRewriter)} does not support method {method} because count is not the last argument.");
 
             var il = context.IL;
-            il.InsertBeforeAndRetargetJumps(instruction, il.CreateBestLdloc(context.RuntimeGuardVariable));
-            il.InsertBefore(instruction, il.Create(OpCodes.Call, context.RuntimeGuardReferences.GuardCountInt32Method));
-            return 2;
+            il.InsertBeforeAndRetargetJumps(instruction, il.CreateLdlocBest(context.RuntimeGuardVariable));
+            il.InsertBefore(instruction, il.CreateCall(context.RuntimeGuardReferences.GuardCountInt32Method));
+            return true;
         }
 
         // Unnecessary microoptimization (avoids LINQ allocation)

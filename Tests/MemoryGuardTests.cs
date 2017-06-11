@@ -22,44 +22,51 @@ namespace Unbreakable.Tests {
         }
 
         [Theory]
-        [InlineData("byte[] M() => new byte[100000];", false)]
-        [InlineData("byte[] M() => new byte[(long)int.MaxValue + 1];", true)]
-        public void ThrowsGuardException_WhenAllocatingLargeArray(string code, bool requiresX64) {
+        [InlineData("new byte[100000]", false)]
+        [InlineData("new byte[(long)int.MaxValue + 1]", true)]
+        public void ThrowsGuardException_WhenAllocatingLargeArray(string expression, bool requiresX64) {
             if (requiresX64)
                 Assert.True(IntPtr.Size == 8, "This test can only be run in x64.");
-
-            var m = TestHelper.RewriteAndGetMethodWrappedInScope(@"
-                class C {
-                    " + code + @"
-                }
-            ", "C", "M");
-            var exception = Assert.Throws<TargetInvocationException>(() => m());
-            Assert.IsType<MemoryGuardException>(exception.InnerException);
+            AssertThrowsMemoryGuard(expression);
         }
 
         [Theory]
-        [InlineData("string M() => new string('a', 10000);")]
-        public void ThrowsGuardException_WhenAllocatingLargeString(string code) {
+        [InlineData("new string('a', 10000)")]
+        public void ThrowsGuardException_WhenAllocatingLargeString(string expression) {
             // found by Julien Roncaglia (@vbfox)
-            var m = TestHelper.RewriteAndGetMethodWrappedInScope(@"
-                class C {
-                    " + code + @"
-                }
-            ", "C", "M");
-            var exception = Assert.Throws<TargetInvocationException>(() => m());
-            Assert.IsType<MemoryGuardException>(exception.InnerException);
+            AssertThrowsMemoryGuard(expression);
         }
 
         [Theory]
-        [InlineData("List<string> M() => new List<string>(10000);")]
-        [InlineData("Stack<string> M() => new Stack<string>(10000);")]
-        [InlineData("Dictionary<string, string> M() => new Dictionary<string, string>(10000);")]
-        [InlineData("Queue<string> M() => new Queue<string>(10000);")]
-        public void ThrowsGuardException_WhenAllocatingLargeCollections(string code) {
+        [InlineData("new List<string>(10000)")]
+        [InlineData("new Stack<string>(10000)")]
+        [InlineData("new Dictionary<string, string>(10000)")]
+        [InlineData("new Queue<string>(10000)")]
+        public void ThrowsGuardException_WhenAllocatingLargeCollections(string expression) {
+            AssertThrowsMemoryGuard(expression);
+        }
+
+        [Theory]
+        [InlineData("Enumerable.Range(0, 10000).ToArray()")]
+        [InlineData("Enumerable.Range(0, 10000).ToList()")]
+        [InlineData("Enumerable.Range(0, 10000).ToDictionary(i => i)")]
+        public void ThrowsGuardException_WhenMaterializingLargeEnumerable(string expression) {
+            // found by Tereza Tomcova (@the_ress)
+            AssertThrowsMemoryGuard(expression);
+        }
+
+        [Theory]
+        [InlineData("(new[] { 0 }).Intersect(Enumerable.Range(0, 10000)).ToArray()")]
+        public void ThrowsGuardException_WhenMatchingToLargeEnumerable(string expression) {
+            AssertThrowsMemoryGuard(expression);
+        }
+
+        private static void AssertThrowsMemoryGuard(string expression) {
             var m = TestHelper.RewriteAndGetMethodWrappedInScope(@"
                 using System.Collections.Generic;
+                using System.Linq;
                 class C {
-                    " + code + @"
+                    object M() => " + expression + @";
                 }
             ", "C", "M");
             var exception = Assert.Throws<TargetInvocationException>(() => m());

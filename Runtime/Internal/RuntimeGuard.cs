@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Threading;
@@ -11,6 +12,7 @@ namespace Unbreakable.Runtime.Internal {
         private long _stackBaseline;
         private readonly Stopwatch _stopwatch;
         private long _allocatedCountTotal;
+        [ThreadStatic] private static long _staticConstructorStackBaseline;
 
         private long _stackBytesLimit;
         private long _allocatedCountTotalLimit;
@@ -26,40 +28,58 @@ namespace Unbreakable.Runtime.Internal {
             EnsureTime();
         }
 
+        public void GuardEnterStaticConstructor() {
+            EnsureActive();
+            _staticConstructorStackBaseline = GetCurrentStackOffset();
+            EnsureTime();
+        }
+
+        public void GuardExitStaticConstructor() {
+            _staticConstructorStackBaseline = 0;
+        }
+
         public void GuardJump() {
             EnsureActive();
             EnsureTime();
         }
-        
+
+        public IEnumerable<T> GuardCollectedEnumerable<T>(IEnumerable<T> enumerable) {
+            EnsureActive();
+            foreach (var item in enumerable) {
+                EnsureTime();
+                EnsureCount(1);
+                yield return item;
+            }
+        }
+
+        public IEnumerable<T> GuardIteratedEnumerable<T>(IEnumerable<T> enumerable) {
+            EnsureActive();
+            foreach (var item in enumerable) {
+                EnsureTime();
+                yield return item;
+            }
+        }
+
         private void GuardCount(long count) {
             EnsureActive();
             EnsureTime();
-            Interlocked.Add(ref _allocatedCountTotal, count);
-            if (_allocatedCountTotal > _allocatedCountTotalLimit)
-                throw new MemoryGuardException("Total size limit reached for collections and strings.");
-        }
-
-        public static IntPtr GuardCountFlowThroughForIntPtr(IntPtr count, RuntimeGuard guard) {
-            guard.GuardCount(count.ToInt64());
-            return count;
-        }
-
-        public static int GuardCountFlowThroughForInt32(int count, RuntimeGuard guard) {
-            guard.GuardCount(count);
-            return count;
-        }
-
-        public static long GuardCountFlowThroughForInt64(long count, RuntimeGuard guard) {
-            guard.GuardCount(count);
-            return count;
+            EnsureCount(count);
         }
 
         private void EnsureStack() {
-            var stackCurrent = GetCurrentLocationInStack();
-            if (_stackBaseline == 0)
-                Interlocked.CompareExchange(ref _stackBaseline, stackCurrent, 0);
+            var stackCurrent = GetCurrentStackOffset();
 
-            if (_stackBaseline - stackCurrent > _stackBytesLimit)
+            long stackBaseline;
+            if (_staticConstructorStackBaseline != 0) {
+                stackBaseline = _staticConstructorStackBaseline;
+            }
+            else {
+                if (_stackBaseline == 0)
+                    Interlocked.CompareExchange(ref _stackBaseline, stackCurrent, 0);
+                stackBaseline = _stackBaseline;
+            }
+
+            if (stackBaseline - stackCurrent > _stackBytesLimit)
                 throw new StackGuardException("Stack limit reached.");
         }
 
@@ -75,7 +95,13 @@ namespace Unbreakable.Runtime.Internal {
                 throw new GuardException(GuardException.NoScopeMessage);
         }
 
-        private unsafe long GetCurrentLocationInStack() {
+        private void EnsureCount(long count) {
+            Interlocked.Add(ref _allocatedCountTotal, count);
+            if (_allocatedCountTotal > _allocatedCountTotalLimit)
+                throw new MemoryGuardException("Total allocation limit reached (collections and strings).");
+        }
+
+        private unsafe long GetCurrentStackOffset() {
             byte* local = stackalloc byte[1];
             return (long)local;
         }
@@ -94,6 +120,31 @@ namespace Unbreakable.Runtime.Internal {
 
         internal void Stop() {
             _active = false;
+        }
+
+        public static class FlowThrough {
+            public static IEnumerable<T> GuardCollectedEnumerable<T>(IEnumerable<T> enumerable, RuntimeGuard guard) {
+                return guard.GuardCollectedEnumerable(enumerable);
+            }
+
+            public static IEnumerable<T> GuardIteratedEnumerable<T>(IEnumerable<T> enumerable, RuntimeGuard guard) {
+                return guard.GuardIteratedEnumerable(enumerable);
+            }
+
+            public static IntPtr GuardCountForIntPtr(IntPtr count, RuntimeGuard guard) {
+                guard.GuardCount(count.ToInt64());
+                return count;
+            }
+
+            public static int GuardCountForInt32(int count, RuntimeGuard guard) {
+                guard.GuardCount(count);
+                return count;
+            }
+
+            public static long GuardCountForInt64(long count, RuntimeGuard guard) {
+                guard.GuardCount(count);
+                return count;
+            }
         }
     }
 }

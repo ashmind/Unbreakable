@@ -23,6 +23,8 @@ namespace Unbreakable.Internal {
                     if (!namespaceRule.Types.TryGetValue(typeName, out typeRule))
                         return new ApiFilterResult(namespaceRule.Access == ApiAccess.Allowed ? Allowed : DeniedType);
                     break;
+                case ApiFilterTypeKind.Array:
+                    return Filter(nameof(System), nameof(Array), ApiFilterTypeKind.External, memberName);
                 case ApiFilterTypeKind.CompilerGeneratedDelegate:
                     typeRule = Rules.CompilerGeneratedDelegate;
                     break;

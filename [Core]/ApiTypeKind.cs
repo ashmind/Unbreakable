@@ -1,6 +1,7 @@
 ﻿namespace Unbreakable {
     public enum ApiFilterTypeKind {
         External,
-        CompilerGeneratedDelegate
+        Array,
+        CompilerGeneratedDelegate,
     }
 }
