@@ -8,7 +8,7 @@ build_script:
 - dotnet build --configuration Release
 
 test_script:
-- dotnet test Tests\Tests.csproj
+- dotnet test Tests\Tests.csproj /p:Platform=x64
   
 after_test:
 - .\pack-all.bat

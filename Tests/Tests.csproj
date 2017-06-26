@@ -16,8 +16,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Runtime\Runtime.csproj" />
-    <ProjectReference Include="..\[Core]\[Core].csproj" />
+    <ProjectReference Include="..\Runtime\Runtime.csproj">
+      <SetPlatform>Platform=AnyCPU</SetPlatform>
+    </ProjectReference>
+    <ProjectReference Include="..\[Core]\[Core].csproj">
+      <SetPlatform>Platform=AnyCPU</SetPlatform>
+    </ProjectReference>
   </ItemGroup>
 
 </Project>
