@@ -1,0 +1,13 @@
+﻿<Project>
+  <PropertyGroup>
+    <Authors>Andrey Shchekin</Authors>
+    <PackageProjectUrl>https://github.com/ashmind/Unbreakable</PackageProjectUrl>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/ashmind/Unbreakable.git</RepositoryUrl>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
+    <DefineConstants>$(DefineConstants); JETBRAINS_ANNOTATIONS</DefineConstants>
+  </PropertyGroup>
+</Project>

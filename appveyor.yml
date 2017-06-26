@@ -1,0 +1,25 @@
+version: '{build}'
+configuration: Release
+
+before_build:
+- dotnet restore
+
+build_script:
+- dotnet build --configuration Release
+
+test_script:
+- dotnet test Tests\Tests.csproj
+  
+after_test:
+- .\pack-all.bat
+
+artifacts:
+- path: '*.nupkg'
+
+deploy:
+  - provider: NuGet
+    on:
+      branch: /^(master|\d\.\d)$/
+    api_key:
+      secure: rV20COJkB2Lt/O6E7NvcdMJlHtBS8C7uuUWhFXu6XTPmEVqAeMKCDyz/yuOZwVRo
+    artifact: /.*\.nupkg/

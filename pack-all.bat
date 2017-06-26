@@ -1,0 +1,2 @@
+@echo off
+powershell "$versionSuffix = '%1'; $output = (Resolve-Path .); @('[Core]', 'Runtime') | %% { dotnet restore /p:VersionSuffix=$versionSuffix; dotnet pack $_ --version-suffix=$versionSuffix --output $output --configuration Release }"
