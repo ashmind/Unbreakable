@@ -14,10 +14,17 @@ namespace Unbreakable {
             Argument.NotNull(nameof(assemblyTargetStream), assemblyTargetStream);
             if (assemblyTargetStream == assemblySourceStream) // Cecil limitation? Causes some weird issues.
                 throw new ArgumentException("Target stream must be different from source stream.", nameof(assemblyTargetStream));
-            settings = settings ?? AssemblyGuardSettings.Default;
 
-            var id = Guid.NewGuid();
             var assembly = AssemblyDefinition.ReadAssembly(assemblySourceStream);
+            var rewritten = Rewrite(assembly, settings);
+            rewritten.Assembly.Write(assemblyTargetStream);
+            //assembly.Write($@"d:\Temp\unbreakable\{Guid.NewGuid()}.dll");
+            return rewritten.Token;
+        }
+
+        internal static RewriteResult Rewrite(AssemblyDefinition assembly, AssemblyGuardSettings settings) {
+            var id = Guid.NewGuid();
+            settings = settings ?? AssemblyGuardSettings.Default;
             var apiValidator = new CecilApiValidator(settings.ApiFilter, assembly);
             foreach (var module in assembly.Modules) {
                 var guardInstanceField = EmitGuardInstance(module, id);
@@ -28,10 +35,7 @@ namespace Unbreakable {
                     ValidateAndRewriteType(type, guard, apiValidator, settings);
                 }
             }
-
-            assembly.Write(assemblyTargetStream);
-            //assembly.Write($@"d:\Temp\unbreakable\{Guid.NewGuid()}.dll");
-            return new RuntimeGuardToken(id);
+            return new RewriteResult(assembly, new RuntimeGuardToken(id));
         }
 
         private static FieldDefinition EmitGuardInstance(ModuleDefinition module, Guid id) {
@@ -212,6 +216,16 @@ namespace Unbreakable {
             var code = instruction.OpCode.Code;
             return (code == Code.Call || code == Code.Calli || code == Code.Callvirt)
                 && ((MethodReference)instruction.Operand).Module.Assembly == userCodeAssembly;
+        }
+
+        internal struct RewriteResult {
+            public RewriteResult(AssemblyDefinition assembly, RuntimeGuardToken token) {
+                Assembly = assembly;
+                Token = token;
+            }
+
+            public AssemblyDefinition Assembly { get; }
+            public RuntimeGuardToken Token { get; }
         }
     }
 }
