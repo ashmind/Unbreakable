@@ -16,7 +16,7 @@ namespace Unbreakable {
 
         [NotNull]
         public ApiRules Namespace([NotNull] string @namespace, ApiAccess access, [CanBeNull] Action<ApiNamespaceRule> setup = null) {
-            Argument.NotNullOrEmpty(nameof(@namespace), @namespace);
+            Argument.NotNull(nameof(@namespace), @namespace);
 
             if (!_namespaces.TryGetValue(@namespace, out var rule)) {
                 rule = new ApiNamespaceRule();

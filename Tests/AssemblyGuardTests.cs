@@ -23,7 +23,6 @@ namespace Unbreakable.Tests {
 
         [Theory]
         [InlineData("void M() { Console.WriteLine('x'); }")]
-        [InlineData("void M() { this.GetType(); }")]
         [InlineData("class N { void M() { GC.Collect(); } }")]
         [InlineData("void M() { var x = new IntPtr(0); }")] // crash, found by Alexandre Mutel‏ (@xoofx)
         public void ThrowsGuardException_ForDeniedApi(string code) {

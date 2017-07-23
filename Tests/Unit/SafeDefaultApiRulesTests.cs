@@ -19,9 +19,15 @@ namespace Unbreakable.Tests.Unit {
 
         [Fact]
         public void Create_IncludesAddCallRewriter_ForMethodsNamedAddEnqueueAndPush() {
+            var excludedTypes = new HashSet<Type> {
+                typeof(DateTime),
+                typeof(DateTimeOffset),
+                typeof(Decimal),
+                typeof(TimeSpan)
+            };
             AssertEachMatchingMethodHasRewriterOfType<AddCallRewriter>(
                 m => (m.Name == "Add" || m.Name == "Enqueue" || m.Name == "Push")
-                  && (m.DeclaringType != typeof(DateTime) && m.DeclaringType != typeof(DateTimeOffset))
+                  && (!excludedTypes.Contains(m.DeclaringType))
             );
         }
 
@@ -57,7 +63,7 @@ namespace Unbreakable.Tests.Unit {
                 .GetAssemblies()
                 .Select(a => a.GetType(fullName))
                 .Where(t => t != null)
-                .First();
+                .FirstOrDefault() ?? throw new Exception($"Type {fullName} was not found.");
         }
     }
 }

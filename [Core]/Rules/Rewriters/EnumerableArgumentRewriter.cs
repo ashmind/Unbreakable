@@ -22,7 +22,7 @@ namespace Unbreakable.Rules.Rewriters {
             var il = context.IL;
 
             if (method.Parameters.Count == 1) {
-                var enumerableType = method.Parameters[0].ParameterType.ResolveGenericParameters(method as GenericInstanceMethod);
+                var enumerableType = method.Parameters[0].ParameterType.ResolveGenericParameters(method as GenericInstanceMethod, method.DeclaringType as GenericInstanceType);
                 if (!IsIEnumerable(enumerableType))
                     return false;
                 InsertEnumerableGuard(instruction, context, enumerableType);
@@ -32,7 +32,7 @@ namespace Unbreakable.Rules.Rewriters {
             var parameterTypes = new TypeReference[method.Parameters.Count];
             var hasIEnumerable = false;
             for (var i = 0; i < method.Parameters.Count; i++) {
-                var parameterType = method.Parameters[i].ParameterType.ResolveGenericParameters(method as GenericInstanceMethod);
+                var parameterType = method.Parameters[i].ParameterType.ResolveGenericParameters(method as GenericInstanceMethod, method.DeclaringType as GenericInstanceType);
                 if (IsIEnumerable(parameterType))
                     hasIEnumerable = true;
                 parameterTypes[i] = parameterType;

@@ -50,7 +50,7 @@ namespace Unbreakable {
                 module.Import(typeof(RuntimeGuard))
             );
             instanceType.Fields.Add(instanceField);
-            
+
             var constructor = new MethodDefinition(".cctor", MethodAttributes.Private | MethodAttributes.RTSpecialName | MethodAttributes.SpecialName | MethodAttributes.Static, module.Import(typeof(void)));
             var getGuardInstance = module.Import(typeof(RuntimeGuardInstances).GetMethod(nameof(RuntimeGuardInstances.Get)));
             var il = constructor.Body.GetILProcessor();
@@ -69,8 +69,11 @@ namespace Unbreakable {
             if (type.Namespace == "System" || type.Namespace.StartsWith("System.", StringComparison.Ordinal))
                 throw new AssemblyGuardException($"Custom types cannot be defined in system namespace {type.Namespace}.");
 
-            if ((type.Attributes & TypeAttributes.ExplicitLayout) == TypeAttributes.ExplicitLayout)
-                throw new AssemblyGuardException($"Type {type} has an explicit layout which is not allowed.");
+            if ((type.Attributes & TypeAttributes.ExplicitLayout) == TypeAttributes.ExplicitLayout) {
+                var allowedPattern = settings.AllowExplicitLayoutInTypesMatchingPattern;
+                if (allowedPattern == null || !allowedPattern.IsMatch(type.FullName))
+                    throw new AssemblyGuardException($"Type {type} has an explicit layout which is not allowed.");
+            }
 
             apiValidator.ValidateDefinition(type);
             foreach (var nested in type.NestedTypes) {

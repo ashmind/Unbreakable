@@ -2,10 +2,10 @@
   <Import Project="../NuGetPackage.Common.props" />
 
   <PropertyGroup>
-    <TargetFramework>net46</TargetFramework>
+    <TargetFramework>net45</TargetFramework>
     <AssemblyName>Unbreakable.Runtime</AssemblyName>
     <RootNamespace>Unbreakable.Runtime</RootNamespace>
-    <VersionPrefix>0.1.0-unproven</VersionPrefix>
+    <VersionPrefix>0.1.1-unproven</VersionPrefix>
     <Description>Runtime library for https://www.nuget.org/packages/Unbreakable. This library supports the Unbreakable infrastructure and is not intended to be used directly from your code.</Description>
     <PackageTags>sandboxing</PackageTags>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>

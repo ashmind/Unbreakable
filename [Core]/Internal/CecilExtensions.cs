@@ -9,19 +9,33 @@ using Mono.Cecil.Cil;
 
 namespace Unbreakable.Internal {
     internal static class CecilExtensions {
-        public static TypeReference ResolveGenericParameters(this TypeReference type, [CanBeNull] GenericInstanceMethod methodInstance) {
+        public static TypeReference ResolveGenericParameters(this TypeReference type, [CanBeNull] GenericInstanceMethod methodInstance, [CanBeNull] GenericInstanceType typeInstance) {
             if (type is GenericParameter genericParameter) {
-                if ((genericParameter.Owner as MethodReference)?.Resolve() != methodInstance?.Resolve())
-                    throw new NotImplementedException("Unable to resolve generic parameter that does not come from the method call.");
+                switch (genericParameter.Owner) {
+                    case MethodReference ownerMethod: {
+                        if (ownerMethod.Resolve() != methodInstance?.Resolve())
+                            throw new NotSupportedException($"Generic parameter {type} comes from method {ownerMethod} which is different from provided {methodInstance}.");
 
-                return methodInstance.GenericArguments[genericParameter.Position].ResolveGenericParameters(methodInstance);
+                        return methodInstance.GenericArguments[genericParameter.Position].ResolveGenericParameters(methodInstance, typeInstance);
+                    }
+
+                    case TypeReference ownerType: {
+                        if (ownerType.Resolve() != typeInstance?.Resolve())
+                            throw new NotSupportedException($"Generic parameter {type} comes from type {ownerType} which is different from provided {typeInstance}.");
+
+                        return typeInstance.GenericArguments[genericParameter.Position].ResolveGenericParameters(methodInstance, typeInstance);
+                    }
+
+                    default:
+                        throw new NotSupportedException($"Unsupported generic parameter owner: {genericParameter.Owner}.");
+                }
             }
 
             if (type is GenericInstanceType generic) {
                 var changed = (GenericInstanceType)null;
                 for (var i = 0; i < generic.GenericArguments.Count; i++) {
                     var argument = generic.GenericArguments[i];
-                    var resolved = argument.ResolveGenericParameters(methodInstance);
+                    var resolved = argument.ResolveGenericParameters(methodInstance, typeInstance);
                     if (resolved != argument) {
                         changed = changed ?? Clone(generic);
                         changed.GenericArguments[i] = resolved;
@@ -76,8 +90,14 @@ namespace Unbreakable.Internal {
                 return;
 
             foreach (var handler in il.Body.ExceptionHandlers) {
+                if (handler.TryStart == target)
+                    handler.TryStart = instruction;
                 if (handler.TryEnd == target)
                     handler.TryEnd = instruction;
+                if (handler.FilterStart == target)
+                    handler.FilterStart = instruction;
+                if (handler.HandlerStart == target)
+                    handler.HandlerStart = instruction;
                 if (handler.HandlerEnd == target)
                     handler.HandlerEnd = instruction;
             }

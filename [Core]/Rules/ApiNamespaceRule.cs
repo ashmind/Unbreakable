@@ -11,6 +11,14 @@ namespace Unbreakable.Rules {
         }
 
         [NotNull]
+        public ApiNamespaceRule Type([NotNull] Type type, ApiAccess access, [CanBeNull] Action<ApiTypeRule> setup = null) {
+            var typeName = type.Name;
+            if (type.IsNested)
+                typeName = type.FullName.Substring(type.Namespace.Length + 1);
+            return Type(typeName, access, setup);
+        }
+
+        [NotNull]
         public ApiNamespaceRule Type([NotNull] string typeName, ApiAccess access, [CanBeNull] Action<ApiTypeRule> setup = null) {
             Argument.NotNullOrEmpty(nameof(typeName), typeName);
             if (Access == ApiAccess.Denied && access != ApiAccess.Denied)

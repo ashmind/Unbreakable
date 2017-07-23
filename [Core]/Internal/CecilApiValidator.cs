@@ -63,6 +63,14 @@ namespace Unbreakable.Internal {
             if (type.IsGenericParameter)
                 return null;
 
+            if ((type is GenericInstanceType generic)) {
+                var rule = EnsureAllowed(generic.ElementType, memberName);
+                foreach (var argument in generic.GenericArguments) {
+                    EnsureAllowed(argument);
+                }
+                return rule;
+            }
+
             var typeKind = ApiFilterTypeKind.External;
             if (type.IsArray) {
                 EnsureAllowed(type.GetElementType());
@@ -76,10 +84,12 @@ namespace Unbreakable.Internal {
                 typeKind = ApiFilterTypeKind.CompilerGeneratedDelegate;
             }
 
-            var result = _filter.Filter(type.Namespace, type.Name, typeKind, memberName);
+            var @namespace = GetNamespace(type);
+            var typeName = !type.IsNested ? type.Name : (type.FullName.Substring(@namespace.Length + 1).Replace("/", "+"));
+            var result = _filter.Filter(@namespace, typeName, typeKind, memberName);
             switch (result.Kind) {
                 case ApiFilterResultKind.DeniedNamespace:
-                    throw new AssemblyGuardException($"Namespace {type.Namespace} is not allowed.");
+                    throw new AssemblyGuardException($"Namespace {@namespace} is not allowed.");
                 case ApiFilterResultKind.DeniedType:
                     throw new AssemblyGuardException($"Type {type.FullName} is not allowed.");
                 case ApiFilterResultKind.DeniedMember:
@@ -89,6 +99,15 @@ namespace Unbreakable.Internal {
                 default:
                     throw new NotSupportedException($"Unknown filter result {result}.");
             }
+        }
+
+        private string GetNamespace(TypeReference type) {
+            string @namespace = null;
+            while (string.IsNullOrEmpty(@namespace) && type != null) {
+                @namespace = type.Namespace;
+                type = type.DeclaringType;
+            }
+            return @namespace;
         }
 
         private static bool IsDelegateDefinition(TypeDefinition type) {

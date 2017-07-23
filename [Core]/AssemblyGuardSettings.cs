@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 using JetBrains.Annotations;
 using Unbreakable.Internal;
 
@@ -23,7 +23,8 @@ namespace Unbreakable {
             set => _apiFilter.Rules = Argument.NotNull(nameof(value), value);
         }
 
-        public int MethodLocalsSizeLimit { get; }
-        public int MethodStackPushSizeLimit { get; }
+        public int MethodLocalsSizeLimit { get; set; }
+        public int MethodStackPushSizeLimit { get; set; }
+        public Regex AllowExplicitLayoutInTypesMatchingPattern { get; set; }
     }
 }

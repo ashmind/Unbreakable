@@ -36,6 +36,7 @@ namespace Unbreakable {
         }
 
         public FieldDefinition InstanceField { get; }
+        public FieldDefinition TestField_TEMP { get; }
         public MethodReference GuardEnterMethod { get; }
         public MethodReference GuardEnterStaticConstructorMethod { get; }
         public MethodReference GuardExitStaticConstructorMethod { get; }

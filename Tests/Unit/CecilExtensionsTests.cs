@@ -9,7 +9,7 @@ namespace Unbreakable.Tests.Unit {
         [Fact]
         public void ResolveGenericsParameters_ResolvesTypeToItself_IfNonGeneric() {
             var type = CompileToAssembly("class C {}").MainModule.Types.First(t => t.Name == "C");
-            Assert.Same(type, type.ResolveGenericParameters(null));
+            Assert.Same(type, type.ResolveGenericParameters(null, null));
         }
 
         [Fact]
@@ -26,7 +26,7 @@ namespace Unbreakable.Tests.Unit {
             var method = (GenericInstanceMethod)call.Operand;
             var returnType = method.ReturnType;
 
-            var resolved = returnType.GetElementType().ResolveGenericParameters(method);
+            var resolved = returnType.GetElementType().ResolveGenericParameters(method, null);
 
             Assert.Equal("System.Int32", resolved.FullName);
         }
@@ -45,7 +45,7 @@ namespace Unbreakable.Tests.Unit {
             var method = (GenericInstanceMethod)call.Operand;
             var returnType = method.ReturnType;
 
-            var resolved = returnType.ResolveGenericParameters(method);
+            var resolved = returnType.ResolveGenericParameters(method, null);
 
             Assert.Equal(
                 "System.Int32",
