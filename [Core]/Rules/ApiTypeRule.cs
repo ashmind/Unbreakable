@@ -31,6 +31,26 @@ namespace Unbreakable.Rules {
         }
 
         [NotNull]
+        public ApiTypeRule Getter([NotNull] string propertyName, ApiAccess access, Action<ApiMemberRule> setup) {
+            return Member("get_" + propertyName, access, setup);
+        }
+
+        [NotNull]
+        public ApiTypeRule Getter([NotNull] string propertyName, ApiAccess access, params IApiMemberRewriter[] rewriters) {
+            return Member("get_" + propertyName, access, rewriters);
+        }
+
+        [NotNull]
+        public ApiTypeRule Setter([NotNull] string propertyName, ApiAccess access, Action<ApiMemberRule> setup) {
+            return Member("set_" + propertyName, access, setup);
+        }
+
+        [NotNull]
+        public ApiTypeRule Setter([NotNull] string propertyName, ApiAccess access, params IApiMemberRewriter[] rewriters) {
+            return Member("set_" + propertyName, access, rewriters);
+        }
+
+        [NotNull]
         public ApiTypeRule Member([NotNull] string name, ApiAccess access, Action<ApiMemberRule> setup) {
             return Member(name, access, null, setup);
         }

@@ -6,6 +6,7 @@ using Unbreakable.Rules;
 using Unbreakable.Rules.Rewriters;
 
 namespace Unbreakable.Internal {
+    using System.Diagnostics;
     using static ApiAccess;
 
     internal static class SafeDefaultApiRules {
@@ -17,12 +18,12 @@ namespace Unbreakable.Internal {
                 .Namespace(nameof(System), Neutral, SetupSystem)
                 .Namespace("System.Collections.Generic", Neutral, SetupSystemCollectionsGeneric)
                 .Namespace("System.Linq", Neutral, SetupSystemLinq)
-                .Namespace("System.Diagnostics", Denied)
+                .Namespace("System.Diagnostics", Neutral, SetupSystemDiagnostics)
                 .Namespace("System.IO", Denied)
                 .Namespace("System.Reflection", Denied)
                 .Namespace("System.Runtime", Denied)
                 .Namespace("System.Runtime.InteropServices", Denied)
-                .Namespace("System.Runtime.CompilerServices", Neutral, n => n.Type(nameof(CompilerGeneratedAttribute), Allowed))
+                .Namespace("System.Runtime.CompilerServices", Neutral, SetupSystemRuntimeCompilerServices)
                 .Namespace("System.Threading", Denied)
 
                 .Namespace("Unbreakable", Denied)
@@ -36,11 +37,17 @@ namespace Unbreakable.Internal {
                 .Type(nameof(AppDomain), Denied)
                 .Type(nameof(AppDomainManager), Denied)
                 .Type(nameof(Console), Denied)
-                .Type(nameof(Environment), Denied)
                 .Type(nameof(GC), Denied)
                 .Type(nameof(LocalDataStoreSlot), Denied)
                 .Type(nameof(OperatingSystem), Denied)
                 .Type(nameof(TypedReference), Denied)
+
+                .Type(nameof(Environment), Neutral,
+                    t => t.Getter(nameof(Environment.CurrentManagedThreadId), Allowed)
+                )
+                .Type(nameof(NotSupportedException), Neutral,
+                    t => t.Constructor(Allowed)
+                )
 
                 .Type(nameof(Object), Allowed)
                 .Type(nameof(String), Allowed,
@@ -53,7 +60,8 @@ namespace Unbreakable.Internal {
                 .Type(nameof(DateTimeOffset), Allowed)
                 .Type(typeof(void).Name, Allowed)
                 .Type(nameof(Nullable), Allowed)
-                .Type(typeof(Nullable<>).Name, Allowed);
+                .Type(typeof(Nullable<>).Name, Allowed)
+                .Type(typeof(Random).Name, Allowed);
 
             foreach (var type in PrimitiveTypes.List) {
                 if (type == typeof(IntPtr) || type == typeof(UIntPtr))
@@ -141,6 +149,12 @@ namespace Unbreakable.Internal {
             type.Member("Add", Allowed, AddCallRewriter.Default);
         }
 
+        private static void SetupSystemDiagnostics(ApiNamespaceRule diagnostics) {
+            diagnostics
+                .Type(nameof(DebuggerHiddenAttribute), Allowed)
+                .Type(nameof(Process), Denied);
+        }
+
         private static void SetupSystemLinq(ApiNamespaceRule linq) {
             linq
                 .Type(nameof(Enumerable), Neutral,
@@ -196,6 +210,12 @@ namespace Unbreakable.Internal {
                           .Member(nameof(Enumerable.Where), Allowed)
                           .Member(nameof(Enumerable.Zip), Allowed)
                 );
+        }
+
+        private static void SetupSystemRuntimeCompilerServices(ApiNamespaceRule compilerServices) {
+            compilerServices
+                .Type(nameof(CompilerGeneratedAttribute), Allowed)
+                .Type(nameof(IteratorStateMachineAttribute), Allowed);
         }
 
         private static ApiTypeRule CreateTypeRuleForCompilerGeneratedDelegate() {
