@@ -18,7 +18,7 @@ namespace Unbreakable.Internal {
             typeof(Func<>).Assembly.GetTypes().Where(t => t.Namespace == nameof(System) && t.BaseType == typeof(MulticastDelegate)).ToArray();
 
         private static readonly IReadOnlyCollection<string> ValueTupleTypeNames =
-            Enumerable.Range(0, 8).Select(n => "ValueTuple`" + n).ToArray();
+            Enumerable.Range(1, 8).Select(n => "ValueTuple`" + n).ToArray();
 
         public static ApiRules Create() {
             return new ApiRules(CreateTypeRuleForCompilerGeneratedDelegate())
