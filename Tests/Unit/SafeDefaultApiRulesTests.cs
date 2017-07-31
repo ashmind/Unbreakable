@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using AshMind.Extensions;
 using Unbreakable.Internal;
 using Unbreakable.Rules;
@@ -10,13 +11,6 @@ using Xunit;
 
 namespace Unbreakable.Tests.Unit {
     public class SafeDefaultApiRulesTests {
-        [Fact]
-        public void Create_IncludesEnumerableArgumentRewriter_ForAnyMethodWithIEnumerableParameters() {
-            AssertEachMatchingMethodHasRewriterOfType<EnumerableArgumentRewriter>(
-                m => m.GetParameters().Any(p => p.ParameterType.IsGenericTypeDefinedAs(typeof(IEnumerable<>)))
-            );
-        }
-
         [Fact]
         public void Create_IncludesAddCallRewriter_ForMethodsNamedAddEnqueueAndPush() {
             var excludedTypes = new HashSet<Type> {
@@ -28,6 +22,19 @@ namespace Unbreakable.Tests.Unit {
             AssertEachMatchingMethodHasRewriterOfType<AddCallRewriter>(
                 m => (m.Name == "Add" || m.Name == "Enqueue" || m.Name == "Push")
                   && (!excludedTypes.Contains(m.DeclaringType))
+            );
+        }
+
+        [Fact]
+        public void Create_IncludesCountArgumentRewriter_ForMethodsWithParamerNamedCountOrCapacity() {
+            var excluded = new HashSet<(Type, string)> {
+                (typeof(string), nameof(string.Join)),
+                (typeof(string), nameof(string.Split))
+            };
+            AssertEachMatchingMethodHasRewriterOfType<CountArgumentRewriter>(
+                m => m.GetParameters().Any(p => p.Name == "count" || p.Name == "capacity")
+                  && !m.GetParameters().Any(p => Regex.IsMatch(p.Name, "^(.+Index|index)$"))
+                  && !excluded.Contains((m.DeclaringType, m.Name))
             );
         }
 

@@ -16,7 +16,6 @@ namespace Unbreakable {
             public static readonly MethodInfo FlowThroughGuardCountIntPtr = typeof(RuntimeGuard.FlowThrough).GetMethod(nameof(RuntimeGuard.FlowThrough.GuardCountIntPtr));
             public static readonly MethodInfo FlowThroughGuardCountInt32 = typeof(RuntimeGuard.FlowThrough).GetMethod(nameof(RuntimeGuard.FlowThrough.GuardCountInt32));
             public static readonly MethodInfo FlowThroughGuardCountInt64 = typeof(RuntimeGuard.FlowThrough).GetMethod(nameof(RuntimeGuard.FlowThrough.GuardCountInt64));
-            public static readonly MethodInfo FlowThroughGuardEnumerableIterated = typeof(RuntimeGuard.FlowThrough).GetMethod(nameof(RuntimeGuard.FlowThrough.GuardEnumerableIterated));
             public static readonly MethodInfo FlowThroughGuardEnumerableCollected = typeof(RuntimeGuard.FlowThrough).GetMethod(nameof(RuntimeGuard.FlowThrough.GuardEnumerableCollected));
         }
 
@@ -30,7 +29,6 @@ namespace Unbreakable {
             FlowThroughGuardCountIntPtrMethod = module.Import(MethodInfos.FlowThroughGuardCountIntPtr);
             FlowThroughGuardCountInt32Method = module.Import(MethodInfos.FlowThroughGuardCountInt32);
             FlowThroughGuardCountInt64Method = module.Import(MethodInfos.FlowThroughGuardCountInt64);
-            FlowThroughGuardEnumerableIteratedMethod = module.Import(MethodInfos.FlowThroughGuardEnumerableIterated);
             FlowThroughGuardEnumerableCollectedMethod = module.Import(MethodInfos.FlowThroughGuardEnumerableCollected);
             _module = module;
         }
@@ -45,7 +43,6 @@ namespace Unbreakable {
         public MethodReference FlowThroughGuardCountIntPtrMethod { get; }
         public MethodReference FlowThroughGuardCountInt32Method { get; }
         public MethodReference FlowThroughGuardCountInt64Method { get; }
-        public MethodReference FlowThroughGuardEnumerableIteratedMethod { get; }
         public MethodReference FlowThroughGuardEnumerableCollectedMethod { get; }
     }
 }

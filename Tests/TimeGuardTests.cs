@@ -22,14 +22,6 @@ namespace Unbreakable.Tests {
             AssertThrowsTimeGuard(code);
         }
 
-        [Theory]
-        [InlineData("Enumerable.Range(0, 10000000).Last()")]
-        [InlineData("Enumerable.Range(0, 10000000).FirstOrDefault(i => false)")]
-        public void ThrowsGuardException_WhenIteratingLargeEnumerable(string expression) {
-            // found by Tereza Tomcova (@the_ress)
-            AssertThrowsTimeGuard("object M() => " + expression + ";");
-        }
-
         private void AssertThrowsTimeGuard(string code) {
             var m = TestHelper.RewriteAndGetMethodWrappedInScope(@"
                 using System.Linq;

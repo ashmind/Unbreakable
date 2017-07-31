@@ -1,22 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Mono.Cecil;
+﻿using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Unbreakable.Internal;
 using Unbreakable.Rules.Internal;
 
 namespace Unbreakable.Rules.Rewriters {
-    public class EnumerableArgumentRewriter : IApiMemberRewriterInternal {
-        public static EnumerableArgumentRewriter Iterated { get; } = new EnumerableArgumentRewriter(false);
-        public static EnumerableArgumentRewriter Collected { get; } = new EnumerableArgumentRewriter(true);
-
-        private readonly bool _collected;
-
-        public EnumerableArgumentRewriter(bool collected) {
-            _collected = collected;
-        }
-
+    public class CollectedEnumerableArgumentRewriter : IApiMemberRewriterInternal {
+        public static CollectedEnumerableArgumentRewriter Default { get; } = new CollectedEnumerableArgumentRewriter();
+        
         bool IApiMemberRewriterInternal.Rewrite(Instruction instruction, ApiMemberRewriterContext context) {
             var method = (MethodReference)instruction.Operand;
             var il = context.IL;
@@ -64,12 +54,9 @@ namespace Unbreakable.Rules.Rewriters {
         private void InsertEnumerableGuard(Instruction instruction, ApiMemberRewriterContext context, TypeReference enumerableType) {
             var il = context.IL;
             var elementType = ((GenericInstanceType)enumerableType).GenericArguments[0];
-            var guardMethodDefinition = _collected
-                ? context.RuntimeGuardReferences.FlowThroughGuardEnumerableCollectedMethod
-                : context.RuntimeGuardReferences.FlowThroughGuardEnumerableIteratedMethod;
-
-            var guardMethodInstance = new GenericInstanceMethod(guardMethodDefinition);
-            guardMethodInstance.GenericArguments.Add(elementType);
+            var guardMethodInstance = new GenericInstanceMethod(context.RuntimeGuardReferences.FlowThroughGuardEnumerableCollectedMethod) {
+                GenericArguments = { elementType }
+            };
 
             il.InsertBeforeAndRetargetJumps(instruction, il.CreateLdlocBest(context.RuntimeGuardVariable));
             il.InsertBefore(instruction, il.CreateCall(guardMethodInstance));

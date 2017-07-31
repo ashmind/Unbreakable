@@ -58,14 +58,6 @@ namespace Unbreakable.Runtime.Internal {
             }
         }
 
-        public IEnumerable<T> GuardEnumerableIterated<T>(IEnumerable<T> enumerable) {
-            EnsureActive();
-            foreach (var item in enumerable) {
-                EnsureTime();
-                yield return item;
-            }
-        }
-
         private void EnsureStack() {
             var stackCurrent = GetCurrentStackOffset();
 
@@ -140,10 +132,6 @@ namespace Unbreakable.Runtime.Internal {
 
             public static IEnumerable<T> GuardEnumerableCollected<T>(IEnumerable<T> enumerable, RuntimeGuard guard) {
                 return guard.GuardEnumerableCollected(enumerable);
-            }
-
-            public static IEnumerable<T> GuardEnumerableIterated<T>(IEnumerable<T> enumerable, RuntimeGuard guard) {
-                return guard.GuardEnumerableIterated(enumerable);
             }
         }
     }

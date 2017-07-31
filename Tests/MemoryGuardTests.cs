@@ -71,6 +71,14 @@ namespace Unbreakable.Tests {
             AssertThrowsMemoryGuard("object M() => " + expression + ";");
         }
 
+        [Theory]
+        [InlineData("Enumerable.Range(0, 10000000).Last()")]
+        [InlineData("Enumerable.Range(0, 10000000).FirstOrDefault(i => false)")]
+        public void ThrowsGuardException_WhenDefiningLargeEnumerable(string expression) {
+            // found by Tereza Tomcova (@the_ress)
+            AssertThrowsMemoryGuard("object M() => " + expression + ";");
+        }
+
         private static void AssertThrowsMemoryGuard(string code) {
             var m = TestHelper.RewriteAndGetMethodWrappedInScope(@"
                 using System.Collections.Generic;
