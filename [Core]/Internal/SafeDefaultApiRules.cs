@@ -232,6 +232,8 @@ namespace Unbreakable.Internal {
         private static void SetupSystemDiagnostics(ApiNamespaceRule diagnostics) {
             diagnostics
                 .Type(nameof(DebuggerHiddenAttribute), Allowed)
+                .Type(nameof(DebuggerNonUserCodeAttribute), Allowed)
+                .Type(nameof(DebuggerStepThroughAttribute), Allowed)
                 .Type(nameof(Process), Denied);
         }
 
