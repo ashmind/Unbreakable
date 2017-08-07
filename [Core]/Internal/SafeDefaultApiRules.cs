@@ -49,7 +49,9 @@ namespace Unbreakable.Internal {
                 .Type(nameof(AppDomainManager), Denied)
                 .Type(typeof(Array), Neutral,
                     t => t.Member(nameof(Array.Copy), Allowed)
+                          .Member(nameof(Array.Empty), Allowed)
                           .Member(nameof(Array.GetLength), Allowed)
+                          .Member(nameof(Array.GetValue), Allowed)
                           .Getter(nameof(Array.Rank), Allowed)
                           .Member(nameof(Array.SetValue), Allowed)
                 )
