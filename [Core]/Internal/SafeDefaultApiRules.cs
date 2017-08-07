@@ -76,7 +76,10 @@ namespace Unbreakable.Internal {
                     t => t.Getter(nameof(Environment.CurrentManagedThreadId), Allowed)
                           .Getter(nameof(Environment.NewLine), Allowed)
                 )
-                .Type(nameof(Exception), Neutral, t => t.Constructor(Allowed))
+                .Type(nameof(Exception), Neutral, 
+                    t => t.Constructor(Allowed)
+                          .Getter(nameof(Exception.Message), Allowed)
+                )
                 .Type(nameof(FlagsAttribute), Allowed)
                 .Type(nameof(GC), Neutral, 
                     t => t.Member(nameof(GC.SuppressFinalize), Allowed)
