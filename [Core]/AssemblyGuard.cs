@@ -161,10 +161,22 @@ namespace Unbreakable {
             il.CorrectAllAfterChanges();
         }
 
-        private static bool ShouldInsertJumpGuardBefore(Instruction instruction) {
-            var flowControl = instruction.OpCode.FlowControl;
-            return (flowControl != FlowControl.Next && flowControl != FlowControl.Return)
-                && !(instruction.Operand is Instruction target && target.Offset > instruction.Offset);
+        private static bool ShouldInsertJumpGuardBefore(Instruction instruction, bool ignorePrefix = false) {
+            var opCode = instruction.OpCode;
+            if (opCode.OpCodeType == OpCodeType.Prefix)
+                return ShouldInsertJumpGuardBefore(instruction.Next, ignorePrefix: true);
+
+            if (!ignorePrefix && instruction.Previous?.OpCode.OpCodeType == OpCodeType.Prefix)
+                return false;
+
+            var flowControl = opCode.FlowControl;
+            if (flowControl == FlowControl.Next || flowControl == FlowControl.Return)
+                return false;
+
+            if (instruction.Operand is Instruction target && target.Offset > instruction.Offset)
+                return false;
+
+            return true;
         }
 
         private static void ValidateMethodLocalsSize(MethodDefinition method, AssemblyGuardSettings settings) {
