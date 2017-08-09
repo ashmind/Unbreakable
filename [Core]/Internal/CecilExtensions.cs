@@ -79,6 +79,56 @@ namespace Unbreakable.Internal {
             return il.Create(OpCodes.Call, method);
         }
 
+        public static void CorrectAllAfterChanges(this ILProcessor il) {
+            CorrectBranchSizes(il);
+        }
+
+        private static void CorrectBranchSizes(ILProcessor il) {
+            var offset = 0;
+            foreach (var instruction in il.Body.Instructions) {
+                offset += instruction.GetSize();
+                instruction.Offset = offset;
+            }
+
+            foreach (var instruction in il.Body.Instructions) {
+                var opCode = instruction.OpCode;
+                if (opCode.OperandType != OperandType.ShortInlineBrTarget)
+                    continue;
+
+                var operandValue = ((Instruction)instruction.Operand).Offset - (instruction.Offset + instruction.GetSize());
+                if (operandValue >= sbyte.MinValue && operandValue <= sbyte.MaxValue)
+                    continue;
+
+                instruction.OpCode = ConvertFromShortBranchOpCode(opCode);
+            }
+        }
+
+        private static OpCode ConvertFromShortBranchOpCode(OpCode opCode) {
+            switch (opCode.Code) {
+                case Code.Br_S: return OpCodes.Br;
+                case Code.Brfalse_S: return OpCodes.Brfalse;
+                case Code.Brtrue_S: return OpCodes.Brtrue;
+                case Code.Beq_S: return OpCodes.Beq;
+                case Code.Bge_S: return OpCodes.Bge;
+                case Code.Bge_Un_S: return OpCodes.Bge_Un;
+                case Code.Bgt_S: return OpCodes.Bgt;
+                case Code.Bgt_Un_S: return OpCodes.Bgt_Un;
+                case Code.Ble_S: return OpCodes.Ble;
+                case Code.Ble_Un_S: return OpCodes.Ble_Un;
+                case Code.Blt_S: return OpCodes.Blt;
+                case Code.Blt_Un_S: return OpCodes.Blt_Un;
+                case Code.Bne_Un_S: return OpCodes.Bne_Un;
+                case Code.Leave_S: return OpCodes.Leave;
+                default:
+                    throw new ArgumentOutOfRangeException("Unknown branch opcode: " + opCode);
+            }
+        }
+
+        private static bool IsBranchOperandLargerThanSByte(Instruction branch) {
+            var operandValue = ((Instruction)branch.Operand).Offset - (branch.Offset + branch.GetSize());
+            return operandValue > sbyte.MaxValue || operandValue < sbyte.MinValue;
+        }
+
         public static void InsertBeforeAndRetargetJumps(this ILProcessor il, Instruction target, Instruction instruction) {
             il.InsertBefore(target, instruction);
             foreach (var other in il.Body.Instructions) {

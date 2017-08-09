@@ -157,6 +157,8 @@ namespace Unbreakable {
                 il.InsertBefore(instruction, il.Create(OpCodes.Call, guard.GuardJumpMethod));
                 i += 2;
             }
+
+            il.CorrectAllAfterChanges();
         }
 
         private static bool ShouldInsertJumpGuardBefore(Instruction instruction) {
