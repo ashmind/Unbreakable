@@ -10,10 +10,12 @@ namespace Unbreakable {
             StackBytesLimit = 1024;
             AllocatedCountTotalLimit = 100;
             TimeLimit = TimeSpan.FromMilliseconds(500);
+            OperationCountLimit = 500;
         }
 
         public int StackBytesLimit { get; set; }
         public long AllocatedCountTotalLimit { get; set; }
         public TimeSpan TimeLimit { get; set; }
+        public int OperationCountLimit { get; set; }
     }
 }

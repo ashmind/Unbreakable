@@ -5,5 +5,6 @@ namespace Unbreakable.Runtime.Internal {
         int StackBytesLimit { get; }
         long AllocatedCountTotalLimit { get; }
         TimeSpan TimeLimit { get; }
+        int OperationCountLimit { get; }
     }
 }

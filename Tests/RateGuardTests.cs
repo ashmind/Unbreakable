@@ -6,10 +6,10 @@ using Xunit;
 using Xunit.Abstractions;
 
 namespace Unbreakable.Tests {
-    public class TimeGuardTests {
+    public class RateGuardTests {
         private readonly ITestOutputHelper _output;
 
-        public TimeGuardTests(ITestOutputHelper output) {
+        public RateGuardTests(ITestOutputHelper output) {
             _output = output;
         }
 
@@ -18,21 +18,20 @@ namespace Unbreakable.Tests {
         [InlineData("void M() { again: try { while(true) {} } catch { goto again; } }")]
         // found by Alexandre Mutel (@xoofx)
         [InlineData("void M() { again: try { while(true) {} } catch {} goto again; }")]
-        public void ThrowsGuardException_IfMethodRunsOverDuration(string code) {
-            AssertThrowsTimeGuard(code);
+        public void ThrowsGuardException_IfMethodRunsTooFast(string code) {
+            AssertThrowsRateGuard(code);
         }
 
-        private void AssertThrowsTimeGuard(string code) {
+        private void AssertThrowsRateGuard(string code) {
             var m = TestHelper.RewriteAndGetMethodWrappedInScope(@"
-                using System.Linq;
                 class C {
                     " + code + @"
                 }"
             , "C", "M");
             var watch = Stopwatch.StartNew();
             var exception = Assert.Throws<TargetInvocationException>(() => m());
-            _output.WriteLine("Time: {0:F2}ms", (double)watch.ElapsedTicks / TimeSpan.TicksPerMillisecond);
-            Assert.IsType<TimeGuardException>(exception.InnerException);
+            _output.WriteLine("Time: {0:F2}ms", watch.Elapsed.TotalMilliseconds);
+            Assert.IsType<RateGuardException>(exception.InnerException);
         }
     }
 }

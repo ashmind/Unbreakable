@@ -9,14 +9,16 @@ namespace Unbreakable.Runtime.Internal {
     public class RuntimeGuard {
         private bool _active;
 
-        private long _stackBaseline;
-        private readonly Stopwatch _stopwatch;
-        private long _allocatedCountTotal;
-        [ThreadStatic] private static long _staticConstructorStackBaseline;
-
+        private int _operationCountLimit;
         private long _stackBytesLimit;
         private long _allocatedCountTotalLimit;
         private long _timeLimitStopwatchTicks;
+
+        private long _stackBaseline;
+        private readonly Stopwatch _stopwatch;
+        private int _operationCount;
+        private long _allocatedCountTotal;
+        [ThreadStatic] private static long _staticConstructorStackBaseline;
 
         public RuntimeGuard() {
             _stopwatch = new Stopwatch();
@@ -26,12 +28,14 @@ namespace Unbreakable.Runtime.Internal {
             EnsureActive();
             EnsureStack();
             EnsureTime();
+            EnsureRate();
         }
 
         public void GuardEnterStaticConstructor() {
             EnsureActive();
             _staticConstructorStackBaseline = GetCurrentStackOffset();
             EnsureTime();
+            EnsureRate();
         }
 
         public void GuardExitStaticConstructor() {
@@ -41,6 +45,7 @@ namespace Unbreakable.Runtime.Internal {
         public void GuardJump() {
             EnsureActive();
             EnsureTime();
+            EnsureRate();
         }
 
         public void GuardCount(long count) {
@@ -54,6 +59,7 @@ namespace Unbreakable.Runtime.Internal {
             foreach (var item in enumerable) {
                 EnsureTime();
                 EnsureCount(1);
+                EnsureRate();
                 yield return item;
             }
         }
@@ -79,7 +85,13 @@ namespace Unbreakable.Runtime.Internal {
             if (!_stopwatch.IsRunning)
                 _stopwatch.Start();
             if (_stopwatch.ElapsedTicks > _timeLimitStopwatchTicks)
-                throw new TimeGuardException($"Time limit reached.");
+                throw new TimeGuardException("Time limit reached.");
+        }
+
+        private void EnsureRate() {
+            _operationCount += 1;
+            if (_operationCount > _operationCountLimit)
+                throw new RateGuardException("Operation limit reached.");
         }
 
         private void EnsureActive() {
@@ -104,8 +116,10 @@ namespace Unbreakable.Runtime.Internal {
             _stackBytesLimit = settings.StackBytesLimit;
             _allocatedCountTotalLimit = settings.AllocatedCountTotalLimit;
             _timeLimitStopwatchTicks = (long)(settings.TimeLimit.TotalSeconds * Stopwatch.Frequency);
+            _operationCountLimit = settings.OperationCountLimit;
 
             _stackBaseline = 0;
+            _operationCount = 0;
             _stopwatch.Stop();
             _stopwatch.Reset();
         }
