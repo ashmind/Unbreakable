@@ -303,7 +303,8 @@ namespace Unbreakable.Internal {
                           .Member(nameof(Enumerable.Union), Allowed, CollectedEnumerableArgumentRewriter.Default)
                           .Member(nameof(Enumerable.Where), Allowed)
                           .Member(nameof(Enumerable.Zip), Allowed)
-                );
+                )
+                .Type(typeof(IGrouping<,>), Allowed);
         }
 
         private static void SetupSystemRuntimeCompilerServices(ApiNamespaceRule compilerServices) {
