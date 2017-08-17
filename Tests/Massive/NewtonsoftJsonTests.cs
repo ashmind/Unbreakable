@@ -37,7 +37,7 @@ namespace Unbreakable.Tests.Massive {
             definition.Name.HashAlgorithm = AssemblyHashAlgorithm.None;
             definition.MainModule.Attributes &= ~ModuleAttributes.StrongNameSigned;
             AssemblyGuard.Rewrite(definition, new AssemblyGuardSettings {
-                ApiRules = ApiRules,
+                ApiPolicy = ApiRules,
                 MethodLocalsSizeLimit = IntPtr.Size * 40,
                 MethodStackPushSizeLimit = 120,
                 AllowExplicitLayoutInTypesMatchingPattern = new Regex("<PrivateImplementationDetails>")
@@ -49,7 +49,7 @@ namespace Unbreakable.Tests.Massive {
             return Assembly.Load(assemblyStream.ToArray());
         }
 
-        private static readonly ApiRules ApiRules = ApiRules.SafeDefaults()
+        private static readonly ApiPolicy ApiRules = ApiPolicy.SafeDefault()
             .Namespace("System", Neutral,
                 n => n.Type(typeof(Array), Neutral,
                           t => t.Member(nameof(Array.CreateInstance), Allowed)

@@ -2,18 +2,19 @@
   <Import Project="../NuGetPackage.Common.props" />
 
   <PropertyGroup>
+    <UnbreakablePolicyReportTaskAssemblyPath>$(MSBuildProjectDirectory)/../Build.PolicyReport/bin/$(Configuration)/Unbreakable.Build.PolicyReport.dll</UnbreakablePolicyReportTaskAssemblyPath>
+  </PropertyGroup>
+  <Import Project="../Build.PolicyReport/build/Unbreakable.Build.PolicyReport.targets" />
+
+  <PropertyGroup>
     <TargetFramework>net46</TargetFramework>
     <AssemblyName>Unbreakable</AssemblyName>
     <RootNamespace>Unbreakable</RootNamespace>
-    <VersionPrefix>0.1.8-unproven</VersionPrefix>
+    <VersionPrefix>0.2.0-unproven</VersionPrefix>
     <Description>.NET sandboxing framework: rewrites other assemblies to ensure they can't bring down the hosting process.</Description>
-    <PackageTags>sandboxing</PackageTags>
+    <PackageTags>sandboxing Unbreakable</PackageTags>
   </PropertyGroup>
-
-  <ItemGroup>
-    <None Include="Rules\Internal\ApiMemberRewriterContext.cs" />
-  </ItemGroup>
-
+  
   <ItemGroup>
     <PackageReference Include="Argument" Version="1.0.3" />
     <PackageReference Include="JetBrains.Annotations" Version="10.4.0" />
@@ -22,6 +23,13 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Runtime\Runtime.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Internal\SafeDefaultApiPolicy.cs">
+      <UnbreakablePolicyTypeName>Unbreakable.Internal.SafeDefaultApiPolicy</UnbreakablePolicyTypeName>
+      <UnbreakablePolicyMethodName>Create</UnbreakablePolicyMethodName>
+    </Compile>
   </ItemGroup>
 
 </Project>

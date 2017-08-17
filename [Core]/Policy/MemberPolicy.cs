@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using System.Threading;
 using JetBrains.Annotations;
-using Unbreakable.Rules.Internal;
+using Unbreakable.Policy.Internal;
 
-namespace Unbreakable.Rules {
-    public class ApiMemberRule {
+namespace Unbreakable.Policy {
+    public class MemberPolicy {
         private ApiAccess _access;
-        private IList<IApiMemberRewriterInternal> _rewriters;
+        private IList<IMemberRewriterInternal> _rewriters;
 
-        internal ApiMemberRule(ApiAccess access) {
+        internal MemberPolicy(ApiAccess access) {
             Access = access;
         }
 
@@ -23,34 +23,34 @@ namespace Unbreakable.Rules {
         }
 
         [NotNull]
-        public IReadOnlyCollection<IApiMemberRewriter> Rewriters {
+        public IReadOnlyCollection<IMemberRewriter> Rewriters {
             get {
                 EnsureRewriters();
-                return (IReadOnlyCollection<IApiMemberRewriter>)_rewriters;
+                return (IReadOnlyCollection<IMemberRewriter>)_rewriters;
             }
         }
 
         [NotNull]
-        internal IReadOnlyCollection<IApiMemberRewriterInternal> InternalRewriters => (IReadOnlyCollection<IApiMemberRewriterInternal>)Rewriters;
+        internal IReadOnlyCollection<IMemberRewriterInternal> InternalRewriters => (IReadOnlyCollection<IMemberRewriterInternal>)Rewriters;
 
         [NotNull]
-        public ApiMemberRule AddRewriter([NotNull] IApiMemberRewriter rewriter) {
+        public MemberPolicy AddRewriter([NotNull] IMemberRewriter rewriter) {
             Argument.NotNull("rewriter", rewriter);
             EnsureRewriters();
-            _rewriters.Add(Argument.Cast<IApiMemberRewriterInternal>(nameof(rewriter), rewriter));
+            _rewriters.Add(Argument.Cast<IMemberRewriterInternal>(nameof(rewriter), rewriter));
             return this;
         }
 
         [NotNull]
-        public ApiMemberRule RemoveRewriter([CanBeNull] IApiMemberRewriter rewriter) {
+        public MemberPolicy RemoveRewriter([CanBeNull] IMemberRewriter rewriter) {
             EnsureRewriters();
-            _rewriters.Remove((IApiMemberRewriterInternal)rewriter);
+            _rewriters.Remove((IMemberRewriterInternal)rewriter);
             return this;
         }
 
         private void EnsureRewriters() {
             if (_rewriters == null)
-                Interlocked.CompareExchange(ref _rewriters, new List<IApiMemberRewriterInternal>(), null);
+                Interlocked.CompareExchange(ref _rewriters, new List<IMemberRewriterInternal>(), null);
         }
     }
 }

@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Unbreakable.Internal;
-using Unbreakable.Rules.Internal;
+using Unbreakable.Policy.Internal;
 using Unbreakable.Runtime.Internal;
 
 namespace Unbreakable {
@@ -134,7 +134,7 @@ namespace Unbreakable {
                     var rewritten = false;
                     foreach (var rewriter in memberRule.InternalRewriters) {
                         rewritten = rewriter.Rewrite(
-                            instruction, new ApiMemberRewriterContext(il, guardVariable, guard)
+                            instruction, new MemberRewriterContext(il, guardVariable, guard)
                         ) || rewritten;
                     }
                     if (rewritten) {

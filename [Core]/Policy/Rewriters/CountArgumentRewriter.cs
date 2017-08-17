@@ -2,10 +2,10 @@
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Unbreakable.Internal;
-using Unbreakable.Rules.Internal;
+using Unbreakable.Policy.Internal;
 
-namespace Unbreakable.Rules.Rewriters {
-    public class CountArgumentRewriter : IApiMemberRewriterInternal {
+namespace Unbreakable.Policy.Rewriters {
+    public class CountArgumentRewriter : IMemberRewriterInternal {
         public static CountArgumentRewriter Default { get; } = new CountArgumentRewriter();
         public static CountArgumentRewriter ForCapacity { get; } = new CountArgumentRewriter("capacity");
 
@@ -15,7 +15,7 @@ namespace Unbreakable.Rules.Rewriters {
             _countParameterName = countParameterName;
         }
 
-        bool IApiMemberRewriterInternal.Rewrite(Instruction instruction, ApiMemberRewriterContext context) {
+        bool IMemberRewriterInternal.Rewrite(Instruction instruction, MemberRewriterContext context) {
             var method = ((MethodReference)instruction.Operand).Resolve();
             var countParameter = GetCountParameter(method);
             if (countParameter == null)

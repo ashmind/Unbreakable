@@ -1,0 +1,37 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="../NuGetPackage.Common.props" />
+
+  <PropertyGroup>
+    <TargetFramework>net46</TargetFramework>
+    <AssemblyName>Unbreakable.Build.PolicyReport</AssemblyName>
+    <RootNamespace>Unbreakable.Build.PolicyReport</RootNamespace>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <BuildOutputTargetFolder>build</BuildOutputTargetFolder>
+    <VersionPrefix>0.0.2</VersionPrefix>
+    <Description>Build task to create a report for a certain Unbreakable policy (e.g. for source control/policy review).</Description>
+    <PackageTags>sandboxing MSBuild Unbreakable</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="build\Unbreakable.Build.PolicyReport.targets">
+      <PackagePath>build</PackagePath>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="15.1.548">
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="build\Unbreakable.PolicyReport.targets">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

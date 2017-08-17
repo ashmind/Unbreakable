@@ -1,7 +1,7 @@
 ﻿using System;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
-using Unbreakable.Rules;
+using Unbreakable.Policy;
 
 namespace Unbreakable.Internal {
     internal class CecilApiValidator {
@@ -31,14 +31,14 @@ namespace Unbreakable.Internal {
             }
         }
 
-        public ApiMemberRule ValidateInstructionAndGetRule(Instruction instruction) {
+        public MemberPolicy ValidateInstructionAndGetRule(Instruction instruction) {
             if (!(instruction.Operand is MemberReference reference))
                 return null;
 
             return ValidateMemberReference(reference);
         }
 
-        private ApiMemberRule ValidateMemberReference(MemberReference reference) {
+        private MemberPolicy ValidateMemberReference(MemberReference reference) {
             var type = reference.DeclaringType;
             switch (reference) {
                 case MethodReference m: {
@@ -59,7 +59,7 @@ namespace Unbreakable.Internal {
             }
         }
 
-        private ApiMemberRule EnsureAllowed(TypeReference type, string memberName = null) {
+        private MemberPolicy EnsureAllowed(TypeReference type, string memberName = null) {
             if (type.IsGenericParameter)
                 return null;
 

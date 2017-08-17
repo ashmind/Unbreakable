@@ -2,9 +2,9 @@
 using Mono.Cecil.Cil;
 using Unbreakable.Internal;
 
-namespace Unbreakable.Rules.Internal {
-    internal struct ApiMemberRewriterContext {
-        public ApiMemberRewriterContext(
+namespace Unbreakable.Policy.Internal {
+    internal struct MemberRewriterContext {
+        public MemberRewriterContext(
             ILProcessor il,
             VariableDefinition runtimeGuardVariable,
             RuntimeGuardReferences runtimeGuardReferences

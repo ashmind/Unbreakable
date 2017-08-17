@@ -1,0 +1,49 @@
+﻿<Project>
+  
+  <ItemDefinitionGroup>
+    <Compile>
+      <UnbreakablePolicyTypeName></UnbreakablePolicyTypeName>
+      <UnbreakablePolicyMethodName></UnbreakablePolicyMethodName>
+    </Compile>
+  </ItemDefinitionGroup>
+
+  <PropertyGroup>
+    <UnbreakablePolicyReportEnabled Condition="'$(UnbreakablePolicyReportEnabled)' == ''">true</UnbreakablePolicyReportEnabled>
+    <UnbreakablePolicyReportTaskAssemblyPath
+      Condition="'$(UnbreakablePolicyReportTaskAssemblyPath)' == ''">$(MSBuildThisFileDirectory)Unbreakable.Build.PolicyReport.dll</UnbreakablePolicyReportTaskAssemblyPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="**/*.PolicyReport.txt" />
+    <UnbreakablePolicyReport Include="**/*.PolicyReport.txt">
+      <DependentUpon>$(FileName).cs</DependentUpon>
+    </UnbreakablePolicyReport>
+  </ItemGroup>
+  
+  <UsingTask TaskName="CreateUnbreakablePolicyReport"
+             AssemblyFile="$(UnbreakablePolicyReportTaskAssemblyPath)"
+             Condition="'$(UnbreakablePolicyReportEnabled)' == 'true'" />
+
+  <Target Name="UnbreakablePolicyFind">
+    <ItemGroup>
+      <UnbreakablePolicySource Include="@(Compile)" Condition="'%(UnbreakablePolicyMethodName)' != '' OR '%(UnbreakablePolicyTypeName)' != ''" />      
+    </ItemGroup>
+    <ItemGroup Condition="'@(UnbreakablePolicySource)' != '' AND @(UnbreakablePolicyReport) == ''">
+      <UnbreakablePolicyReport Include="_not_created_yet_" />
+    </ItemGroup>
+  </Target>
+  
+  <Target Name="UnbreakablePolicyReport"
+          AfterTargets="Build"
+          DependsOnTargets="UnbreakablePolicyFind"
+          Condition="'$(UnbreakablePolicyReportEnabled)' == 'true'"
+          Inputs="@(UnbreakablePolicySource)"
+          Outputs="@(UnbreakablePolicyReport)">
+    <CreateUnbreakablePolicyReport
+        ReferencedAssemblyPaths="@(ReferencePath)"
+        PolicyAssemblyPath="$(TargetPath)"
+        PolicyTypeName="%(UnbreakablePolicySource.UnbreakablePolicyTypeName)"
+        PolicyMethodName="%(UnbreakablePolicySource.UnbreakablePolicyMethodName)"
+        OutputPath="%(UnbreakablePolicySource.RootDir)%(UnbreakablePolicySource.Directory)%(UnbreakablePolicySource.FileName).PolicyReport.txt" />
+  </Target>
+</Project>

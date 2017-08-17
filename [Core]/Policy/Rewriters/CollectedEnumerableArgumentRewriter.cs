@@ -1,13 +1,13 @@
 ﻿using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Unbreakable.Internal;
-using Unbreakable.Rules.Internal;
+using Unbreakable.Policy.Internal;
 
-namespace Unbreakable.Rules.Rewriters {
-    public class CollectedEnumerableArgumentRewriter : IApiMemberRewriterInternal {
+namespace Unbreakable.Policy.Rewriters {
+    public class CollectedEnumerableArgumentRewriter : IMemberRewriterInternal {
         public static CollectedEnumerableArgumentRewriter Default { get; } = new CollectedEnumerableArgumentRewriter();
         
-        bool IApiMemberRewriterInternal.Rewrite(Instruction instruction, ApiMemberRewriterContext context) {
+        bool IMemberRewriterInternal.Rewrite(Instruction instruction, MemberRewriterContext context) {
             var method = (MethodReference)instruction.Operand;
             var il = context.IL;
 
@@ -51,7 +51,7 @@ namespace Unbreakable.Rules.Rewriters {
             return true;
         }
 
-        private void InsertEnumerableGuard(Instruction instruction, ApiMemberRewriterContext context, TypeReference enumerableType) {
+        private void InsertEnumerableGuard(Instruction instruction, MemberRewriterContext context, TypeReference enumerableType) {
             var il = context.IL;
             var elementType = ((GenericInstanceType)enumerableType).GenericArguments[0];
             var guardMethodInstance = new GenericInstanceMethod(context.RuntimeGuardReferences.FlowThroughGuardEnumerableCollectedMethod) {

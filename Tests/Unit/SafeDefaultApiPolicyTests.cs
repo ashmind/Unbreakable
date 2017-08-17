@@ -5,12 +5,12 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using AshMind.Extensions;
 using Unbreakable.Internal;
-using Unbreakable.Rules;
-using Unbreakable.Rules.Rewriters;
+using Unbreakable.Policy;
+using Unbreakable.Policy.Rewriters;
 using Xunit;
 
 namespace Unbreakable.Tests.Unit {
-    public class SafeDefaultApiRulesTests {
+    public class SafeDefaultApiPolicyTests {
         [Fact]
         public void Create_IncludesAddCallRewriter_ForMethodsNamedAddEnqueueAndPush() {
             var excludedTypes = new HashSet<Type> {
@@ -39,9 +39,9 @@ namespace Unbreakable.Tests.Unit {
         }
 
         private static void AssertEachMatchingMethodHasRewriterOfType<TApiMemberRewriter>(Func<MethodBase, bool> matcher)
-            where TApiMemberRewriter : IApiMemberRewriter
+            where TApiMemberRewriter : IMemberRewriter
         {
-            var namespaceRules = SafeDefaultApiRules.Create();
+            var namespaceRules = SafeDefaultApiPolicy.Create();
             foreach (var namespaceRule in namespaceRules.Namespaces) {
                 if (namespaceRule.Value.Access == ApiAccess.Denied)
                     continue;

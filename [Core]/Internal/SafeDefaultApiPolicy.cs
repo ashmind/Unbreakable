@@ -6,22 +6,22 @@ using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
-using Unbreakable.Rules;
-using Unbreakable.Rules.Rewriters;
+using Unbreakable.Policy;
+using Unbreakable.Policy.Rewriters;
 
 namespace Unbreakable.Internal {
     using System.Collections;
     using static ApiAccess;
 
-    internal static class SafeDefaultApiRules {
+    internal static class SafeDefaultApiPolicy {
         private static readonly IReadOnlyCollection<Type> DelegateTypes =
             typeof(Func<>).Assembly.GetTypes().Where(t => t.Namespace == nameof(System) && t.BaseType == typeof(MulticastDelegate)).ToArray();
 
         private static readonly IReadOnlyCollection<string> ValueTupleTypeNames =
             Enumerable.Range(1, 8).Select(n => "ValueTuple`" + n).ToArray();
 
-        public static ApiRules Create() {
-            return new ApiRules(CreateTypeRuleForCompilerGeneratedDelegate())
+        public static ApiPolicy Create() {
+            return new ApiPolicy(CreateTypeRuleForCompilerGeneratedDelegate())
                 .Namespace(nameof(System), Neutral, SetupSystem)
                 .Namespace("System.Collections", Neutral, n => n.Type(nameof(IEnumerator), Allowed))
                 .Namespace("System.Collections.Generic", Neutral, SetupSystemCollectionsGeneric)
@@ -41,7 +41,7 @@ namespace Unbreakable.Internal {
                 .Namespace("Unbreakable.Runtime", Denied);
         }
 
-        private static void SetupSystem(ApiNamespaceRule system) {
+        private static void SetupSystem(NamespacePolicy system) {
             system
                 .Type(nameof(Activator), Denied)
                 .Type(nameof(AppContext), Denied)
@@ -132,7 +132,7 @@ namespace Unbreakable.Internal {
             }
         }
 
-        private static void SetupSystemCollectionsGeneric(ApiNamespaceRule collections) {
+        private static void SetupSystemCollectionsGeneric(NamespacePolicy collections) {
             collections
                 .Type(typeof(Comparer<>), Allowed)
                 .Type(typeof(Dictionary<,>), Allowed,
@@ -199,7 +199,7 @@ namespace Unbreakable.Internal {
                 .Type(typeof(Stack<>.Enumerator), Allowed);
         }
 
-        private static void SetupSetCommon(ApiTypeRule set) {
+        private static void SetupSetCommon(TypePolicy set) {
             set.Member(nameof(ISet<object>.UnionWith), Allowed, CollectedEnumerableArgumentRewriter.Default)
                .Member(nameof(ISet<object>.IntersectWith), Allowed)
                .Member(nameof(ISet<object>.ExceptWith), Allowed)
@@ -213,11 +213,11 @@ namespace Unbreakable.Internal {
                .Other(SetupAdd);
         }
 
-        private static void SetupAdd(ApiTypeRule type) {
+        private static void SetupAdd(TypePolicy type) {
             type.Member("Add", Allowed, AddCallRewriter.Default);
         }
 
-        private static void SetupSystemComponentModel(ApiNamespaceRule componentModel) {
+        private static void SetupSystemComponentModel(NamespacePolicy componentModel) {
             componentModel
                 .Type(nameof(TypeConverter), Neutral,
                     t => t.Member(nameof(TypeConverter.CanConvertFrom), Allowed)
@@ -234,7 +234,7 @@ namespace Unbreakable.Internal {
                 );
         }
 
-        private static void SetupSystemDiagnostics(ApiNamespaceRule diagnostics) {
+        private static void SetupSystemDiagnostics(NamespacePolicy diagnostics) {
             diagnostics
                 .Type(nameof(DebuggerHiddenAttribute), Allowed)
                 .Type(nameof(DebuggerNonUserCodeAttribute), Allowed)
@@ -242,14 +242,14 @@ namespace Unbreakable.Internal {
                 .Type(nameof(Process), Denied);
         }
 
-        private static void SetupSystemGlobalization(ApiNamespaceRule globalization) {
+        private static void SetupSystemGlobalization(NamespacePolicy globalization) {
             globalization
                 .Type(nameof(CultureInfo), Neutral,
                     t => t.Getter(nameof(CultureInfo.InvariantCulture), Allowed)
                 );
         }
 
-        private static void SetupSystemLinq(ApiNamespaceRule linq) {
+        private static void SetupSystemLinq(NamespacePolicy linq) {
             linq
                 .Type(nameof(Enumerable), Neutral,
                     t => t.Member(nameof(Enumerable.Aggregate), Allowed)
@@ -307,7 +307,7 @@ namespace Unbreakable.Internal {
                 .Type(typeof(IGrouping<,>), Allowed);
         }
 
-        private static void SetupSystemRuntimeCompilerServices(ApiNamespaceRule compilerServices) {
+        private static void SetupSystemRuntimeCompilerServices(NamespacePolicy compilerServices) {
             compilerServices
                 .Type(nameof(CompilerGeneratedAttribute), Allowed)
                 .Type(nameof(ExtensionAttribute), Allowed)
@@ -317,7 +317,7 @@ namespace Unbreakable.Internal {
                 );
         }
 
-        private static void SetupSystemText(ApiNamespaceRule text) {
+        private static void SetupSystemText(NamespacePolicy text) {
             text
                 .Type(nameof(StringBuilder), Neutral,
                     t => t.Constructor(Allowed, CountArgumentRewriter.ForCapacity)
@@ -335,8 +335,8 @@ namespace Unbreakable.Internal {
                 );
         }
 
-        private static ApiTypeRule CreateTypeRuleForCompilerGeneratedDelegate() {
-            return new ApiTypeRule(Neutral)
+        private static TypePolicy CreateTypeRuleForCompilerGeneratedDelegate() {
+            return new TypePolicy(Neutral)
                 .Constructor(Allowed)
                 .Member("Invoke", Allowed);
         }

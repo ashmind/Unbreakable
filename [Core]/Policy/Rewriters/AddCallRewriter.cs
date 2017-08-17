@@ -5,13 +5,13 @@ using System.Text;
 using System.Threading.Tasks;
 using Mono.Cecil.Cil;
 using Unbreakable.Internal;
-using Unbreakable.Rules.Internal;
+using Unbreakable.Policy.Internal;
 
-namespace Unbreakable.Rules.Rewriters {
-    public class AddCallRewriter : IApiMemberRewriterInternal {
+namespace Unbreakable.Policy.Rewriters {
+    public class AddCallRewriter : IMemberRewriterInternal {
         public static AddCallRewriter Default { get; } = new AddCallRewriter();
 
-        bool IApiMemberRewriterInternal.Rewrite(Instruction instruction, ApiMemberRewriterContext context) {
+        bool IMemberRewriterInternal.Rewrite(Instruction instruction, MemberRewriterContext context) {
             var il = context.IL;
 
             var ldloc = il.CreateLdlocBest(context.RuntimeGuardVariable);

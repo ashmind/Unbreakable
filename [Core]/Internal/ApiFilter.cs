@@ -1,23 +1,23 @@
 ﻿using System;
 using JetBrains.Annotations;
-using Unbreakable.Rules;
+using Unbreakable.Policy;
 
 namespace Unbreakable.Internal {
     using static ApiFilterResultKind;
 
     internal class ApiFilter : IApiFilter {
-        public ApiFilter(ApiRules rules) {
-            Rules = rules;
+        public ApiFilter(ApiPolicy policy) {
+            Policy = policy;
         }
 
         public ApiFilterResult Filter([NotNull] string @namespace, [NotNull] string typeName, ApiFilterTypeKind typeKind, [CanBeNull] string memberName = null) {
             Argument.NotNull(nameof(@namespace), @namespace);
             Argument.NotNullOrEmpty(nameof(typeName), typeName);
 
-            ApiTypeRule typeRule;
+            TypePolicy typeRule;
             switch (typeKind) {
                 case ApiFilterTypeKind.External:
-                    if (!Rules.Namespaces.TryGetValue(@namespace, out var namespaceRule) || namespaceRule.Access == ApiAccess.Denied)
+                    if (!Policy.Namespaces.TryGetValue(@namespace, out var namespaceRule) || namespaceRule.Access == ApiAccess.Denied)
                         return new ApiFilterResult(DeniedNamespace);
 
                     if (!namespaceRule.Types.TryGetValue(typeName, out typeRule))
@@ -26,7 +26,7 @@ namespace Unbreakable.Internal {
                 case ApiFilterTypeKind.Array:
                     return Filter(nameof(System), nameof(Array), ApiFilterTypeKind.External, memberName);
                 case ApiFilterTypeKind.CompilerGeneratedDelegate:
-                    typeRule = Rules.CompilerGeneratedDelegate;
+                    typeRule = Policy.CompilerGeneratedDelegate;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(typeKind));
@@ -48,6 +48,6 @@ namespace Unbreakable.Internal {
         }
 
         [NotNull]
-        public ApiRules Rules { get; set; }
+        public ApiPolicy Policy { get; set; }
     }
 }
