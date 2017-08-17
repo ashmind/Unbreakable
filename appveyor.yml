@@ -5,7 +5,7 @@ before_build:
 - dotnet restore
 
 build_script:
-- dotnet build --configuration Release
+- dotnet build --configuration Release /p:UnbreakablePolicyReportEnabled=false
 
 test_script:
 - dotnet test Tests\Tests.csproj /p:Platform=x64
