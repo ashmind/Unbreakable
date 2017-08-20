@@ -136,8 +136,8 @@ System
      ToString: Denied
   Action`9: Denied
   ActivationContext: Denied
+  ActivationContext+ContextForm: Denied
   Activator: Denied
-  AdjustmentRule: Denied
   AggregateException: Denied
   AppContext: Denied
   AppDomain: Denied
@@ -411,7 +411,6 @@ System
   ConsoleModifiers: Denied
   ConsoleSpecialKey: Denied
   ContextBoundObject: Denied
-  ContextForm: Denied
   ContextMarshalException: Denied
   ContextStaticAttribute: Denied
   Convert: Allowed
@@ -752,6 +751,8 @@ System
      set_ExitCode: Denied
      SetEnvironmentVariable: Denied
      ToString: Denied
+  Environment+SpecialFolder: Denied
+  Environment+SpecialFolderOption: Denied
   EnvironmentVariableTarget: Denied
   EventArgs: Denied
   EventHandler: Allowed
@@ -1274,8 +1275,6 @@ System
      Parse: Allowed
      ToString: Allowed
      TryParse: Allowed
-  SpecialFolder: Denied
-  SpecialFolderOption: Denied
   StackOverflowException: Denied
   STAThreadAttribute: Denied
   String: Allowed
@@ -1405,18 +1404,99 @@ System
      IsInvalidTime: Allowed
      ToSerializedString: Allowed
      ToString: Allowed
+  TimeZoneInfo+AdjustmentRule: Denied
+  TimeZoneInfo+TransitionTime: Denied
   TimeZoneNotFoundException: Denied
-  TransitionTime: Denied
-  Tuple: Denied
-  Tuple`1: Denied
-  Tuple`2: Denied
-  Tuple`3: Denied
-  Tuple`4: Denied
-  Tuple`5: Denied
-  Tuple`6: Denied
-  Tuple`7: Denied
-  Tuple`8: Denied
-  TupleExtensions: Denied
+  Tuple: Allowed
+     Create: Allowed
+     Equals: Allowed
+     GetHashCode: Allowed
+     GetType: Allowed
+     ToString: Allowed
+  Tuple`1: Allowed
+     Equals: Allowed
+     get_Item1: Allowed
+     GetHashCode: Allowed
+     GetType: Allowed
+     ToString: Allowed
+  Tuple`2: Allowed
+     Equals: Allowed
+     get_Item1: Allowed
+     get_Item2: Allowed
+     GetHashCode: Allowed
+     GetType: Allowed
+     ToString: Allowed
+  Tuple`3: Allowed
+     Equals: Allowed
+     get_Item1: Allowed
+     get_Item2: Allowed
+     get_Item3: Allowed
+     GetHashCode: Allowed
+     GetType: Allowed
+     ToString: Allowed
+  Tuple`4: Allowed
+     Equals: Allowed
+     get_Item1: Allowed
+     get_Item2: Allowed
+     get_Item3: Allowed
+     get_Item4: Allowed
+     GetHashCode: Allowed
+     GetType: Allowed
+     ToString: Allowed
+  Tuple`5: Allowed
+     Equals: Allowed
+     get_Item1: Allowed
+     get_Item2: Allowed
+     get_Item3: Allowed
+     get_Item4: Allowed
+     get_Item5: Allowed
+     GetHashCode: Allowed
+     GetType: Allowed
+     ToString: Allowed
+  Tuple`6: Allowed
+     Equals: Allowed
+     get_Item1: Allowed
+     get_Item2: Allowed
+     get_Item3: Allowed
+     get_Item4: Allowed
+     get_Item5: Allowed
+     get_Item6: Allowed
+     GetHashCode: Allowed
+     GetType: Allowed
+     ToString: Allowed
+  Tuple`7: Allowed
+     Equals: Allowed
+     get_Item1: Allowed
+     get_Item2: Allowed
+     get_Item3: Allowed
+     get_Item4: Allowed
+     get_Item5: Allowed
+     get_Item6: Allowed
+     get_Item7: Allowed
+     GetHashCode: Allowed
+     GetType: Allowed
+     ToString: Allowed
+  Tuple`8: Allowed
+     Equals: Allowed
+     get_Item1: Allowed
+     get_Item2: Allowed
+     get_Item3: Allowed
+     get_Item4: Allowed
+     get_Item5: Allowed
+     get_Item6: Allowed
+     get_Item7: Allowed
+     get_Rest: Allowed
+     GetHashCode: Allowed
+     GetType: Allowed
+     ToString: Allowed
+  TupleExtensions: Allowed
+     Deconstruct: Allowed
+     Equals: Allowed
+     GetHashCode: Allowed
+     GetType: Allowed
+     ToString: Allowed
+     ToTuple: Allowed
+     ToValueTuple: Allowed
   Type: Allowed
      Equals: Denied
      FindInterfaces: Denied
@@ -1788,18 +1868,32 @@ System.Collections.Generic
      set_Item: Allowed
      ToString: Allowed
      TryGetValue: Allowed
-  Enumerator: Denied
-  Enumerator: Denied
-  Enumerator: Denied
-  Enumerator: Denied
-  Enumerator: Denied
-  Enumerator: Denied
-  Enumerator: Denied
-  Enumerator: Denied
-  Enumerator: Denied
-  Enumerator: Denied
-  Enumerator: Denied
-  Enumerator: Denied
+  Dictionary`2+Enumerator: Allowed
+     Dispose: Allowed
+     Equals: Allowed
+     get_Current: Allowed
+     GetHashCode: Allowed
+     GetType: Allowed
+     MoveNext: Allowed
+     ToString: Allowed
+  Dictionary`2+KeyCollection: Allowed
+     CopyTo: Allowed
+     Equals: Allowed
+     get_Count: Allowed
+     GetEnumerator: Allowed
+     GetHashCode: Allowed
+     GetType: Allowed
+     ToString: Allowed
+  Dictionary`2+KeyCollection+Enumerator: Denied
+  Dictionary`2+ValueCollection: Allowed
+     CopyTo: Allowed
+     Equals: Allowed
+     get_Count: Allowed
+     GetEnumerator: Allowed
+     GetHashCode: Allowed
+     GetType: Allowed
+     ToString: Allowed
+  Dictionary`2+ValueCollection+Enumerator: Denied
   EqualityComparer`1: Allowed
      Equals: Allowed
      get_Default: Allowed
@@ -1834,6 +1928,14 @@ System.Collections.Generic
      ToString: Allowed
      TrimExcess: Allowed
      UnionWith: Allowed
+  HashSet`1+Enumerator: Allowed
+     Dispose: Allowed
+     Equals: Allowed
+     get_Current: Allowed
+     GetHashCode: Allowed
+     GetType: Allowed
+     MoveNext: Allowed
+     ToString: Allowed
   ICollection`1: Allowed
      Add: Allowed
      Clear: Allowed
@@ -1888,8 +1990,6 @@ System.Collections.Generic
      SetEquals: Allowed
      SymmetricExceptWith: Allowed
      UnionWith: Allowed
-  KeyCollection: Denied
-  KeyCollection: Denied
   KeyNotFoundException: Allowed
      Equals: Allowed
      get_Data: Allowed
@@ -1936,6 +2036,14 @@ System.Collections.Generic
      Remove: Allowed
      RemoveFirst: Allowed
      RemoveLast: Allowed
+     ToString: Allowed
+  LinkedList`1+Enumerator: Allowed
+     Dispose: Allowed
+     Equals: Allowed
+     get_Current: Allowed
+     GetHashCode: Allowed
+     GetType: Allowed
+     MoveNext: Allowed
      ToString: Allowed
   LinkedListNode`1: Allowed
      Equals: Allowed
@@ -1987,6 +2095,14 @@ System.Collections.Generic
      ToString: Allowed
      TrimExcess: Allowed
      TrueForAll: Allowed
+  List`1+Enumerator: Allowed
+     Dispose: Allowed
+     Equals: Allowed
+     get_Current: Allowed
+     GetHashCode: Allowed
+     GetType: Allowed
+     MoveNext: Allowed
+     ToString: Allowed
   Queue`1: Allowed
      Clear: Allowed
      Contains: Allowed
@@ -2002,6 +2118,14 @@ System.Collections.Generic
      ToArray: Allowed
      ToString: Allowed
      TrimExcess: Allowed
+  Queue`1+Enumerator: Allowed
+     Dispose: Allowed
+     Equals: Allowed
+     get_Current: Allowed
+     GetHashCode: Allowed
+     GetType: Allowed
+     MoveNext: Allowed
+     ToString: Allowed
   SortedDictionary`2: Allowed
      Add: Allowed
      Clear: Allowed
@@ -2021,6 +2145,18 @@ System.Collections.Generic
      set_Item: Allowed
      ToString: Allowed
      TryGetValue: Allowed
+  SortedDictionary`2+Enumerator: Allowed
+     Dispose: Allowed
+     Equals: Allowed
+     get_Current: Allowed
+     GetHashCode: Allowed
+     GetType: Allowed
+     MoveNext: Allowed
+     ToString: Allowed
+  SortedDictionary`2+KeyCollection: Denied
+  SortedDictionary`2+KeyCollection+Enumerator: Denied
+  SortedDictionary`2+ValueCollection: Denied
+  SortedDictionary`2+ValueCollection+Enumerator: Denied
   SortedList`2: Allowed
      Add: Allowed
      Clear: Allowed
@@ -2074,6 +2210,14 @@ System.Collections.Generic
      SymmetricExceptWith: Allowed
      ToString: Allowed
      UnionWith: Allowed
+  SortedSet`1+Enumerator: Allowed
+     Dispose: Allowed
+     Equals: Allowed
+     get_Current: Allowed
+     GetHashCode: Allowed
+     GetType: Allowed
+     MoveNext: Allowed
+     ToString: Allowed
   Stack`1: Allowed
      Clear: Allowed
      Contains: Allowed
@@ -2089,8 +2233,14 @@ System.Collections.Generic
      ToArray: Allowed
      ToString: Allowed
      TrimExcess: Allowed
-  ValueCollection: Denied
-  ValueCollection: Denied
+  Stack`1+Enumerator: Allowed
+     Dispose: Allowed
+     Equals: Allowed
+     get_Current: Allowed
+     GetHashCode: Allowed
+     GetType: Allowed
+     MoveNext: Allowed
+     ToString: Allowed
 System.ComponentModel
   AddingNewEventArgs: Denied
   AddingNewEventHandler: Denied
@@ -2253,7 +2403,6 @@ System.ComponentModel
   SByteConverter: Denied
   SettingsBindableAttribute: Denied
   SingleConverter: Denied
-  StandardValuesCollection: Denied
   StringConverter: Denied
   SyntaxCheck: Denied
   TimeSpanConverter: Denied
@@ -2281,6 +2430,7 @@ System.ComponentModel
      GetType: Denied
      IsValid: Denied
      ToString: Denied
+  TypeConverter+StandardValuesCollection: Denied
   TypeConverterAttribute: Denied
   TypeDescriptionProvider: Denied
   TypeDescriptionProviderAttribute: Denied
@@ -2342,6 +2492,7 @@ System.Diagnostics
   DataReceivedEventHandler: Denied
   Debug: Denied
   DebuggableAttribute: Denied
+  DebuggableAttribute+DebuggingModes: Denied
   Debugger: Denied
   DebuggerBrowsableAttribute: Denied
   DebuggerBrowsableState: Denied
@@ -2373,7 +2524,6 @@ System.Diagnostics
      ToString: Allowed
   DebuggerTypeProxyAttribute: Denied
   DebuggerVisualizerAttribute: Denied
-  DebuggingModes: Denied
   DefaultTraceListener: Denied
   DelimitedListTraceListener: Denied
   DiagnosticsConfigurationHandler: Denied
@@ -2631,7 +2781,6 @@ System.Runtime.CompilerServices
   CallSiteBinder: Denied
   CallSiteHelpers: Denied
   CallSiteOps: Denied
-  CleanupCode: Denied
   Closure: Denied
   CompilationRelaxations: Denied
   CompilationRelaxationsAttribute: Denied
@@ -2646,12 +2795,12 @@ System.Runtime.CompilerServices
   CompilerGlobalScopeAttribute: Denied
   CompilerMarshalOverride: Denied
   ConditionalWeakTable`2: Denied
+  ConditionalWeakTable`2+CreateValueCallback: Denied
   ConfiguredTaskAwaitable: Denied
   ConfiguredTaskAwaitable`1: Denied
-  ConfiguredTaskAwaiter: Denied
-  ConfiguredTaskAwaiter: Denied
+  ConfiguredTaskAwaitable`1+ConfiguredTaskAwaiter: Denied
+  ConfiguredTaskAwaitable+ConfiguredTaskAwaiter: Denied
   ContractHelper: Denied
-  CreateValueCallback: Denied
   CustomConstantAttribute: Denied
   DateTimeConstantAttribute: Denied
   DebugInfoGenerator: Denied
@@ -2732,6 +2881,8 @@ System.Runtime.CompilerServices
      RunClassConstructor: Denied
      RunModuleConstructor: Denied
      ToString: Denied
+  RuntimeHelpers+CleanupCode: Denied
+  RuntimeHelpers+TryCode: Denied
   RuntimeOps: Denied
   RuntimeWrappedException: Denied
   ScopelessEnumAttribute: Denied
@@ -2742,13 +2893,12 @@ System.Runtime.CompilerServices
   SuppressIldasmAttribute: Denied
   TaskAwaiter: Denied
   TaskAwaiter`1: Denied
-  TryCode: Denied
   TupleElementNamesAttribute: Denied
   TypeForwardedFromAttribute: Denied
   TypeForwardedToAttribute: Denied
   UnsafeValueTypeAttribute: Denied
   YieldAwaitable: Denied
-  YieldAwaiter: Denied
+  YieldAwaitable+YieldAwaiter: Denied
 System.Runtime.InteropServices
 System.Text
   ASCIIEncoding: Denied

@@ -15,7 +15,7 @@ namespace Unbreakable.Build.PolicyReport {
             var namespaces = assemblies
                 .Values
                 .SelectMany(a => a.GetExportedTypes())
-                .GroupBy(t => t.Namespace)
+                .GroupBy(GetNamespace)
                 .ToDictionary(g => g.Key ?? "", g => g.ToList());
 
             using (var writer = new StreamWriter(OutputPath)) {
@@ -28,20 +28,24 @@ namespace Unbreakable.Build.PolicyReport {
                     if (namespaceAccess == "Denied")
                         continue;
 
-                    foreach (var type in @namespace.Value.OrderBy(t => t.Name)) {
-                        var typePolicy = GetItem(namespacePolicy.Types, type.Name);
+                    var types = @namespace.Value.Select(type => new {
+                        value = type,
+                        name = @namespace.Key.Length > 0 ? type.FullName.Substring(@namespace.Key.Length + 1) : type.FullName
+                    });
+                    foreach (var type in types.OrderBy(t => t.name)) {
+                        var typePolicy = GetItem(namespacePolicy.Types, type.name);
                         var typeAccess = (string)typePolicy?.Access.ToString();
                         var effectiveTypeAccess = GetEffectiveTypeAccess(typeAccess, namespaceAccess);
 
                         writer.Write("  ");
-                        writer.Write(type.Name);
+                        writer.Write(type.name);
                         writer.Write(": ");
                         writer.WriteLine(effectiveTypeAccess);
 
                         if (effectiveTypeAccess == "Denied")
                             continue;
 
-                        foreach (var methodName in type.GetMethods().Select(m => m.Name).Distinct().OrderBy(n => n)) {
+                        foreach (var methodName in type.value.GetMethods().Select(m => m.Name).Distinct().OrderBy(n => n)) {
                             var methodPolicy = typePolicy != null ? GetItem(typePolicy.Members, methodName) : null;
                             var effectiveMethodAccess = GetEffectiveMethodAccess((string)methodPolicy?.Access.ToString(), typeAccess, effectiveTypeAccess);
                             writer.Write("     ");
@@ -54,6 +58,10 @@ namespace Unbreakable.Build.PolicyReport {
             }
 
             return true;
+        }
+
+        private string GetNamespace(Type type) {
+            return !type.IsNested ? type.Namespace : GetNamespace(type.DeclaringType);
         }
 
         private void SetupAssemblyResolution(IReadOnlyDictionary<string, Assembly> assemblies) {

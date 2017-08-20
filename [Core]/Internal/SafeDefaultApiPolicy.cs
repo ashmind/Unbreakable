@@ -17,6 +17,9 @@ namespace Unbreakable.Internal {
         private static readonly IReadOnlyCollection<Type> DelegateTypes =
             typeof(Func<>).Assembly.GetTypes().Where(t => t.Namespace == nameof(System) && t.BaseType == typeof(MulticastDelegate)).ToArray();
 
+        private static readonly IReadOnlyCollection<Type> TupleTypes =
+            typeof(Tuple<>).Assembly.GetTypes().Where(t => t.Namespace == nameof(System) && t.Name.StartsWith("Tuple`")).ToArray();
+
         private static readonly IReadOnlyCollection<string> ValueTupleTypeNames =
             Enumerable.Range(1, 8).Select(n => "ValueTuple`" + n).ToArray();
 
@@ -106,6 +109,8 @@ namespace Unbreakable.Internal {
                 )
                 .Type(nameof(TimeSpan), Allowed)
                 .Type(nameof(TimeZoneInfo), Allowed)
+                .Type(nameof(Tuple), Allowed)
+                .Type("TupleExtensions", Allowed)
                 .Type(nameof(Type), Neutral,
                     t => t.Member(nameof(Type.GetTypeFromHandle), Allowed)
                           .Member(nameof(Type.IsAssignableFrom), Allowed)
@@ -125,6 +130,10 @@ namespace Unbreakable.Internal {
 
             foreach (var type in DelegateTypes) {
                 system.Type(type, Neutral, t => t.Constructor(Allowed).Member("Invoke", Allowed));
+            }
+
+            foreach (var type in TupleTypes) {
+                system.Type(type, Allowed);
             }
 
             foreach (var typeName in ValueTupleTypeNames) {
