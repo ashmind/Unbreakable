@@ -25,6 +25,8 @@ namespace Unbreakable.Build.PolicyReport {
                         continue;
                     var namespaceAccess = (string)namespacePolicy.Access.ToString();
                     writer.WriteLine(@namespace.Key);
+                    if (namespaceAccess == "Denied")
+                        continue;
 
                     foreach (var type in @namespace.Value.OrderBy(t => t.Name)) {
                         var typePolicy = GetItem(namespacePolicy.Types, type.Name);
@@ -35,6 +37,9 @@ namespace Unbreakable.Build.PolicyReport {
                         writer.Write(type.Name);
                         writer.Write(": ");
                         writer.WriteLine(effectiveTypeAccess);
+
+                        if (effectiveTypeAccess == "Denied")
+                            continue;
 
                         foreach (var methodName in type.GetMethods().Select(m => m.Name).Distinct().OrderBy(n => n)) {
                             var methodPolicy = typePolicy != null ? GetItem(typePolicy.Members, methodName) : null;
@@ -83,9 +88,6 @@ namespace Unbreakable.Build.PolicyReport {
         }
 
         private string GetEffectiveMethodAccess(string methodAccess, string typeAccess, string effectiveTypeAccess) {
-            if (effectiveTypeAccess == "Denied")
-                return "Denied";
-
             if (methodAccess == null)
                 return typeAccess == "Allowed" ? "Allowed" : "Denied";
             
