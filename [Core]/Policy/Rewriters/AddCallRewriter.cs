@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Mono.Cecil.Cil;
+﻿using Mono.Cecil.Cil;
 using Unbreakable.Internal;
 using Unbreakable.Policy.Internal;
 
 namespace Unbreakable.Policy.Rewriters {
     public class AddCallRewriter : IMemberRewriterInternal {
         public static AddCallRewriter Default { get; } = new AddCallRewriter();
+
+        string IMemberRewriterInternal.GetShortName() => nameof(AddCallRewriter);
 
         bool IMemberRewriterInternal.Rewrite(Instruction instruction, MemberRewriterContext context) {
             var il = context.IL;

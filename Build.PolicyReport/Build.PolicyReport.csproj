@@ -7,7 +7,7 @@
     <RootNamespace>Unbreakable.Build.PolicyReport</RootNamespace>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <BuildOutputTargetFolder>build</BuildOutputTargetFolder>
-    <VersionPrefix>0.0.4</VersionPrefix>
+    <VersionPrefix>0.0.5</VersionPrefix>
     <Description>Build task to create a report for a certain Unbreakable policy (e.g. for source control/policy review).</Description>
     <PackageTags>sandboxing MSBuild Unbreakable</PackageTags>
   </PropertyGroup>
@@ -22,6 +22,10 @@
     <PackageReference Include="Microsoft.Build.Utilities.Core" Version="15.1.548">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\[Core]\[Core].csproj" />
   </ItemGroup>
 
   <ItemGroup>

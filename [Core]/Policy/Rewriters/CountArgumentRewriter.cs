@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Unbreakable.Internal;
@@ -14,6 +14,8 @@ namespace Unbreakable.Policy.Rewriters {
         public CountArgumentRewriter(string countParameterName = "count") {
             _countParameterName = countParameterName;
         }
+
+        string IMemberRewriterInternal.GetShortName() => $"{nameof(CountArgumentRewriter)}({_countParameterName})";
 
         bool IMemberRewriterInternal.Rewrite(Instruction instruction, MemberRewriterContext context) {
             var method = ((MethodReference)instruction.Operand).Resolve();

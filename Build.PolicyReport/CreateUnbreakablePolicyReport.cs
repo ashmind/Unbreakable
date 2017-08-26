@@ -1,11 +1,15 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using Microsoft.Build.Framework;
+using Unbreakable.Policy;
+using Unbreakable.Policy.Internal;
 
 namespace Unbreakable.Build.PolicyReport {
+    using static ApiAccess;
+
     [LoadInSeparateAppDomain]
     public class CreateUnbreakablePolicyReport : Microsoft.Build.Utilities.AppDomainIsolatedTask {
         public override bool Execute() {
@@ -20,44 +24,62 @@ namespace Unbreakable.Build.PolicyReport {
 
             using (var writer = new StreamWriter(OutputPath)) {
                 foreach (var @namespace in namespaces.OrderBy(n => n.Key)) {
-                    var namespacePolicy = GetItem(policy.Namespaces, @namespace.Key);
-                    if (namespacePolicy == null)
-                        continue;
-                    var namespaceAccess = (string)namespacePolicy.Access.ToString();
-                    writer.WriteLine(@namespace.Key);
-                    if (namespaceAccess == "Denied")
-                        continue;
-
-                    var types = @namespace.Value.Select(type => new {
-                        value = type,
-                        name = @namespace.Key.Length > 0 ? type.FullName.Substring(@namespace.Key.Length + 1) : type.FullName
-                    });
-                    foreach (var type in types.OrderBy(t => t.name)) {
-                        var typePolicy = GetItem(namespacePolicy.Types, type.name);
-                        var typeAccess = (string)typePolicy?.Access.ToString();
-                        var effectiveTypeAccess = GetEffectiveTypeAccess(typeAccess, namespaceAccess);
-
-                        writer.Write("  ");
-                        writer.Write(type.name);
-                        writer.Write(": ");
-                        writer.WriteLine(effectiveTypeAccess);
-
-                        if (effectiveTypeAccess == "Denied")
-                            continue;
-
-                        foreach (var methodName in type.value.GetMethods().Select(m => m.Name).Distinct().OrderBy(n => n)) {
-                            var methodPolicy = typePolicy != null ? GetItem(typePolicy.Members, methodName) : null;
-                            var effectiveMethodAccess = GetEffectiveMethodAccess((string)methodPolicy?.Access.ToString(), typeAccess, effectiveTypeAccess);
-                            writer.Write("     ");
-                            writer.Write(methodName);
-                            writer.Write(": ");
-                            writer.WriteLine(effectiveMethodAccess);
-                        }
-                    }
+                    WriteNamespaceReport(writer, @namespace.Key, @namespace.Value, policy);
                 }
             }
 
             return true;
+        }
+        
+        private void WriteNamespaceReport(StreamWriter writer, string @namespace, IEnumerable<Type> types, ApiPolicy policy) {
+            if (!policy.Namespaces.TryGetValue(@namespace, out var namespacePolicy))
+                return;
+            writer.WriteLine(@namespace);
+            if (namespacePolicy.Access == Denied)
+                return;
+
+            var typesWithNames = types.Select(type => new {
+                value = type,
+                name = @namespace.Length > 0 ? type.FullName.Substring(@namespace.Length + 1) : type.FullName
+            });
+            foreach (var type in typesWithNames.OrderBy(t => t.name)) {
+                WriteTypeReport(writer, type.value, type.name, namespacePolicy);
+            }
+        }
+
+        private void WriteTypeReport(StreamWriter writer, Type type, string typeName, NamespacePolicy namespacePolicy) {
+            if (!namespacePolicy.Types.TryGetValue(typeName, out var typePolicy))
+                typePolicy = null;
+
+            var effectiveTypeAccess = GetEffectiveTypeAccess(typePolicy?.Access, namespacePolicy.Access);
+
+            writer.Write("  ");
+            writer.Write(typeName);
+            writer.Write(": ");
+            writer.WriteLine(effectiveTypeAccess);
+
+            if (effectiveTypeAccess == Denied)
+                return;
+
+            foreach (var methodName in type.GetMembers().OfType<MethodBase>().Select(m => m.Name).Distinct().OrderBy(n => n)) {
+                WriteMethodReport(writer, methodName, typePolicy, effectiveTypeAccess);
+            }
+        }
+
+        private void WriteMethodReport(StreamWriter writer, string methodName, TypePolicy typePolicy, ApiAccess effectiveTypeAccess) {
+            if (!typePolicy.Members.TryGetValue(methodName, out var methodPolicy))
+                methodPolicy = null;
+            var effectiveMethodAccess = GetEffectiveMethodAccess(methodPolicy?.Access, typePolicy.Access, effectiveTypeAccess);
+            writer.Write("     ");
+            writer.Write(methodName);
+            writer.Write(": ");
+            writer.Write(effectiveMethodAccess);
+            if (methodPolicy?.HasRewriters ?? false) {
+                writer.Write(" (");
+                writer.Write(string.Join(", ", methodPolicy.Rewriters.Cast<IMemberRewriterInternal>().Select(r => r.GetShortName())));
+                writer.Write(")");
+            }
+            writer.WriteLine();
         }
 
         private string GetNamespace(Type type) {
@@ -71,35 +93,27 @@ namespace Unbreakable.Build.PolicyReport {
             };
         }
 
-        private dynamic GetPolicy() {
+        private ApiPolicy GetPolicy() {
             var policyAssembly = Assembly.LoadFrom(PolicyAssemblyPath);
             var type = policyAssembly.GetType(PolicyTypeName, true);
             var method = type.GetMethod(PolicyMethodName);
             if (method == null)
                 throw new Exception($"Method '{PolicyMethodName}' was not found in '{PolicyTypeName}'.");
-            var policy = (dynamic)method.Invoke(null, null);
-            return policy;
+            return (ApiPolicy)method.Invoke(null, null);
         }
 
-        private dynamic GetItem(dynamic dictionary, string name) {
-            return dictionary.ContainsKey(name) ? dictionary[name] : null;
-        }
-
-        private string GetEffectiveTypeAccess(string typeAccess, string namespaceAccess) {
+        private ApiAccess GetEffectiveTypeAccess(ApiAccess? typeAccess, ApiAccess namespaceAccess) {
             if (typeAccess == null)
-                return namespaceAccess == "Allowed" ? "Allowed" : "Denied";
+                return namespaceAccess == Allowed ? Allowed : Denied;
 
-            if (typeAccess == "Neutral")
-                return "Allowed";
+            if (typeAccess == Neutral)
+                return Allowed;
 
-            return typeAccess;
+            return typeAccess.Value;
         }
 
-        private string GetEffectiveMethodAccess(string methodAccess, string typeAccess, string effectiveTypeAccess) {
-            if (methodAccess == null)
-                return typeAccess == "Allowed" ? "Allowed" : "Denied";
-            
-            return methodAccess;
+        private ApiAccess GetEffectiveMethodAccess(ApiAccess? methodAccess, ApiAccess? typeAccess, ApiAccess effectiveTypeAccess) {           
+            return methodAccess ?? (typeAccess == Allowed ? Allowed : Denied);
         }
 
         [Required] public string[] ReferencedAssemblyPaths { get; set; }

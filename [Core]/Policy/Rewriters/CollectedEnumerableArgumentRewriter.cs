@@ -6,7 +6,9 @@ using Unbreakable.Policy.Internal;
 namespace Unbreakable.Policy.Rewriters {
     public class CollectedEnumerableArgumentRewriter : IMemberRewriterInternal {
         public static CollectedEnumerableArgumentRewriter Default { get; } = new CollectedEnumerableArgumentRewriter();
-        
+
+        string IMemberRewriterInternal.GetShortName() => nameof(CollectedEnumerableArgumentRewriter);
+
         bool IMemberRewriterInternal.Rewrite(Instruction instruction, MemberRewriterContext context) {
             var method = (MethodReference)instruction.Operand;
             var il = context.IL;

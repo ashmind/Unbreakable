@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using JetBrains.Annotations;
@@ -21,6 +21,8 @@ namespace Unbreakable.Policy {
                 _access = value;
             }
         }
+
+        public bool HasRewriters => _rewriters != null;
 
         [NotNull]
         public IReadOnlyCollection<IMemberRewriter> Rewriters {
