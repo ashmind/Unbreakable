@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -12,16 +12,22 @@ using Xunit;
 namespace Unbreakable.Tests.Unit {
     public class SafeDefaultApiPolicyTests {
         [Fact]
-        public void Create_IncludesAddCallRewriter_ForMethodsNamedAddEnqueueAndPush() {
+        public void Create_IncludesAddCallRewriter_ForMethodsNamedAddInsertEnqueueAndPush() {
+            var methodNames = new HashSet<string> {
+                "Add",
+                "Insert",
+                "Enqueue",
+                "Push"
+            };
             var excludedTypes = new HashSet<Type> {
                 typeof(DateTime),
                 typeof(DateTimeOffset),
                 typeof(Decimal),
+                typeof(string),
                 typeof(TimeSpan)
             };
             AssertEachMatchingMethodHasRewriterOfType<AddCallRewriter>(
-                m => (m.Name == "Add" || m.Name == "Enqueue" || m.Name == "Push")
-                  && (!excludedTypes.Contains(m.DeclaringType))
+                m => methodNames.Contains(m.Name) && !excludedTypes.Contains(m.DeclaringType)
             );
         }
 

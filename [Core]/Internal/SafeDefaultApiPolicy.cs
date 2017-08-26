@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -26,7 +26,7 @@ namespace Unbreakable.Internal {
         public static ApiPolicy Create() {
             return new ApiPolicy(CreateTypeRuleForCompilerGeneratedDelegate())
                 .Namespace(nameof(System), Neutral, SetupSystem)
-                .Namespace("System.Collections", Neutral, n => n.Type(nameof(IEnumerator), Allowed))
+                .Namespace("System.Collections", Neutral, SetupSystemCollections)
                 .Namespace("System.Collections.Generic", Neutral, SetupSystemCollectionsGeneric)
                 .Namespace("System.ComponentModel", Neutral, SetupSystemComponentModel)
                 .Namespace("System.Diagnostics", Neutral, SetupSystemDiagnostics)
@@ -141,6 +141,17 @@ namespace Unbreakable.Internal {
             }
         }
 
+        private static void SetupSystemCollections(NamespacePolicy collections) {
+            collections
+                .Type(nameof(DictionaryEntry), Allowed)
+                .Type(nameof(ICollection), Allowed)
+                .Type(nameof(IDictionary), Allowed, SetupAdd)
+                .Type(nameof(IDictionaryEnumerator), Allowed)
+                .Type(nameof(IList), Allowed, t => t.Other(SetupAdd, SetupInsert))
+                .Type(nameof(IEnumerable), Allowed)
+                .Type(nameof(IEnumerator), Allowed);
+        }
+
         private static void SetupSystemCollectionsGeneric(NamespacePolicy collections) {
             collections
                 .Type(typeof(Comparer<>), Allowed)
@@ -163,7 +174,7 @@ namespace Unbreakable.Internal {
                 .Type(typeof(IEnumerable<>), Allowed)
                 .Type(typeof(IEnumerator<>), Allowed)
                 .Type(typeof(IEqualityComparer<>), Allowed)
-                .Type(typeof(IList<>), Allowed)
+                .Type(typeof(IList<>), Allowed, SetupInsert)
                 .Type(typeof(IReadOnlyCollection<>), Allowed)
                 .Type(typeof(IReadOnlyDictionary<,>), Allowed)
                 .Type(typeof(IReadOnlyList<>), Allowed)
@@ -179,7 +190,7 @@ namespace Unbreakable.Internal {
                     t => t.Constructor(Allowed, CountArgumentRewriter.ForCapacity, CollectedEnumerableArgumentRewriter.Default)
                           .Member(nameof(List<object>.AddRange), Allowed, CollectedEnumerableArgumentRewriter.Default)
                           .Member(nameof(List<object>.InsertRange), Allowed, CollectedEnumerableArgumentRewriter.Default)
-                          .Other(SetupAdd)
+                          .Other(SetupAdd, SetupInsert)
                 )
                 .Type(typeof(List<>.Enumerator), Allowed)
                 .Type(typeof(Queue<>), Allowed,
@@ -224,6 +235,10 @@ namespace Unbreakable.Internal {
 
         private static void SetupAdd(TypePolicy type) {
             type.Member("Add", Allowed, AddCallRewriter.Default);
+        }
+
+        private static void SetupInsert(TypePolicy type) {
+            type.Member("Insert", Allowed, AddCallRewriter.Default);
         }
 
         private static void SetupSystemComponentModel(NamespacePolicy componentModel) {
