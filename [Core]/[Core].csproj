@@ -5,7 +5,7 @@
     <UnbreakablePolicyReportTaskAssemblyPath>$(MSBuildProjectDirectory)/../Build.PolicyReport/bin/$(Configuration)/Unbreakable.Build.PolicyReport.dll</UnbreakablePolicyReportTaskAssemblyPath>
     <UnbreakablePolicyReportEnabled Condition="Exists('$(UnbreakablePolicyReportTaskAssemblyPath)')">true</UnbreakablePolicyReportEnabled>
   </PropertyGroup>
-  <Import Project="../Build.PolicyReport/build/Unbreakable.Build.PolicyReport.targets" />
+  <Import Project="../Build.PolicyReport/Unbreakable.Build.PolicyReport.targets" />
 
   <PropertyGroup>
     <TargetFramework>net46</TargetFramework>
