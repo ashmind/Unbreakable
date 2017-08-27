@@ -263,7 +263,8 @@ namespace Unbreakable.Internal {
                 .Type(nameof(DebuggerHiddenAttribute), Allowed)
                 .Type(nameof(DebuggerNonUserCodeAttribute), Allowed)
                 .Type(nameof(DebuggerStepThroughAttribute), Allowed)
-                .Type(nameof(Process), Denied);
+                .Type(nameof(Process), Denied)
+                .Type(nameof(Stopwatch), Allowed);
         }
 
         private static void SetupSystemGlobalization(NamespacePolicy globalization) {

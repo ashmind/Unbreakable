@@ -2698,7 +2698,22 @@ System.Diagnostics
   SourceSwitch: Denied
   StackFrame: Denied
   StackTrace: Denied
-  Stopwatch: Denied
+  Stopwatch: Allowed
+     .ctor: Allowed
+     Equals: Allowed
+     get_Elapsed: Allowed
+     get_ElapsedMilliseconds: Allowed
+     get_ElapsedTicks: Allowed
+     get_IsRunning: Allowed
+     GetHashCode: Allowed
+     GetTimestamp: Allowed
+     GetType: Allowed
+     Reset: Allowed
+     Restart: Allowed
+     Start: Allowed
+     StartNew: Allowed
+     Stop: Allowed
+     ToString: Allowed
   Switch: Denied
   SwitchAttribute: Denied
   SwitchLevelAttribute: Denied
