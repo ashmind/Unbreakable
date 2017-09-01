@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using Xunit;
 
 namespace Unbreakable.Tests {
@@ -7,13 +7,24 @@ namespace Unbreakable.Tests {
         public void AllowsExternMethods() {
             // crash, found by Alexandre Mutel‏ (@xoofx)
             var compiled = TestHelper.Compile(@"
-                class C
-                {
+                class C {
                     static extern void Extern();
-                    int M()
-                    {
+                    int M() {
                         Extern();
                         return 0;
+                    }
+                }
+            ");
+            // Assert.DoesNotThrow
+            AssemblyGuard.Rewrite(compiled, new MemoryStream());
+        }
+
+        [Fact]
+        public void AllowsAnonymousTypes() {
+            var compiled = TestHelper.Compile(@"
+                class C {
+                    object M() {
+                        return new { a = ""x"" };
                     }
                 }
             ");

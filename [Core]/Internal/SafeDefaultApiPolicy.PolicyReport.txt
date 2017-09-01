@@ -2617,7 +2617,24 @@ System.Diagnostics
   Debugger: Denied
   DebuggerBrowsableAttribute: Denied
   DebuggerBrowsableState: Denied
-  DebuggerDisplayAttribute: Denied
+  DebuggerDisplayAttribute: Allowed
+     .ctor: Allowed
+     Equals: Allowed
+     get_Name: Allowed
+     get_Target: Allowed
+     get_TargetTypeName: Allowed
+     get_Type: Allowed
+     get_TypeId: Allowed
+     get_Value: Allowed
+     GetHashCode: Allowed
+     GetType: Allowed
+     IsDefaultAttribute: Allowed
+     Match: Allowed
+     set_Name: Allowed
+     set_Target: Allowed
+     set_TargetTypeName: Allowed
+     set_Type: Allowed
+     ToString: Allowed
   DebuggerHiddenAttribute: Allowed
      .ctor: Allowed
      Equals: Allowed

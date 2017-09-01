@@ -260,6 +260,7 @@ namespace Unbreakable.Internal {
 
         private static void SetupSystemDiagnostics(NamespacePolicy diagnostics) {
             diagnostics
+                .Type(nameof(DebuggerDisplayAttribute), Allowed)
                 .Type(nameof(DebuggerHiddenAttribute), Allowed)
                 .Type(nameof(DebuggerNonUserCodeAttribute), Allowed)
                 .Type(nameof(DebuggerStepThroughAttribute), Allowed)
