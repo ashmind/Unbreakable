@@ -7,7 +7,7 @@
     <RootNamespace>Unbreakable.Build.PolicyReport</RootNamespace>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <IncludeBuildOutput>false</IncludeBuildOutput>
-    <VersionPrefix>0.0.5</VersionPrefix>
+    <VersionPrefix>0.0.6</VersionPrefix>
     <Description>Build task to create a report for a certain Unbreakable policy (e.g. for source control/policy review).</Description>
     <PackageTags>sandboxing MSBuild Unbreakable</PackageTags>
   </PropertyGroup>
