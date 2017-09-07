@@ -1,5 +1,4 @@
-﻿<Project>
-  
+<Project>  
   <ItemDefinitionGroup>
     <Compile>
       <UnbreakablePolicyTypeName></UnbreakablePolicyTypeName>
@@ -9,8 +8,7 @@
 
   <PropertyGroup>
     <UnbreakablePolicyReportEnabled Condition="'$(UnbreakablePolicyReportEnabled)' == ''">true</UnbreakablePolicyReportEnabled>
-    <UnbreakablePolicyReportTaskAssemblyPath
-      Condition="'$(UnbreakablePolicyReportTaskAssemblyPath)' == ''">$(MSBuildThisFileDirectory)Unbreakable.Build.PolicyReport.dll</UnbreakablePolicyReportTaskAssemblyPath>
+    <UnbreakablePolicyReportTaskAssemblyDirectory Condition="'$(UnbreakablePolicyReportTaskAssemblyDirectory)' == ''">$(MSBuildThisFileDirectory)</UnbreakablePolicyReportTaskAssemblyDirectory>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,10 +17,6 @@
       <DependentUpon>$(FileName).cs</DependentUpon>
     </UnbreakablePolicyReport>
   </ItemGroup>
-  
-  <UsingTask TaskName="CreateUnbreakablePolicyReport"
-             AssemblyFile="$(UnbreakablePolicyReportTaskAssemblyPath)"
-             Condition="'$(UnbreakablePolicyReportEnabled)' == 'true'" />
 
   <Target Name="UnbreakablePolicyFind">
     <ItemGroup>
@@ -39,11 +33,35 @@
           Condition="'$(UnbreakablePolicyReportEnabled)' == 'true'"
           Inputs="@(UnbreakablePolicySource)"
           Outputs="@(UnbreakablePolicyReport)">
-    <CreateUnbreakablePolicyReport
-        ReferencedAssemblyPaths="@(ReferencePath)"
-        PolicyAssemblyPath="$(TargetPath)"
-        PolicyTypeName="%(UnbreakablePolicySource.UnbreakablePolicyTypeName)"
-        PolicyMethodName="%(UnbreakablePolicySource.UnbreakablePolicyMethodName)"
-        OutputPath="%(UnbreakablePolicySource.RootDir)%(UnbreakablePolicySource.Directory)%(UnbreakablePolicySource.FileName).PolicyReport.txt" />
+
+    <PropertyGroup>
+      <_UnbreakablePolicyReportAssemblyTempDirectory>$(MSBuildProjectDirectory)\$(IntermediateOutputPath)Unbreakable\reportbin\</_UnbreakablePolicyReportAssemblyTempDirectory>
+      <_UnbreakablePolicyReportTaskAssemblyFileName>Unbreakable.Build.PolicyReport.dll</_UnbreakablePolicyReportTaskAssemblyFileName>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <_FileToCopyToUnbreakableReportTemp Include="@(ReferencePath)" />
+      <_FileToCopyToUnbreakableReportTemp Include="$(TargetPath)" />
+      <_FileToCopyToUnbreakableReportTemp Include="$(UnbreakablePolicyReportTaskAssemblyDirectory)*.dll" />
+    </ItemGroup>
+    
+    <MakeDir Directories="$(_UnbreakablePolicyReportAssemblyTempDirectory)" />
+    <Copy DestinationFolder="$(_UnbreakablePolicyReportAssemblyTempDirectory)" SourceFiles="@(_FileToCopyToUnbreakableReportTemp)" />
+    
+    <PropertyGroup>
+      <_UnbreakablePolicyReportTaskAssemblyTempPath>$(_UnbreakablePolicyReportAssemblyTempDirectory)$(_UnbreakablePolicyReportTaskAssemblyFileName)</_UnbreakablePolicyReportTaskAssemblyTempPath>
+      <_TargetTempPathForUnbreakable>$(_UnbreakablePolicyReportAssemblyTempDirectory)$(TargetFileName)</_TargetTempPathForUnbreakable>
+      <_ReferencedAssemblyPathsForUnbreakable>@(ReferencePath, '|')</_ReferencedAssemblyPathsForUnbreakable>
+    </PropertyGroup>
+    
+    <MSBuild Projects="$(MSBuildThisFileDirectory)Unbreakable.Build.PolicyReport.Inner.proj"
+             Properties="
+                ArgumentPolicyReportTaskAssemblyPath=$(_UnbreakablePolicyReportTaskAssemblyTempPath);
+                ArgumentReferencedAssemblyPaths=$(_ReferencedAssemblyPathsForUnbreakable);
+                ArgumentPolicyAssemblyPath=$(_TargetTempPathForUnbreakable);
+                ArgumentPolicyTypeName=%(UnbreakablePolicySource.UnbreakablePolicyTypeName);
+                ArgumentPolicyMethodName=%(UnbreakablePolicySource.UnbreakablePolicyMethodName);
+                ArgumentPolicyReportPath=%(UnbreakablePolicySource.RootDir)%(UnbreakablePolicySource.Directory)%(UnbreakablePolicySource.FileName).PolicyReport.txt
+             "/>
   </Target>
 </Project>

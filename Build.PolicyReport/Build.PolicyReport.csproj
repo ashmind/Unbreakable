@@ -6,14 +6,18 @@
     <AssemblyName>Unbreakable.Build.PolicyReport</AssemblyName>
     <RootNamespace>Unbreakable.Build.PolicyReport</RootNamespace>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <IncludeBuildOutput>false</IncludeBuildOutput>
-    <VersionPrefix>0.0.6</VersionPrefix>
-    <Description>Build task to create a report for a certain Unbreakable policy (e.g. for source control/policy review).</Description>
+    <IncludeBuildOutput>true</IncludeBuildOutput>
+    <BuildOutputTargetFolder>build</BuildOutputTargetFolder>
+    <VersionPrefix>0.0.7</VersionPrefix>
+    <Description>Build task to create a report for a certain Unbreakable policy (e.g. for source control/policy review).</Description>    
     <PackageTags>sandboxing MSBuild Unbreakable</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
     <Content Include="Unbreakable.Build.PolicyReport.targets">
+      <PackagePath>build/net46</PackagePath>
+    </Content>
+    <Content Include="Unbreakable.Build.PolicyReport.Inner.proj">
       <PackagePath>build/net46</PackagePath>
     </Content>
   </ItemGroup>
@@ -26,19 +30,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\[Core]\[Core].csproj">
-      <PrivateAssets>All</PrivateAssets>
+      <ExcludeAssets>All</ExcludeAssets>
+      <Private>false</Private>
     </ProjectReference>
   </ItemGroup>
 
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
-
-  <Target Name="IncludeAssembliesInPackage" AfterTargets="Build">
-    <ItemGroup>
-      <Content Include="$(OutputPath)\*.dll" Exclude="$(OutputPath)\Microsoft.Build*.dll; $(OutputPath)\Mono.Cecil*.dll">
-        <PackagePath>build/net46</PackagePath>
-      </Content>
-    </ItemGroup>
-  </Target>
 </Project>

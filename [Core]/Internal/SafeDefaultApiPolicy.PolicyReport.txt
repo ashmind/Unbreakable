@@ -1901,7 +1901,8 @@ System.Collections
      get_Count: Allowed
      get_IsSynchronized: Allowed
      get_SyncRoot: Allowed
-  IComparer: Denied
+  IComparer: Allowed
+     Compare: Allowed
   IDictionary: Allowed
      Add: Allowed (AddCallRewriter)
      Clear: Allowed
@@ -1924,7 +1925,9 @@ System.Collections
      get_Current: Allowed
      MoveNext: Allowed
      Reset: Allowed
-  IEqualityComparer: Denied
+  IEqualityComparer: Allowed
+     Equals: Allowed
+     GetHashCode: Allowed
   IHashCodeProvider: Denied
   IList: Allowed
      Add: Allowed (AddCallRewriter)

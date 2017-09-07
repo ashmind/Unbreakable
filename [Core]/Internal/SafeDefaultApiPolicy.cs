@@ -145,7 +145,9 @@ namespace Unbreakable.Internal {
             collections
                 .Type(nameof(DictionaryEntry), Allowed)
                 .Type(nameof(ICollection), Allowed)
+                .Type(nameof(IComparer), Allowed)
                 .Type(nameof(IDictionary), Allowed, SetupAdd)
+                .Type(nameof(IEqualityComparer), Allowed)
                 .Type(nameof(IDictionaryEnumerator), Allowed)
                 .Type(nameof(IList), Allowed, t => t.Other(SetupAdd, SetupInsert))
                 .Type(nameof(IEnumerable), Allowed)
