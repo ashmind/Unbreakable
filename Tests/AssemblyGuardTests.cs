@@ -32,6 +32,22 @@ namespace Unbreakable.Tests {
             AssemblyGuard.Rewrite(compiled, new MemoryStream());
         }
 
+        [Fact]
+        public void AllowsReasonableAmountOfNullableLocals() {
+            var compiled = TestHelper.Compile(@"
+                class C {
+                    void M() {
+                        int? a = 1;
+                        int? b = 1;
+                        int? c = a + b;
+                        int? d = a + b;
+                    }
+                }
+            ");
+            // Assert.DoesNotThrow
+            AssemblyGuard.Rewrite(compiled, new MemoryStream());
+        }
+
         [Theory]
         [InlineData("void M() { Console.WriteLine('x'); }")]
         [InlineData("class N { void M() { GC.Collect(); } }")]

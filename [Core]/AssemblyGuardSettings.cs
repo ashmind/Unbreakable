@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Text.RegularExpressions;
 using JetBrains.Annotations;
 using Unbreakable.Internal;
@@ -11,7 +11,7 @@ namespace Unbreakable {
 
         public AssemblyGuardSettings() {
             _apiFilter = new ApiFilter(SafeDefaultApiPolicy.Create());
-            MethodLocalsSizeLimit = IntPtr.Size * 10;
+            MethodLocalsSizeLimit = IntPtr.Size * 32;
             MethodStackPushSizeLimit = 64;
         }
 
