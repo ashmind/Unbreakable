@@ -1,4 +1,5 @@
-﻿using Mono.Cecil.Cil;
+using System;
+using Mono.Cecil.Cil;
 using Unbreakable.Internal;
 using Unbreakable.Policy.Internal;
 
@@ -12,7 +13,7 @@ namespace Unbreakable.Policy.Rewriters {
             var il = context.IL;
 
             var ldloc = il.CreateLdlocBest(context.RuntimeGuardVariable);
-            var ldlc1 = il.Create(OpCodes.Ldc_I4_1);
+            var ldlc1 = il.Create(OpCodes.Ldc_I8, 1L);
 
             il.InsertAfter(instruction, ldloc);
             il.InsertAfter(ldloc, ldlc1);

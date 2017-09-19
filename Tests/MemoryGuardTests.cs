@@ -1,10 +1,17 @@
-﻿using System;
+using System;
 using System.Reflection;
 using Unbreakable.Runtime;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Unbreakable.Tests {
     public class MemoryGuardTests {
+        private readonly ITestOutputHelper _output;
+
+        public MemoryGuardTests(ITestOutputHelper output) {
+            _output = output;
+        }
+
         [Theory]
         [InlineData("(new string('a', 50)).Length", 50)]
         [InlineData("(new byte[50]).Length", 50)]
@@ -23,12 +30,29 @@ namespace Unbreakable.Tests {
             Assert.Equal(expected, m());
         }
 
+        [Fact]
+        public void AllowsAllocations_ByListAdd() {
+            var m = TestHelper.RewriteAndGetMethodWrappedInScope(@"
+                using System.Collections.Generic;
+                class C {
+                    void M() {
+                        var list = new List<int>();
+                        list.Add(1);
+                    }
+                }
+            ", "C", "M");
+
+            AssertEx.DoesNotThrow(() => m());
+        }
+
         [Theory]
         [InlineData("new byte[100000]", false)]
         [InlineData("new byte[(long)int.MaxValue + 1]", true)]
         public void ThrowsGuardException_WhenAllocatingLargeArray(string expression, bool requiresX64) {
-            if (requiresX64)
-                Assert.True(IntPtr.Size == 8, "This test can only be run in x64.");
+            if (requiresX64 && IntPtr.Size < 8) {
+                _output.WriteLine("This test can only be run in x64.");
+                return;
+            }
             AssertThrowsMemoryGuard("object M() => " + expression + ";");
         }
 
