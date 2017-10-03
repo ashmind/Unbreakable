@@ -347,6 +347,28 @@ namespace Unbreakable.Internal {
 
         private static void SetupSystemText(NamespacePolicy text) {
             text
+                .Type(nameof(Encoding), Neutral,
+                    t => t.Member(nameof(Encoding.GetEncoding), Allowed)
+                          .Getter(nameof(Encoding.ASCII), Allowed)
+                          .Getter(nameof(Encoding.BigEndianUnicode), Allowed)
+                          .Getter(nameof(Encoding.BodyName), Allowed)
+                          .Getter(nameof(Encoding.CodePage), Allowed)
+                          .Getter(nameof(Encoding.Default), Allowed)
+                          .Getter(nameof(Encoding.HeaderName), Allowed)
+                          .Getter(nameof(Encoding.IsBrowserDisplay), Allowed)
+                          .Getter(nameof(Encoding.IsBrowserSave), Allowed)
+                          .Getter(nameof(Encoding.IsMailNewsDisplay), Allowed)
+                          .Getter(nameof(Encoding.IsMailNewsSave), Allowed)
+                          .Getter(nameof(Encoding.IsReadOnly), Allowed)
+                          .Getter(nameof(Encoding.IsSingleByte), Allowed)
+                          .Getter(nameof(Encoding.EncodingName), Allowed)
+                          .Getter(nameof(Encoding.Unicode), Allowed)
+                          .Getter(nameof(Encoding.UTF32), Allowed)
+                          .Getter(nameof(Encoding.UTF7), Allowed)
+                          .Getter(nameof(Encoding.UTF8), Allowed)
+                          .Getter(nameof(Encoding.WebName), Allowed)
+                          .Getter(nameof(Encoding.WindowsCodePage), Allowed)
+                )
                 .Type(nameof(StringBuilder), Neutral,
                     t => t.Constructor(Allowed, CountArgumentRewriter.ForCapacity)
                           .Member(nameof(StringBuilder.Append), Allowed, AddCallRewriter.Default, CountArgumentRewriter.Default, new CountArgumentRewriter("repeatCount"))
