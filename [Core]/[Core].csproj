@@ -3,7 +3,7 @@
 
   <PropertyGroup>
     <UnbreakablePolicyReportTaskAssemblyDirectory>$(MSBuildProjectDirectory)/../Build.PolicyReport/bin/$(Configuration)/</UnbreakablePolicyReportTaskAssemblyDirectory>
-    <UnbreakablePolicyReportEnabled Condition="Exists('$(UnbreakablePolicyReportTaskAssemblyPath)')">true</UnbreakablePolicyReportEnabled>
+    <UnbreakablePolicyReportEnabled Condition="'$(Configuration)' == 'Debug'">true</UnbreakablePolicyReportEnabled>
   </PropertyGroup>
   <Import Project="../Build.PolicyReport/Unbreakable.Build.PolicyReport.targets" />
 
