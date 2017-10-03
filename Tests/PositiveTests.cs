@@ -1,4 +1,4 @@
-﻿using Xunit;
+using Xunit;
 
 namespace Unbreakable.Tests {
     public class PositiveTests {
@@ -10,6 +10,7 @@ namespace Unbreakable.Tests {
             int M(int a) => ((F)(() => a + 1))();
         ", 2)]
         [InlineData(@"bool M(int a) => DateTime.Now.Ticks > 0;", true)] // crash, found by Valery Sarkisov‏ (@VSarkisov)
+        [InlineData(@"int M(int _) { MOut(out int x); return x; } void MOut(out int b) { b = 1; }", 1)]
         public void PreservesStandardLogic(string code, object expected) {
             var m = TestHelper.RewriteAndGetMethodWrappedInScope(@"
                 using System;

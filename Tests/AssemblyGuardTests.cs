@@ -1,4 +1,5 @@
 using System.IO;
+using System.Security;
 using Xunit;
 
 namespace Unbreakable.Tests {
@@ -29,7 +30,7 @@ namespace Unbreakable.Tests {
                 }
             ");
             // Assert.DoesNotThrow
-            AssemblyGuard.Rewrite(compiled, new MemoryStream());
+            AssemblyGuard.Rewrite(compiled, new MemoryStream(), AssemblyGuardSettings.DefaultForCSharpAssembly());
         }
 
         [Fact]
@@ -74,6 +75,25 @@ namespace Unbreakable.Tests {
             ");
             Assert.Throws<AssemblyGuardException>(
                 () => AssemblyGuard.Rewrite(compiled, new MemoryStream())
+            );
+        }
+
+        [Theory]
+        [InlineData("int* p = stackalloc int[1];")]
+        [InlineData("int x = 0; int y = *(((int*)&x) + 1);")]
+        [InlineData("int x = 0; *(((int*)&x) + 1) = 1;")]
+        public void ThrowsGuardException_ForPointerTypes(string code) {
+            // pointers, available in local functions due to a Roslyn bug, reported by Andy Gocke‏ (@andygocke)
+            var policy = ApiPolicy.SafeDefault()
+                .Namespace("System.Security", ApiAccess.Neutral, n => n.Type(typeof(UnverifiableCodeAttribute), ApiAccess.Allowed));
+            var compiled = TestHelper.Compile(@"
+                class X {
+                    unsafe void M() { " + code + @" }
+                }
+            ", allowUnsafe: true);
+
+            Assert.Throws<AssemblyGuardException>(
+                () => AssemblyGuard.Rewrite(compiled, new MemoryStream(), new AssemblyGuardSettings { ApiPolicy = policy  })
             );
         }
 

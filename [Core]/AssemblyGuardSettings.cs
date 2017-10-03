@@ -25,6 +25,16 @@ namespace Unbreakable {
 
         public int MethodLocalsSizeLimit { get; set; }
         public int MethodStackPushSizeLimit { get; set; }
-        public Regex AllowExplicitLayoutInTypesMatchingPattern { get; set; }
+        [CanBeNull] public Regex AllowExplicitLayoutInTypesMatchingPattern { get; set; }
+        [CanBeNull] public Regex AllowPointerOperationsInTypesMatchingPattern { get; set; }
+
+        public static AssemblyGuardSettings DefaultForCSharpAssembly() {
+            return new AssemblyGuardSettings {
+                // Array initializers for constant arrays use those
+                AllowExplicitLayoutInTypesMatchingPattern = new Regex("<PrivateImplementationDetails>"),
+                // Anonymous types use pointer operations in ToString()
+                AllowPointerOperationsInTypesMatchingPattern = new Regex("^<>f__AnonymousType.+$")
+            };
+        }
     }
 }

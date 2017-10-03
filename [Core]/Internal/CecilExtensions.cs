@@ -1,14 +1,24 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 
 namespace Unbreakable.Internal {
     internal static class CecilExtensions {
+        private static readonly ISet<Code> LdindCodes = new HashSet<Code> {
+            Code.Ldind_I, Code.Ldind_I1, Code.Ldind_I2, Code.Ldind_I4, Code.Ldind_I8,
+            Code.Ldind_R4, Code.Ldind_R8,
+            Code.Ldind_Ref,
+            Code.Ldind_U1, Code.Ldind_U2, Code.Ldind_U4
+        };
+
+        private static readonly ISet<Code> StindCodes = new HashSet<Code> {
+            Code.Stind_I, Code.Stind_I1, Code.Stind_I2, Code.Stind_I4, Code.Stind_I8,
+            Code.Stind_R4, Code.Stind_R8,
+            Code.Stind_Ref
+        };
+
         public static TypeReference ResolveGenericParameters(this TypeReference type, [CanBeNull] GenericInstanceMethod methodInstance, [CanBeNull] GenericInstanceType typeInstance) {
             if (type is GenericParameter genericParameter) {
                 switch (genericParameter.Owner) {
@@ -53,6 +63,14 @@ namespace Unbreakable.Internal {
                 clone.GenericArguments.Add(argument);
             }
             return clone;
+        }
+
+        public static bool IsLdind(this Code code) {
+            return LdindCodes.Contains(code);
+        }
+
+        public static bool IsStind(this Code code) {
+            return StindCodes.Contains(code);
         }
 
         public static Instruction CreateLdlocBest(this ILProcessor il, VariableDefinition variable) {

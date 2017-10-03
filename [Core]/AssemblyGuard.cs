@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 using System.IO;
-using System.Runtime.InteropServices;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Unbreakable.Internal;
+using Unbreakable.Internal.AssemblyValidation;
 using Unbreakable.Policy.Internal;
 using Unbreakable.Runtime.Internal;
 
@@ -25,14 +25,14 @@ namespace Unbreakable {
         internal static RuntimeGuardToken Rewrite(AssemblyDefinition assembly, AssemblyGuardSettings settings = null) {
             var id = Guid.NewGuid();
             settings = settings ?? AssemblyGuardSettings.Default;
-            var apiValidator = new CecilApiValidator(settings.ApiFilter, assembly);
+            var validator = new AssemblyValidator(settings, assembly, new StackSizeValidator(settings), new PointerOperationValidator(settings));
             foreach (var module in assembly.Modules) {
                 var guardInstanceField = EmitGuardInstance(module, id);
                 var guard = new RuntimeGuardReferences(guardInstanceField, module);
 
-                apiValidator.ValidateDefinition(module);
+                validator.ValidateDefinition(module);
                 foreach (var type in module.Types) {
-                    ValidateAndRewriteType(type, guard, apiValidator, settings);
+                    ValidateAndRewriteType(type, guard, validator, settings);
                 }
             }
             return new RuntimeGuardToken(id);
@@ -64,43 +64,24 @@ namespace Unbreakable {
             return instanceField;
         }
 
-        private static void ValidateAndRewriteType(TypeDefinition type, RuntimeGuardReferences guard, CecilApiValidator apiValidator, AssemblyGuardSettings settings) {
-            // Ensures we don't have to suspect each System.Int32 (etc) to be a user-defined type
-            if (type.Namespace == "System" || type.Namespace.StartsWith("System.", StringComparison.Ordinal))
-                throw new AssemblyGuardException($"Custom types cannot be defined in system namespace {type.Namespace}.");
-
-            if ((type.Attributes & TypeAttributes.ExplicitLayout) == TypeAttributes.ExplicitLayout) {
-                var allowedPattern = settings.AllowExplicitLayoutInTypesMatchingPattern;
-                if (allowedPattern == null || !allowedPattern.IsMatch(type.FullName))
-                    throw new AssemblyGuardException($"Type {type} has an explicit layout which is not allowed.");
-            }
-
-            apiValidator.ValidateDefinition(type);
+        private static void ValidateAndRewriteType(TypeDefinition type, RuntimeGuardReferences guard, AssemblyValidator validator, AssemblyGuardSettings settings) {
+            validator.ValidateDefinition(type);
             foreach (var nested in type.NestedTypes) {
-                ValidateAndRewriteType(nested, guard, apiValidator, settings);
+                ValidateAndRewriteType(nested, guard, validator, settings);
             }
             foreach (var method in type.Methods) {
-                apiValidator.ValidateDefinition(method);
-                ValidateAndRewriteMethod(method, guard, apiValidator, settings);
+                ValidateAndRewriteMethod(method, guard, validator, settings);
             }
         }
 
-        private static void ValidateAndRewriteMethod(MethodDefinition method, RuntimeGuardReferences guard, CecilApiValidator apiValidator, AssemblyGuardSettings settings) {
+        private static void ValidateAndRewriteMethod(MethodDefinition method, RuntimeGuardReferences guard, AssemblyValidator validator, AssemblyGuardSettings settings) {
             if (method.DeclaringType == guard.InstanceField.DeclaringType)
                 return;
 
-            if ((method.Attributes & MethodAttributes.PInvokeImpl) == MethodAttributes.PInvokeImpl)
-                throw new AssemblyGuardException($"Method {method} uses P/Invoke which is not allowed.");
-
-            foreach (var @override in method.Overrides) {
-                if (@override.DeclaringType.FullName == "System.Object" && @override.Name == "Finalize")
-                    throw new AssemblyGuardException($"Method {method} is a finalizer which is not allowed.");
-            }
-
+            validator.ValidateDefinition(method);
             if (!method.HasBody)
                 return;
-
-            ValidateMethodLocalsSize(method, settings);
+            
             if (method.Body.Instructions.Count == 0)
                 return; // weird, but happens with 'extern'
 
@@ -119,8 +100,7 @@ namespace Unbreakable {
 
             for (var i = skipFirst; i < instructions.Count; i++) {
                 var instruction = instructions[i];
-                var memberRule = apiValidator.ValidateInstructionAndGetRule(instruction);
-                ValidateInstructionStackSize(instruction, method, settings);
+                var memberRule = validator.ValidateInstructionAndGetPolicy(instruction, method);
                 var code = instruction.OpCode.Code;
                 if (code == Code.Newarr) {
                     il.InsertBeforeAndRetargetJumps(instruction, il.CreateLdlocBest(guardVariable));
@@ -177,56 +157,6 @@ namespace Unbreakable {
                 return false;
 
             return true;
-        }
-
-        private static void ValidateMethodLocalsSize(MethodDefinition method, AssemblyGuardSettings settings) {
-            var size = 0;
-            foreach (var local in method.Body.Variables) {
-                size += TypeSizeCalculator.GetSize(local.VariableType);
-            }
-            if (size > settings.MethodLocalsSizeLimit)
-                throw new AssemblyGuardException($"Size of locals in method {method} exceeds allowed limit.");
-        }
-
-        private static void ValidateInstructionStackSize(Instruction instruction, MethodDefinition method, AssemblyGuardSettings settings) {
-            if (instruction.OpCode.StackBehaviourPush == StackBehaviour.Push0)
-                return;
-
-            var estimatedSize = EstimateSizeOfPush(instruction, method);
-            if (estimatedSize > settings.MethodStackPushSizeLimit)
-                throw new AssemblyGuardException($"Stack push size in method {method} exceeds allowed limit.");
-        }
-
-        private static int EstimateSizeOfPush(Instruction instruction, MethodDefinition method) {
-            TypeReference GetParameterType(MethodDefinition m, int index) {
-                if (!m.IsStatic) {
-                    if (index == 0)
-                        return m.DeclaringType;
-                    index -= 1;
-                }
-                return m.Parameters[index].ParameterType;
-            }
-            int GetSize(TypeReference t) => TypeSizeCalculator.GetSize(t);
-
-            switch (instruction.OpCode.Code) {
-                case Code.Ldarg_0: return GetSize(GetParameterType(method, 0));
-                case Code.Ldarg_1: return GetSize(GetParameterType(method, 1));
-                case Code.Ldarg_2: return GetSize(GetParameterType(method, 2));
-                case Code.Ldarg_3: return GetSize(GetParameterType(method, 3));
-                case Code.Ldloc_0: return GetSize(method.Body.Variables[0].VariableType);
-                case Code.Ldloc_1: return GetSize(method.Body.Variables[1].VariableType);
-                case Code.Ldloc_2: return GetSize(method.Body.Variables[2].VariableType);
-                case Code.Ldloc_3: return GetSize(method.Body.Variables[3].VariableType);
-            }
-
-            switch (instruction.Operand) {
-                case FieldReference f: return GetSize(f.FieldType);
-                case MethodReference m: return GetSize(m.ReturnType);
-                case VariableDefinition v: return GetSize(v.VariableType);
-                case ParameterDefinition p: return GetSize(p.ParameterType);
-                case object o when o != null && o.GetType().IsPrimitive: return Marshal.SizeOf(o);
-                default: return sizeof(long); // estimate
-            }
         }
 
         private static bool IsCallToUserCode(Instruction instruction, AssemblyDefinition userCodeAssembly) {

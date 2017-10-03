@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -11,7 +11,7 @@ namespace Unbreakable.Tests {
     public static class TestHelper {
         public delegate object Invoke(params object[] args);
 
-        public static MemoryStream Compile(string code) {
+        public static MemoryStream Compile(string code, bool allowUnsafe = false) {
             var compilation = CSharpCompilation.Create(
                 "_",
                 new[] { CSharpSyntaxTree.ParseText(code) },
@@ -20,7 +20,7 @@ namespace Unbreakable.Tests {
                     MetadataReference.CreateFromFile(typeof(Stack<>).Assembly.Location),
                     MetadataReference.CreateFromFile(typeof(Enumerable).Assembly.Location)
                 },
-                new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
+                new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, allowUnsafe: allowUnsafe)
             );
 
             var stream = new MemoryStream();
