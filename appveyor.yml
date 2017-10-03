@@ -1,6 +1,10 @@
 version: '{build}'
 configuration: Release
 
+environment:
+  api_key:
+    secure: L9TTNCYYao5V7WxoXrRpjhf25X9o+yiQD1nTsOEXMFR24JQ20IKwrRoqNDFfV0oQ
+
 before_build:
 - dotnet restore
 
@@ -16,10 +20,6 @@ after_test:
 artifacts:
 - path: '*.nupkg'
 
-deploy:
-  - provider: NuGet
-    on:
-      branch: /^(master|\d\.\d)$/
-    api_key:
-      secure: L9TTNCYYao5V7WxoXrRpjhf25X9o+yiQD1nTsOEXMFR24JQ20IKwrRoqNDFfV0oQ
-    artifact: /.*\.nupkg/
+deploy_script:
+  - appveyor DownloadFile https://dist.nuget.org/win-x86-commandline/latest/nuget.exe  
+  - ps: $artifacts.values | ? { ($_.path -like '*.nupkg') -and  !($_.path -like '*.symbols.nupkg') } | % { nuget.exe push $_.path -Source https://www.nuget.org/api/v2/package -ApiKey $env:api_key; if ($lastexitcode -ne 0) { throw } }
