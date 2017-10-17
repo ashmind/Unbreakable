@@ -4,7 +4,7 @@
     <TargetFramework>net46</TargetFramework>
     <AssemblyName>_</AssemblyName>
     <PackageId>Unbreakable</PackageId>
-    <VersionPrefix>0.5.0-unproven</VersionPrefix>    
+    <VersionPrefix>0.5.1-unproven</VersionPrefix>    
     <Description>.NET sandboxing framework: rewrites other assemblies to ensure they can't bring down the hosting process.</Description>
     <PackageTags>sandboxing Unbreakable</PackageTags>
     <IncludeBuildOutput>false</IncludeBuildOutput>
@@ -18,6 +18,12 @@
     <ProjectReference Include="..\[Core]\[Core].csproj">
       <PrivateAssets>All</PrivateAssets>
     </ProjectReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Argument" Version="1.0.3" />
+    <PackageReference Include="JetBrains.Annotations" Version="10.4.0" />
+    <PackageReference Include="Mono.Cecil" Version="0.9.6.4" />
   </ItemGroup>
 
   <ItemGroup>
