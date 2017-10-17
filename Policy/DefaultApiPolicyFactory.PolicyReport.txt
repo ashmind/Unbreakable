@@ -269,7 +269,7 @@ System
      IndexOf: Denied
      Initialize: Denied
      LastIndexOf: Denied
-     Resize: Denied
+     Resize: Allowed (CountArgumentRewriter(newSize))
      Reverse: Denied
      SetValue: Allowed
      Sort: Denied

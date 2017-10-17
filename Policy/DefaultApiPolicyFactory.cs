@@ -56,6 +56,7 @@ namespace Unbreakable.Policy.Internal {
                           .Member(nameof(Array.GetLength), Allowed)
                           .Member(nameof(Array.GetValue), Allowed)
                           .Getter(nameof(Array.Rank), Allowed)
+                          .Member(nameof(Array.Resize), Allowed, new CountArgumentRewriter("newSize"))
                           .Member(nameof(Array.SetValue), Allowed)
                 )
                 .Type(nameof(ArgumentException), Neutral, t => t.Constructor(Allowed))
