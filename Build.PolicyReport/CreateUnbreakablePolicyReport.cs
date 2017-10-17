@@ -99,7 +99,12 @@ namespace Unbreakable.Build.PolicyReport {
             var method = type.GetMethod(PolicyMethodName);
             if (method == null)
                 throw new Exception($"Method '{PolicyMethodName}' was not found in '{PolicyTypeName}'.");
-            return (ApiPolicy)method.Invoke(null, null);
+
+            var instance = (object)null;
+            if (!method.IsStatic)
+                instance = Activator.CreateInstance(type);
+
+            return (ApiPolicy)method.Invoke(instance, null);
         }
 
         private ApiAccess GetEffectiveTypeAccess(ApiAccess? typeAccess, ApiAccess namespaceAccess) {

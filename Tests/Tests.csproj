@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Policy\Policy.csproj" />
     <ProjectReference Include="..\Runtime\Runtime.csproj">
       <SetPlatform>Platform=AnyCPU</SetPlatform>
     </ProjectReference>

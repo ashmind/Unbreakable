@@ -4,15 +4,15 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using AshMind.Extensions;
-using Unbreakable.Internal;
 using Unbreakable.Policy;
+using Unbreakable.Policy.Internal;
 using Unbreakable.Policy.Rewriters;
 using Xunit;
 
 namespace Unbreakable.Tests.Unit {
-    public class SafeDefaultApiPolicyTests {
+    public class DefaultApiPolicyFactoryTests {
         [Fact]
-        public void Create_IncludesAddCallRewriter_ForMethodsNamedAddInsertEnqueueAndPush() {
+        public void CreateSafeDefaultPolicy_IncludesAddCallRewriter_ForMethodsNamedAddInsertEnqueueAndPush() {
             var methodNames = new HashSet<string> {
                 "Add",
                 "Insert",
@@ -32,7 +32,7 @@ namespace Unbreakable.Tests.Unit {
         }
 
         [Fact]
-        public void Create_IncludesCountArgumentRewriter_ForMethodsWithParamerNamedCountOrCapacity() {
+        public void CreateSafeDefaultPolicy_IncludesCountArgumentRewriter_ForMethodsWithParamerNamedCountOrCapacity() {
             var excluded = new HashSet<(Type, string)> {
                 (typeof(string), nameof(string.Join)),
                 (typeof(string), nameof(string.Split))
@@ -47,7 +47,7 @@ namespace Unbreakable.Tests.Unit {
         private static void AssertEachMatchingMethodHasRewriterOfType<TApiMemberRewriter>(Func<MethodBase, bool> matcher)
             where TApiMemberRewriter : IMemberRewriter
         {
-            var namespaceRules = SafeDefaultApiPolicy.Create();
+            var namespaceRules = new DefaultApiPolicyFactory().CreateSafeDefaultPolicy();
             foreach (var namespaceRule in namespaceRules.Namespaces) {
                 if (namespaceRule.Value.Access == ApiAccess.Denied)
                     continue;

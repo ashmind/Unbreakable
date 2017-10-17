@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -6,14 +7,13 @@ using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
-using Unbreakable.Policy;
+using Unbreakable.Internal;
 using Unbreakable.Policy.Rewriters;
 
-namespace Unbreakable.Internal {
-    using System.Collections;
+namespace Unbreakable.Policy.Internal {
     using static ApiAccess;
 
-    internal static class SafeDefaultApiPolicy {
+    internal class DefaultApiPolicyFactory : IDefaultApiPolicyFactory {
         private static readonly IReadOnlyCollection<Type> DelegateTypes =
             typeof(Func<>).Assembly.GetTypes().Where(t => t.Namespace == nameof(System) && t.BaseType == typeof(MulticastDelegate)).ToArray();
 
@@ -23,7 +23,7 @@ namespace Unbreakable.Internal {
         private static readonly IReadOnlyCollection<string> ValueTupleTypeNames =
             Enumerable.Range(1, 8).Select(n => "ValueTuple`" + n).ToArray();
 
-        public static ApiPolicy Create() {
+        public ApiPolicy CreateSafeDefaultPolicy() {
             return new ApiPolicy(CreateTypeRuleForCompilerGeneratedDelegate())
                 .Namespace(nameof(System), Neutral, SetupSystem)
                 .Namespace("System.Collections", Neutral, SetupSystemCollections)

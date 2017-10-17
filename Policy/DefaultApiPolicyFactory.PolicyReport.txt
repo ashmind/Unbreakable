@@ -3155,4 +3155,5 @@ System.Text
   UTF7Encoding: Denied
   UTF8Encoding: Denied
 System.Threading
+Unbreakable
 Unbreakable.Runtime

@@ -1,15 +1,19 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
-using Unbreakable.Internal;
 using Unbreakable.Policy;
+using Unbreakable.Policy.Internal;
 
 namespace Unbreakable {
     public class ApiPolicy {
+        private static readonly IDefaultApiPolicyFactory DefaultFactory = (IDefaultApiPolicyFactory)Activator.CreateInstance(
+            Type.GetType("Unbreakable.Policy.Internal.DefaultApiPolicyFactory, Unbreakable.Policy", true)
+        );
         private readonly IDictionary<string, NamespacePolicy> _namespaces = new Dictionary<string, NamespacePolicy>();
 
-        public static ApiPolicy SafeDefault() => SafeDefaultApiPolicy.Create();
-
+        [NotNull]
+        public static ApiPolicy SafeDefault() => DefaultFactory.CreateSafeDefaultPolicy();
+        
         internal ApiPolicy(TypePolicy compilerGeneratedDelegate) {
             CompilerGeneratedDelegate = compilerGeneratedDelegate;
         }

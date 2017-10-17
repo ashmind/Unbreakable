@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <UnbreakablePolicyReportTaskAssemblyDirectory>$(MSBuildProjectDirectory)/../Build.PolicyReport/bin/$(Configuration)/</UnbreakablePolicyReportTaskAssemblyDirectory>
+    <UnbreakablePolicyReportEnabled Condition="'$(Configuration)' != 'Debug'">false</UnbreakablePolicyReportEnabled>
+  </PropertyGroup>
+  <Import Project="../Build.PolicyReport/Unbreakable.Build.PolicyReport.targets" />
+
+  <PropertyGroup>
+    <TargetFramework>net46</TargetFramework>
+    <AssemblyName>Unbreakable.Policy</AssemblyName>
+    <RootNamespace>Unbreakable.Policy</RootNamespace>
+    <VersionPrefix>0.1.0-unproven</VersionPrefix>
+    <Description>API policies for https://www.nuget.org/packages/Unbreakable. This library supports the Unbreakable infrastructure and is not intended to be used directly from your code.</Description>
+    <PackageTags>sandboxing Unbreakable</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="DefaultApiPolicyFactory.PolicyReport.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\[Core]\[Core].csproj">
+      <PrivateAssets>All</PrivateAssets>
+    </ProjectReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="DefaultApiPolicyFactory.cs">
+      <UnbreakablePolicyMethodName>CreateSafeDefaultPolicy</UnbreakablePolicyMethodName>
+      <UnbreakablePolicyTypeName>Unbreakable.Policy.Internal.DefaultApiPolicyFactory</UnbreakablePolicyTypeName>
+    </Compile>
+  </ItemGroup>
+
+</Project>

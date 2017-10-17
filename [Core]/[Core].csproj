@@ -2,19 +2,18 @@
   <Import Project="../NuGetPackage.Common.props" />
 
   <PropertyGroup>
-    <UnbreakablePolicyReportTaskAssemblyDirectory>$(MSBuildProjectDirectory)/../Build.PolicyReport/bin/$(Configuration)/</UnbreakablePolicyReportTaskAssemblyDirectory>
-    <UnbreakablePolicyReportEnabled Condition="'$(Configuration)' != 'Debug'">false</UnbreakablePolicyReportEnabled>
-  </PropertyGroup>
-  <Import Project="../Build.PolicyReport/Unbreakable.Build.PolicyReport.targets" />
-
-  <PropertyGroup>
     <TargetFramework>net46</TargetFramework>
     <AssemblyName>Unbreakable</AssemblyName>
     <RootNamespace>Unbreakable</RootNamespace>
-    <VersionPrefix>0.4.1-unproven</VersionPrefix>
-    <Description>.NET sandboxing framework: rewrites other assemblies to ensure they can't bring down the hosting process.</Description>
-    <PackageTags>sandboxing Unbreakable</PackageTags>
+    <PackageId>_Core_</PackageId>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Internal\Validation\**" />
+    <EmbeddedResource Remove="Internal\Validation\**" />
+    <None Remove="Internal\Validation\**" />
+    <UnbreakablePolicyReport Remove="Internal\Validation\**" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Argument" Version="1.0.3" />
@@ -24,17 +23,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Runtime\Runtime.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Update="Internal\SafeDefaultApiPolicy.cs">
-      <UnbreakablePolicyTypeName>Unbreakable.Internal.SafeDefaultApiPolicy</UnbreakablePolicyTypeName>
-      <UnbreakablePolicyMethodName>Create</UnbreakablePolicyMethodName>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Internal\Validation\" />
   </ItemGroup>
 
 </Project>

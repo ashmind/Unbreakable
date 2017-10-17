@@ -30,6 +30,7 @@
     <DotNetCliToolReference Include="Microsoft.DotNet.Xdt.Tools" Version="1.2.0" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Policy\Policy.csproj" />
     <ProjectReference Include="..\[Core]\[Core].csproj" />
   </ItemGroup>
   <ItemGroup>

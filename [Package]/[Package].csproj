@@ -1,0 +1,45 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net46</TargetFramework>
+    <AssemblyName>_</AssemblyName>
+    <PackageId>Unbreakable</PackageId>
+    <VersionPrefix>0.5.0-unproven</VersionPrefix>    
+    <Description>.NET sandboxing framework: rewrites other assemblies to ensure they can't bring down the hosting process.</Description>
+    <PackageTags>sandboxing Unbreakable</PackageTags>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Policy\Policy.csproj" />
+    <ProjectReference Include="..\Runtime\Runtime.csproj">
+      <PrivateAssets>All</PrivateAssets>
+    </ProjectReference>
+    <ProjectReference Include="..\[Core]\[Core].csproj">
+      <PrivateAssets>All</PrivateAssets>
+    </ProjectReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="$(OutputPath)Unbreakable.dll">
+      <PackagePath>lib\net46</PackagePath>
+    </Content>
+    <Content Include="$(OutputPath)Unbreakable.Runtime.dll">
+      <PackagePath>lib\net46</PackagePath>
+    </Content>
+  </ItemGroup>
+
+  <Target Name="IncludeAssembliesInPackage">
+    <Error Text="$(OutputPath)Unbreakable.dll" />
+    <!-- https://github.com/NuGet/Home/issues/3891 -->
+    <ItemGroup>
+      <BuildOutputInPackage Include="$(OutputPath)Unbreakable.dll">
+        <FinalOutputPath>$([System.IO.Path]::GetFullPath('$(OutputPath)Unbreakable.dll'))</FinalOutputPath>
+      </BuildOutputInPackage>
+      <BuildOutputInPackage Include="$(OutputPath)Unbreakable.Runtime.dll">
+        <FinalOutputPath>$([System.IO.Path]::GetFullPath('$(OutputPath)Unbreakable.Runtime.dll'))</FinalOutputPath>
+      </BuildOutputInPackage>
+    </ItemGroup>
+  </Target>
+
+</Project>
