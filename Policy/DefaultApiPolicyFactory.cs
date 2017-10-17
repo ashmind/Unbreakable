@@ -114,6 +114,9 @@ namespace Unbreakable.Policy.Internal {
                 .Type(nameof(Type), Neutral,
                     t => t.Member(nameof(Type.GetTypeFromHandle), Allowed)
                           .Member(nameof(Type.IsAssignableFrom), Allowed)
+                          .Getter(nameof(Type.FullName), Allowed)
+                          .Getter(nameof(Type.Name), Allowed)
+                          .Getter(nameof(Type.Namespace), Allowed)
                           .Member("op_Equality", Allowed)
                 )
                 .Type(nameof(TypeCode), Allowed)

@@ -1566,7 +1566,7 @@ System
      get_DeclaringMethod: Denied
      get_DeclaringType: Denied
      get_DefaultBinder: Denied
-     get_FullName: Denied
+     get_FullName: Allowed
      get_GenericParameterAttributes: Denied
      get_GenericParameterPosition: Denied
      get_GenericTypeArguments: Denied
@@ -1614,8 +1614,8 @@ System
      get_MemberType: Denied
      get_MetadataToken: Denied
      get_Module: Denied
-     get_Name: Denied
-     get_Namespace: Denied
+     get_Name: Allowed
+     get_Namespace: Allowed
      get_ReflectedType: Denied
      get_StructLayoutAttribute: Denied
      get_TypeHandle: Denied
