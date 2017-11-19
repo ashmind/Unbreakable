@@ -30,8 +30,11 @@ namespace Unbreakable.Internal {
 
         public void ValidateDefinition([NotNull] TypeDefinition type) {
             // Ensures we don't have to suspect each System.Int32 (etc) to be a user-defined type
-            if (type.Namespace == "System" || type.Namespace.StartsWith("System.", StringComparison.Ordinal))
-                throw new AssemblyGuardException($"Custom types cannot be defined in system namespace {type.Namespace}.");
+            if (type.Namespace == "System" || type.Namespace.StartsWith("System.", StringComparison.Ordinal)) {
+                var allowedPattern = _settings.AllowCustomTypesMatchingPatternInSystemNamespaces;
+                if (allowedPattern == null || !allowedPattern.IsMatch(type.FullName))
+                    throw new AssemblyGuardException($"Custom types cannot be defined in system namespace {type.Namespace}.");
+            }
 
             if ((type.Attributes & TypeAttributes.ExplicitLayout) == TypeAttributes.ExplicitLayout) {
                 var allowedPattern = _settings.AllowExplicitLayoutInTypesMatchingPattern;
