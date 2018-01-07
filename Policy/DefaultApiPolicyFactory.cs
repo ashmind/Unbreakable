@@ -344,6 +344,7 @@ namespace Unbreakable.Policy.Internal {
                 .Type(nameof(CompilerGeneratedAttribute), Allowed)
                 .Type(nameof(ExtensionAttribute), Allowed)
                 .Type(nameof(IteratorStateMachineAttribute), Allowed)
+                .Type("IsReadOnlyAttribute", Allowed)
                 .Type(nameof(RuntimeHelpers), Neutral, 
                     t => t.Member(nameof(RuntimeHelpers.InitializeArray), Allowed)
                 );
