@@ -40,7 +40,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <_FileToCopyToUnbreakableReportTemp Include="@(ReferencePath)" />
+      <_FileToCopyToUnbreakableReportTemp Include="@(ReferenceCopyLocalPaths)" />
       <_FileToCopyToUnbreakableReportTemp Include="$(TargetPath)" />
       <_FileToCopyToUnbreakableReportTemp Include="$(UnbreakablePolicyReportTaskAssemblyDirectory)*.dll" />
     </ItemGroup>
@@ -51,13 +51,11 @@
     <PropertyGroup>
       <_UnbreakablePolicyReportTaskAssemblyTempPath>$(_UnbreakablePolicyReportAssemblyTempDirectory)$(_UnbreakablePolicyReportTaskAssemblyFileName)</_UnbreakablePolicyReportTaskAssemblyTempPath>
       <_TargetTempPathForUnbreakable>$(_UnbreakablePolicyReportAssemblyTempDirectory)$(TargetFileName)</_TargetTempPathForUnbreakable>
-      <_ReferencedAssemblyPathsForUnbreakable>@(ReferencePath, '|')</_ReferencedAssemblyPathsForUnbreakable>
     </PropertyGroup>
     
     <MSBuild Projects="$(MSBuildThisFileDirectory)Unbreakable.Build.PolicyReport.Inner.proj"
              Properties="
                 ArgumentPolicyReportTaskAssemblyPath=$(_UnbreakablePolicyReportTaskAssemblyTempPath);
-                ArgumentReferencedAssemblyPaths=$(_ReferencedAssemblyPathsForUnbreakable);
                 ArgumentPolicyAssemblyPath=$(_TargetTempPathForUnbreakable);
                 ArgumentPolicyTypeName=%(UnbreakablePolicySource.UnbreakablePolicyTypeName);
                 ArgumentPolicyMethodName=%(UnbreakablePolicySource.UnbreakablePolicyMethodName);

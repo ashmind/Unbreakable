@@ -13,8 +13,13 @@ namespace Unbreakable.Build.PolicyReport {
     [LoadInSeparateAppDomain]
     public class CreateUnbreakablePolicyReport : Microsoft.Build.Utilities.AppDomainIsolatedTask {
         public override bool Execute() {
-            var policy = GetPolicy();
-            var assemblies = ReferencedAssemblyPaths.Select(Assembly.LoadFrom).ToDictionary(a => a.GetName().Name);
+            var policyAssembly = Assembly.LoadFrom(PolicyAssemblyPath);
+            var policy = GetPolicy(policyAssembly);
+            var assemblies = policyAssembly
+                .GetReferencedAssemblies()
+                .Select(SafeLoadAssembly)
+                .Where(a => a != null)
+                .ToDictionary(a => a.GetName().Name);
             SetupAssemblyResolution(assemblies);
             var namespaces = assemblies
                 .Values
@@ -30,7 +35,17 @@ namespace Unbreakable.Build.PolicyReport {
 
             return true;
         }
-        
+
+        private Assembly SafeLoadAssembly(AssemblyName assemblyName) {
+            try {
+                return Assembly.Load(assemblyName);
+            }
+            catch (BadImageFormatException ex) {
+                Log.LogWarning("Failed to load assembly '{0}':{1}{2}", assemblyName, Environment.NewLine, ex);
+                return null;
+            }
+        }
+
         private void WriteNamespaceReport(StreamWriter writer, string @namespace, IEnumerable<Type> types, ApiPolicy policy) {
             if (!policy.Namespaces.TryGetValue(@namespace, out var namespacePolicy))
                 return;
@@ -93,8 +108,7 @@ namespace Unbreakable.Build.PolicyReport {
             };
         }
 
-        private ApiPolicy GetPolicy() {
-            var policyAssembly = Assembly.LoadFrom(PolicyAssemblyPath);
+        private ApiPolicy GetPolicy(Assembly policyAssembly) {
             var type = policyAssembly.GetType(PolicyTypeName, true);
             var method = type.GetMethod(PolicyMethodName);
             if (method == null)
@@ -120,8 +134,7 @@ namespace Unbreakable.Build.PolicyReport {
         private ApiAccess GetEffectiveMethodAccess(ApiAccess? methodAccess, ApiAccess? typeAccess, ApiAccess effectiveTypeAccess) {           
             return methodAccess ?? (typeAccess == Allowed ? Allowed : Denied);
         }
-
-        [Required] public string[] ReferencedAssemblyPaths { get; set; }
+        
         [Required] public string PolicyAssemblyPath { get; set; }
         [Required] public string PolicyTypeName { get; set; }
         [Required] public string PolicyMethodName { get; set; }

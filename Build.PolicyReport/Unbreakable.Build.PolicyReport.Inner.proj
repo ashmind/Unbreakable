@@ -1,13 +1,8 @@
 <Project DefaultTargets="UnbreakablePolicyReportInner">  
   <UsingTask TaskName="CreateUnbreakablePolicyReport" AssemblyFile="$(ArgumentPolicyReportTaskAssemblyPath)" />
 
-  <Target Name="UnbreakablePolicyReportInner">
-    <ItemGroup>
-      <ReferencedAssemblyPath Include="$(ArgumentReferencedAssemblyPaths.Split('|'))" />    
-    </ItemGroup>
-  
+  <Target Name="UnbreakablePolicyReportInner">  
     <CreateUnbreakablePolicyReport
-        ReferencedAssemblyPaths="@(ReferencedAssemblyPath)"
         PolicyAssemblyPath="$(ArgumentPolicyAssemblyPath)"
         PolicyTypeName="$(ArgumentPolicyTypeName)"
         PolicyMethodName="$(ArgumentPolicyMethodName)"

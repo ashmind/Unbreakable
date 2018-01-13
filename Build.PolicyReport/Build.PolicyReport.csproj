@@ -8,7 +8,7 @@
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <IncludeBuildOutput>true</IncludeBuildOutput>
     <BuildOutputTargetFolder>build</BuildOutputTargetFolder>
-    <VersionPrefix>0.0.9</VersionPrefix>
+    <VersionPrefix>0.0.10</VersionPrefix>
     <Description>Build task to create a report for a certain Unbreakable policy (e.g. for source control/policy review).</Description>    
     <PackageTags>sandboxing MSBuild Unbreakable</PackageTags>
   </PropertyGroup>
