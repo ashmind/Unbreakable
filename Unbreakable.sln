@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26730.8
+VisualStudioVersion = 15.0.27130.2010
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "[Core]", "[Core]\[Core].csproj", "{B24C8C8D-7425-47BA-A789-F6EC78BBD217}"
 EndProject
@@ -15,7 +15,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Build.PolicyReport", "Build
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Policy", "Policy\Policy.csproj", "{6E83EB75-9E18-4DD1-8910-8CB13E702B8F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "[Package]", "[Package]\[Package].csproj", "{F88575F6-D203-4249-B9DE-204BC7272E02}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "[Package]", "[Package]\[Package].csproj", "{F88575F6-D203-4249-B9DE-204BC7272E02}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{F20C49BF-7241-4F4F-8006-550083160552}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Analyzer", "Tools\Analyzer\Analyzer.csproj", "{F6EB62D0-6990-4757-9A2D-1EED5776D209}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,9 +55,16 @@ Global
 		{F88575F6-D203-4249-B9DE-204BC7272E02}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F88575F6-D203-4249-B9DE-204BC7272E02}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F88575F6-D203-4249-B9DE-204BC7272E02}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F6EB62D0-6990-4757-9A2D-1EED5776D209}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F6EB62D0-6990-4757-9A2D-1EED5776D209}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F6EB62D0-6990-4757-9A2D-1EED5776D209}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F6EB62D0-6990-4757-9A2D-1EED5776D209}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{F6EB62D0-6990-4757-9A2D-1EED5776D209} = {F20C49BF-7241-4F4F-8006-550083160552}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {24448A95-328C-4CE2-8BFE-AEDEFF964D96}

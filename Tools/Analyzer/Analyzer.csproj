@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net471</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>Unbreakable.Tools.Analyzer</RootNamespace>
+    <AssemblyName>Unbreakable.Tools.Analyzer</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ILReader" Version="1.0.0" />
+  </ItemGroup>
+</Project>
