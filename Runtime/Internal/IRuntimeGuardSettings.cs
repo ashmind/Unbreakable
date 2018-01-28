@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Unbreakable.Runtime.Internal {
     internal interface IRuntimeGuardSettings {
@@ -6,5 +6,6 @@ namespace Unbreakable.Runtime.Internal {
         long AllocatedCountTotalLimit { get; }
         TimeSpan TimeLimit { get; }
         int OperationCountLimit { get; }
+        Action<IDisposable> AfterForcedDispose { get; }
     }
 }

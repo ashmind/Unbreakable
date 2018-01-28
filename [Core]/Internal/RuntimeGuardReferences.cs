@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Reflection;
 using Mono.Cecil;
 using Unbreakable.Runtime.Internal;
@@ -17,6 +17,7 @@ namespace Unbreakable {
             public static readonly MethodInfo FlowThroughGuardCountInt32 = typeof(RuntimeGuard.FlowThrough).GetMethod(nameof(RuntimeGuard.FlowThrough.GuardCountInt32));
             public static readonly MethodInfo FlowThroughGuardCountInt64 = typeof(RuntimeGuard.FlowThrough).GetMethod(nameof(RuntimeGuard.FlowThrough.GuardCountInt64));
             public static readonly MethodInfo FlowThroughGuardEnumerableCollected = typeof(RuntimeGuard.FlowThrough).GetMethod(nameof(RuntimeGuard.FlowThrough.GuardEnumerableCollected));
+            public static readonly MethodInfo FlowThroughCollectDisposable = typeof(RuntimeGuard.FlowThrough).GetMethod(nameof(RuntimeGuard.FlowThrough.CollectDisposable));
         }
 
         public RuntimeGuardReferences(FieldDefinition instanceField, ModuleDefinition module) {
@@ -30,11 +31,11 @@ namespace Unbreakable {
             FlowThroughGuardCountInt32Method = module.Import(MethodInfos.FlowThroughGuardCountInt32);
             FlowThroughGuardCountInt64Method = module.Import(MethodInfos.FlowThroughGuardCountInt64);
             FlowThroughGuardEnumerableCollectedMethod = module.Import(MethodInfos.FlowThroughGuardEnumerableCollected);
+            FlowThroughCollectDisposableMethod = module.Import(MethodInfos.FlowThroughCollectDisposable);
             _module = module;
         }
 
         public FieldDefinition InstanceField { get; }
-        public FieldDefinition TestField_TEMP { get; }
         public MethodReference GuardEnterMethod { get; }
         public MethodReference GuardEnterStaticConstructorMethod { get; }
         public MethodReference GuardExitStaticConstructorMethod { get; }
@@ -44,5 +45,6 @@ namespace Unbreakable {
         public MethodReference FlowThroughGuardCountInt32Method { get; }
         public MethodReference FlowThroughGuardCountInt64Method { get; }
         public MethodReference FlowThroughGuardEnumerableCollectedMethod { get; }
+        public MethodReference FlowThroughCollectDisposableMethod { get; }
     }
 }

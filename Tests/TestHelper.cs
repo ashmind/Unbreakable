@@ -18,7 +18,8 @@ namespace Unbreakable.Tests {
                 new[] {
                     MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
                     MetadataReference.CreateFromFile(typeof(Stack<>).Assembly.Location),
-                    MetadataReference.CreateFromFile(typeof(Enumerable).Assembly.Location)
+                    MetadataReference.CreateFromFile(typeof(Enumerable).Assembly.Location),
+                    MetadataReference.CreateFromFile(typeof(TestHelper).Assembly.Location),
                 },
                 new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, allowUnsafe: allowUnsafe)
             );
@@ -30,11 +31,11 @@ namespace Unbreakable.Tests {
             return stream;
         }
 
-        public static Invoke RewriteAndGetMethodWrappedInScope(string code, string typeName, string methodName) {
+        public static Invoke RewriteAndGetMethodWrappedInScope(string code, string typeName, string methodName, AssemblyGuardSettings guardSettings = null) {
             var assemblySourceStream = Compile(code);
             var assemblyTargetStream = new MemoryStream();
 
-            var token = AssemblyGuard.Rewrite(assemblySourceStream, assemblyTargetStream);
+            var token = AssemblyGuard.Rewrite(assemblySourceStream, assemblyTargetStream, guardSettings);
 
             return args => {
                 using (token.Scope(new RuntimeGuardSettings { TimeLimit = TimeSpan.FromMilliseconds(100) })) {

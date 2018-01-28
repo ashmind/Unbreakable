@@ -1,6 +1,4 @@
-﻿using System;
 using Mono.Cecil.Cil;
-using Unbreakable.Internal;
 
 namespace Unbreakable.Policy.Internal {
     internal struct MemberRewriterContext {

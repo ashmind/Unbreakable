@@ -170,5 +170,10 @@ namespace Unbreakable.Internal {
                     handler.HandlerEnd = instruction;
             }
         }
+
+        public static void InsertAfter(this ILProcessor il, Instruction target, Instruction instruction1, Instruction instruction2) {
+            il.InsertAfter(target, instruction1);
+            il.InsertAfter(instruction1, instruction2);
+        }
     }
 }

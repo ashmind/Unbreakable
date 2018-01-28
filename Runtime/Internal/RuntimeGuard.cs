@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -13,12 +13,14 @@ namespace Unbreakable.Runtime.Internal {
         private long _stackBytesLimit;
         private long _allocatedCountTotalLimit;
         private long _timeLimitStopwatchTicks;
+        private Action<IDisposable> _afterForcedDispose;
 
         private long _stackBaseline;
         private readonly Stopwatch _stopwatch;
         private int _operationCount;
         private long _allocatedCountTotal;
         [ThreadStatic] private static long _staticConstructorStackBaseline;
+        private HashSet<IDisposable> _disposables;
 
         public RuntimeGuard() {
             _stopwatch = new Stopwatch();
@@ -62,6 +64,14 @@ namespace Unbreakable.Runtime.Internal {
                 EnsureRate();
                 yield return item;
             }
+        }
+
+        public void CollectDisposable(IDisposable disposable) {
+            if (disposable == null)
+                return;
+            if (_disposables == null)
+                _disposables = new HashSet<IDisposable>();
+            _disposables.Add(disposable);
         }
 
         private void EnsureStack() {
@@ -117,15 +127,29 @@ namespace Unbreakable.Runtime.Internal {
             _allocatedCountTotalLimit = settings.AllocatedCountTotalLimit;
             _timeLimitStopwatchTicks = (long)(settings.TimeLimit.TotalSeconds * Stopwatch.Frequency);
             _operationCountLimit = settings.OperationCountLimit;
+            _afterForcedDispose = settings.AfterForcedDispose;
 
             _stackBaseline = 0;
             _operationCount = 0;
+
+            _disposables?.Clear();
+
             _stopwatch.Stop();
             _stopwatch.Reset();
         }
 
         internal void Stop() {
             _active = false;
+            if (_disposables == null)
+                return;
+            foreach (var disposable in _disposables) {
+                try {
+                    disposable.Dispose();
+                    _afterForcedDispose?.Invoke(disposable);
+                }
+                catch {
+                }
+            }
         }
 
         public static class FlowThrough {
@@ -146,6 +170,13 @@ namespace Unbreakable.Runtime.Internal {
 
             public static IEnumerable<T> GuardEnumerableCollected<T>(IEnumerable<T> enumerable, RuntimeGuard guard) {
                 return guard.GuardEnumerableCollected(enumerable);
+            }
+
+            public static TDisposable CollectDisposable<TDisposable>(TDisposable disposable, RuntimeGuard guard)
+                where TDisposable : IDisposable
+            {
+                guard.CollectDisposable(disposable);
+                return disposable;
             }
         }
     }

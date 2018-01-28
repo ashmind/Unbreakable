@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using JetBrains.Annotations;
 using Unbreakable.Runtime.Internal;
 
@@ -17,5 +17,7 @@ namespace Unbreakable {
         public long AllocatedCountTotalLimit { get; set; }
         public TimeSpan TimeLimit { get; set; }
         public int OperationCountLimit { get; set; }
+
+        public Action<IDisposable> AfterForcedDispose { get; set; }
     }
 }

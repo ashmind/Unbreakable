@@ -112,10 +112,9 @@ namespace Unbreakable {
                 if (memberRule != null && memberRule.Rewriters.Count > 0) {
                     var instructionCountBefore = instructions.Count;
                     var rewritten = false;
+                    var context = new MemberRewriterContext(il, guardVariable, guard);
                     foreach (var rewriter in memberRule.InternalRewriters) {
-                        rewritten = rewriter.Rewrite(
-                            instruction, new MemberRewriterContext(il, guardVariable, guard)
-                        ) || rewritten;
+                        rewritten = rewriter.Rewrite(instruction, context) || rewritten;
                     }
                     if (rewritten) {
                         i += instructions.Count - instructionCountBefore;

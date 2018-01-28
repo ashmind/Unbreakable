@@ -44,6 +44,14 @@ namespace Unbreakable.Tests.Unit {
             );
         }
 
+        [Fact]
+        public void CreateSafeDefaultPolicy_IncludesDisposableReturnRewriter_ForMethodsReturningIDiposable() {
+            AssertEachMatchingMethodHasRewriterOfType<DisposableReturnRewriter>(
+                m => (m.IsConstructor ? m.DeclaringType : ((MethodInfo)m).ReturnType).IsAssignableTo<IDisposable>()
+                  && m.Name != "GetEnumerator"
+            );
+        }
+
         private static void AssertEachMatchingMethodHasRewriterOfType<TApiMemberRewriter>(Func<MethodBase, bool> matcher)
             where TApiMemberRewriter : IMemberRewriter
         {
