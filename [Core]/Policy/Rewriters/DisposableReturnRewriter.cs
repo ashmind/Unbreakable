@@ -5,6 +5,8 @@ using Unbreakable.Policy.Internal;
 
 namespace Unbreakable.Policy.Rewriters {
     public class DisposableReturnRewriter : IMemberRewriterInternal {
+        public static DisposableReturnRewriter Default { get; } = new DisposableReturnRewriter();
+
         public string GetShortName() => nameof(DisposableReturnRewriter);
 
         bool IMemberRewriterInternal.Rewrite(Instruction instruction, MemberRewriterContext context) {
