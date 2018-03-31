@@ -20,5 +20,18 @@ namespace Unbreakable.Tests {
             ", "C", "M");
             Assert.Equal(expected, m(1));
         }
+
+        [Theory]
+        [InlineData("byte M() => System.Text.Encoding.UTF8.GetBytes(\"a\")[0];", (byte)97)]
+        [InlineData("string M() => System.Text.Encoding.UTF8.GetString(new byte[] { 97 });", "a")]
+        public void HandlesStandardApis(string code, object expected) {
+            var m = TestHelper.RewriteAndGetMethodWrappedInScope(@"
+                using System;
+                class C {
+                    " + code + @"
+                }
+            ", "C", "M");
+            Assert.Equal(expected, m());
+        }
     }
 }

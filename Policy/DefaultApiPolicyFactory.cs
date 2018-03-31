@@ -63,19 +63,38 @@ namespace Unbreakable.Policy.Internal {
                 .Type(nameof(ArgumentNullException), Neutral, t => t.Constructor(Allowed))
                 .Type(nameof(ArgumentOutOfRangeException), Neutral, t => t.Constructor(Allowed))
                 .Type(nameof(AttributeUsageAttribute), Allowed)
-                .Type(nameof(Attribute), Allowed)
+                .Type(nameof(Attribute), Allowed,
+                    t => t.Member(nameof(Attribute.GetCustomAttribute), Denied)
+                          .Member(nameof(Attribute.GetCustomAttributes), Denied)
+                          .Member(nameof(Attribute.IsDefined), Denied)
+                )
+                .Type(nameof(BitConverter), Allowed,
+                    t => t.Member(nameof(BitConverter.GetBytes), Allowed, ArrayReturnRewriter.Default)
+                          .Member(nameof(BitConverter.ToString), Allowed, StringReturnRewriter.Default)
+                )
                 .Type(nameof(Console), Denied)
-                .Type(nameof(Convert), Allowed)
-                .Type(nameof(DateTime), Allowed)
+                .Type(nameof(Convert), Allowed,
+                    t => t.Member(nameof(Convert.FromBase64String), Allowed, ArrayReturnRewriter.Default)
+                          .Member(nameof(Convert.FromBase64CharArray), Allowed, ArrayReturnRewriter.Default)
+                          .Member(nameof(Convert.ToBase64String), Allowed, StringReturnRewriter.Default)
+                )
+                .Type(nameof(DateTime), Allowed,
+                    t => t.Member(nameof(DateTime.GetDateTimeFormats), Allowed, ArrayReturnRewriter.Default)
+                )
                 .Type(nameof(DateTimeKind), Allowed)
                 .Type(nameof(DateTimeOffset), Allowed)
                 .Type(nameof(DBNull), Allowed)
-                .Type(nameof(Decimal), Allowed)
+                .Type(nameof(Decimal), Allowed,
+                    t => t.Member(nameof(Decimal.GetBits), Allowed, ArrayReturnRewriter.Default)
+                )
                 .Type(nameof(Delegate), Neutral,
                     t => t.Member(nameof(Delegate.Combine), Allowed)
                           .Member(nameof(Delegate.Remove), Allowed)
                 )
-                .Type(nameof(Enum), Allowed)
+                .Type(nameof(Enum), Allowed,
+                    t => t.Member(nameof(Enum.GetNames), Allowed, ArrayReturnRewriter.Default)
+                          .Member(nameof(Enum.GetValues), Allowed, ArrayReturnRewriter.Default)
+                )
                 .Type(nameof(Environment), Neutral,
                     t => t.Getter(nameof(Environment.CurrentManagedThreadId), Allowed)
                           .Getter(nameof(Environment.NewLine), Allowed)
@@ -88,7 +107,9 @@ namespace Unbreakable.Policy.Internal {
                 .Type(nameof(GC), Neutral, 
                     t => t.Member(nameof(GC.SuppressFinalize), Allowed)
                 )
-                .Type(nameof(Guid), Allowed)
+                .Type(nameof(Guid), Allowed,
+                    t => t.Member(nameof(Guid.ToByteArray), Allowed, ArrayReturnRewriter.Default)
+                )
                 .Type(nameof(IConvertible), Allowed)
                 .Type(nameof(IDisposable), Allowed)
                 .Type(nameof(IFormattable), Allowed)
@@ -105,11 +126,17 @@ namespace Unbreakable.Policy.Internal {
                 .Type(nameof(Random), Allowed)
                 .Type(nameof(String), Allowed,
                     t => t.Constructor(Allowed, CountArgumentRewriter.Default)
+                          .Member(nameof(string.ToCharArray), Allowed, ArrayReturnRewriter.Default)
+                          .Member(nameof(string.Split), Allowed, ArrayReturnRewriter.Default)
                           .Member(nameof(string.Join), Allowed, CollectedEnumerableArgumentRewriter.Default)
                           .Member(nameof(string.Concat), Allowed, CollectedEnumerableArgumentRewriter.Default)
                 )
                 .Type(nameof(TimeSpan), Allowed)
-                .Type(nameof(TimeZoneInfo), Allowed)
+                .Type(nameof(TimeZoneInfo), Allowed,
+                    t => t.Member(nameof(TimeZoneInfo.ClearCachedData), Denied)
+                          .Member(nameof(TimeZoneInfo.GetAdjustmentRules), Allowed, ArrayReturnRewriter.Default)
+                          .Member(nameof(TimeZoneInfo.GetAmbiguousTimeOffsets), Allowed, ArrayReturnRewriter.Default)
+                )
                 .Type(nameof(Tuple), Allowed)
                 .Type("TupleExtensions", Allowed)
                 .Type(nameof(Type), Neutral,
@@ -124,7 +151,9 @@ namespace Unbreakable.Policy.Internal {
                 .Type(nameof(TypedReference), Denied)
                 .Type(typeof(Version).Name, Allowed)
                 .Type(typeof(void).Name, Allowed)
-                .Type(nameof(Uri), Allowed);
+                .Type(nameof(Uri), Allowed,
+                    t => t.Getter(nameof(Uri.Segments), Allowed, ArrayReturnRewriter.Default)
+                );
 
             foreach (var type in PrimitiveTypes.List) {
                 if (type == typeof(IntPtr) || type == typeof(UIntPtr))
@@ -196,12 +225,14 @@ namespace Unbreakable.Policy.Internal {
                     t => t.Constructor(Allowed, CountArgumentRewriter.ForCapacity, CollectedEnumerableArgumentRewriter.Default)
                           .Member(nameof(List<object>.AddRange), Allowed, CollectedEnumerableArgumentRewriter.Default)
                           .Member(nameof(List<object>.InsertRange), Allowed, CollectedEnumerableArgumentRewriter.Default)
+                          .Member(nameof(List<object>.ToArray), Allowed, ArrayReturnRewriter.Default)
                           .Other(SetupAdd, SetupInsert)
                 )
                 .Type(typeof(List<>.Enumerator), Allowed)
                 .Type(typeof(Queue<>), Allowed,
                     t => t.Constructor(Allowed, CountArgumentRewriter.ForCapacity, CollectedEnumerableArgumentRewriter.Default)
                           .Member(nameof(Queue<object>.Enqueue), Allowed, AddCallRewriter.Default)
+                          .Member(nameof(Queue<object>.ToArray), Allowed, ArrayReturnRewriter.Default)
                 )
                 .Type(typeof(Queue<>.Enumerator), Allowed)
                 .Type(typeof(SortedDictionary<,>), Allowed,
@@ -221,6 +252,7 @@ namespace Unbreakable.Policy.Internal {
                 .Type(typeof(Stack<>), Allowed,
                     t => t.Constructor(Allowed, CountArgumentRewriter.ForCapacity, CollectedEnumerableArgumentRewriter.Default)
                           .Member(nameof(Stack<object>.Push), Allowed, AddCallRewriter.Default)
+                          .Member(nameof(Stack<object>.ToArray), Allowed, ArrayReturnRewriter.Default)
                 )
                 .Type(typeof(Stack<>.Enumerator), Allowed);
         }
@@ -352,27 +384,16 @@ namespace Unbreakable.Policy.Internal {
 
         private static void SetupSystemText(NamespacePolicy text) {
             text
-                .Type(nameof(Encoding), Neutral,
-                    t => t.Member(nameof(Encoding.GetEncoding), Allowed)
-                          .Getter(nameof(Encoding.ASCII), Allowed)
-                          .Getter(nameof(Encoding.BigEndianUnicode), Allowed)
-                          .Getter(nameof(Encoding.BodyName), Allowed)
-                          .Getter(nameof(Encoding.CodePage), Allowed)
-                          .Getter(nameof(Encoding.Default), Allowed)
-                          .Getter(nameof(Encoding.HeaderName), Allowed)
-                          .Getter(nameof(Encoding.IsBrowserDisplay), Allowed)
-                          .Getter(nameof(Encoding.IsBrowserSave), Allowed)
-                          .Getter(nameof(Encoding.IsMailNewsDisplay), Allowed)
-                          .Getter(nameof(Encoding.IsMailNewsSave), Allowed)
-                          .Getter(nameof(Encoding.IsReadOnly), Allowed)
-                          .Getter(nameof(Encoding.IsSingleByte), Allowed)
-                          .Getter(nameof(Encoding.EncodingName), Allowed)
-                          .Getter(nameof(Encoding.Unicode), Allowed)
-                          .Getter(nameof(Encoding.UTF32), Allowed)
-                          .Getter(nameof(Encoding.UTF7), Allowed)
-                          .Getter(nameof(Encoding.UTF8), Allowed)
-                          .Getter(nameof(Encoding.WebName), Allowed)
-                          .Getter(nameof(Encoding.WindowsCodePage), Allowed)
+                .Type(nameof(Encoding), Allowed,
+                    t => t.Member(nameof(Encoding.RegisterProvider), Denied)
+                          .Setter(nameof(Encoding.DecoderFallback), Denied)
+                          .Setter(nameof(Encoding.EncoderFallback), Denied)
+                          .Member(nameof(Encoding.Convert), Allowed, ArrayReturnRewriter.Default)
+                          .Member(nameof(Encoding.GetEncodings), Allowed, ArrayReturnRewriter.Default)
+                          .Member(nameof(Encoding.GetPreamble), Allowed, ArrayReturnRewriter.Default)
+                          .Member(nameof(Encoding.GetBytes), Allowed, ArrayReturnRewriter.Default)
+                          .Member(nameof(Encoding.GetChars), Allowed, ArrayReturnRewriter.Default)
+                          .Member(nameof(Encoding.GetString), Allowed, StringReturnRewriter.Default)
                 )
                 .Type(nameof(StringBuilder), Neutral,
                     t => t.Constructor(Allowed, CountArgumentRewriter.ForCapacity)

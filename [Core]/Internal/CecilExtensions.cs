@@ -79,7 +79,10 @@ namespace Unbreakable.Internal {
                 case 1: return il.Create(OpCodes.Ldloc_1);
                 case 2: return il.Create(OpCodes.Ldloc_2);
                 case 3: return il.Create(OpCodes.Ldloc_3);
-                default: return il.Create(OpCodes.Ldloc, variable);
+                default:
+                    if (IsSByte(variable.Index))
+                        return il.Create(OpCodes.Ldloc_S, variable);
+                    return il.Create(OpCodes.Ldloc, variable);
             }
         }
 
@@ -89,7 +92,10 @@ namespace Unbreakable.Internal {
                 case 1: return il.Create(OpCodes.Stloc_1);
                 case 2: return il.Create(OpCodes.Stloc_2);
                 case 3: return il.Create(OpCodes.Stloc_3);
-                default: return il.Create(OpCodes.Stloc, variable);
+                default:
+                    if (IsSByte(variable.Index))
+                        return il.Create(OpCodes.Stloc_S, variable);
+                    return il.Create(OpCodes.Stloc, variable);
             }
         }
 
@@ -99,6 +105,10 @@ namespace Unbreakable.Internal {
 
         public static void CorrectAllAfterChanges(this ILProcessor il) {
             CorrectBranchSizes(il);
+        }
+
+        private static bool IsSByte(int value) {
+            return value >= sbyte.MinValue && value <= sbyte.MaxValue;
         }
 
         private static void CorrectBranchSizes(ILProcessor il) {
@@ -174,6 +184,42 @@ namespace Unbreakable.Internal {
         public static void InsertAfter(this ILProcessor il, Instruction target, Instruction instruction1, Instruction instruction2) {
             il.InsertAfter(target, instruction1);
             il.InsertAfter(instruction1, instruction2);
+        }
+
+        public static void InsertAfter(this ILProcessor il,
+            Instruction target,
+            Instruction instruction1,
+            Instruction instruction2,
+            Instruction instruction3
+        ) {
+            il.InsertAfter(target, instruction1, instruction2);
+            il.InsertAfter(instruction2, instruction3);
+        }
+
+        public static void InsertAfter(
+            this ILProcessor il,
+            Instruction target,
+            Instruction instruction1,
+            Instruction instruction2,
+            Instruction instruction3,
+            Instruction instruction4,
+            Instruction instruction5,
+            Instruction instruction6,
+            Instruction instruction7
+        ) {
+            il.InsertAfter(target, instruction1, instruction2, instruction3);
+            il.InsertAfter(instruction3, instruction4);
+            il.InsertAfter(instruction4, instruction5);
+            il.InsertAfter(instruction5, instruction6);
+            il.InsertAfter(instruction6, instruction7);
+        }
+
+        public static PropertyDefinition GetProperty(this TypeDefinition type, string name) {
+            foreach (var property in type.Properties) {
+                if (property.Name == name)
+                    return property;
+            }
+            return null;
         }
     }
 }

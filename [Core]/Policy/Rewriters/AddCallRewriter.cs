@@ -11,13 +11,11 @@ namespace Unbreakable.Policy.Rewriters {
 
         bool IMemberRewriterInternal.Rewrite(Instruction instruction, MemberRewriterContext context) {
             var il = context.IL;
-
-            var ldloc = il.CreateLdlocBest(context.RuntimeGuardVariable);
-            var ldlc1 = il.Create(OpCodes.Ldc_I8, 1L);
-
-            il.InsertAfter(instruction, ldloc);
-            il.InsertAfter(ldloc, ldlc1);
-            il.InsertAfter(ldlc1, il.CreateCall(context.RuntimeGuardReferences.GuardCountMethod));
+            il.InsertAfter(instruction,
+                il.CreateLdlocBest(context.RuntimeGuardVariable),
+                il.Create(OpCodes.Ldc_I8, 1L),
+                il.CreateCall(context.RuntimeGuardReferences.GuardCountMethod)
+            );
             return true;
         }
     }

@@ -1,13 +1,16 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Text.RegularExpressions;
 using AshMind.Extensions;
+using Xunit;
+using Unbreakable.Internal;
 using Unbreakable.Policy;
 using Unbreakable.Policy.Internal;
 using Unbreakable.Policy.Rewriters;
-using Xunit;
 
 namespace Unbreakable.Tests.Unit {
     public class DefaultApiPolicyFactoryTests {
@@ -35,7 +38,11 @@ namespace Unbreakable.Tests.Unit {
         public void CreateSafeDefaultPolicy_IncludesCountArgumentRewriter_ForMethodsWithParamerNamedCountOrCapacity() {
             var excluded = new HashSet<(Type, string)> {
                 (typeof(string), nameof(string.Join)),
-                (typeof(string), nameof(string.Split))
+                (typeof(string), nameof(string.Split)),
+                (typeof(Encoding), nameof(Encoding.GetByteCount)),
+                (typeof(Encoding), nameof(Encoding.GetCharCount)),
+                (typeof(Enumerable), nameof(Enumerable.Take)),
+                (typeof(Enumerable), nameof(Enumerable.Skip))
             };
             AssertEachMatchingMethodHasRewriterOfType<CountArgumentRewriter>(
                 m => m.GetParameters().Any(p => p.Name == "count" || p.Name == "capacity")
@@ -52,31 +59,81 @@ namespace Unbreakable.Tests.Unit {
             );
         }
 
+        [Fact]
+        public void CreateSafeDefaultPolicy_IncludesArrayReturnRewriter_ForMethodsReturningArrays() {
+            var excluded = new HashSet<(Type, string)> {
+                (typeof(Array), nameof(Array.Empty)),
+                (typeof(Enumerable), nameof(Enumerable.ToArray))
+            };
+            AssertEachMatchingMethodHasRewriterOfType<ArrayReturnRewriter>(
+                b => b is MethodInfo m && m.ReturnType.IsArray
+                  && !excluded.Contains((m.DeclaringType, m.Name))
+            );
+        }
+
+        [Fact]
+        public void CreateSafeDefaultPolicy_DoesNotAllowStaticMembers_IfTheyLookDangerous() {
+            var excluded = new HashSet<(Type, string)> {
+                (typeof(Decimal), nameof(Decimal.Add))
+            };
+            AssertNoMethodsMatching(
+                (m, _) => m.IsStatic
+                       && Regex.IsMatch(m.Name, "^(?:set_|Register|Add|Set|Update|Clear)")
+                       && !excluded.Contains((m.DeclaringType, m.Name))
+            );
+        }
+
         private static void AssertEachMatchingMethodHasRewriterOfType<TApiMemberRewriter>(Func<MethodBase, bool> matcher)
             where TApiMemberRewriter : IMemberRewriter
         {
-            var namespaceRules = new DefaultApiPolicyFactory().CreateSafeDefaultPolicy();
-            foreach (var namespaceRule in namespaceRules.Namespaces) {
-                if (namespaceRule.Value.Access == ApiAccess.Denied)
-                    continue;
+            AssertNoMethodsMatching(
+                (method, rule) => matcher(method)
+                               && !(rule?.Rewriters.OfType<TApiMemberRewriter>().Any() ?? false)
+            );
+        }
 
-                foreach (var typeRule in namespaceRule.Value.Types) {
-                    if (typeRule.Value.Access != ApiAccess.Allowed)
-                        continue;
+        private static void AssertNoMethodsMatching(Func<MethodBase, MemberPolicy, bool> matcher) {
+            var policy = new DefaultApiPolicyFactory().CreateSafeDefaultPolicy();
+            var matched = new HashSet<string>();
 
-                    var type = FindType(namespaceRule.Key + "." + typeRule.Key);
-                    foreach (var method in type.GetMembers().OfType<MethodBase>()) {
-                        if (!matcher(method))
+            var filter = new ApiFilter(policy);
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies()) {
+                foreach (var type in GetExportedTypesSafe(assembly)) {
+                    foreach (var method in type.GetMethods()) {
+                        if (type.Namespace == null)
                             continue;
 
-                        var rule = typeRule.Value.Members.GetValueOrDefault(method.Name);
-                        Assert.True(
-                            rule?.Rewriters.OfType<TApiMemberRewriter>().Any(),
-                            $"Method {method} on type {type} does not have an explicit {typeof(TApiMemberRewriter).Name}."
-                        );
+                        var result = filter.Filter(type.Namespace, type.Name, ApiFilterTypeKind.External, method.Name);
+                        if (result.Kind != ApiFilterResultKind.Allowed)
+                            continue;
+
+                        if (matcher(method, result.MemberRule))
+                            matched.Add(DescribeMethod(method));
                     }
                 }
             }
+
+            Assert.Empty(matched);
+        }
+
+        private static Type[] GetExportedTypesSafe(Assembly assembly) {
+            try {
+                return assembly.GetExportedTypes();
+            }
+            catch (FileNotFoundException) {
+                return Type.EmptyTypes;
+            }
+        }
+
+        private static string DescribeMethod(MethodBase method) {
+            var builder = new StringBuilder();
+            builder.Append(method.DeclaringType.Name)
+                   .Append(".")
+                   .Append(method.Name)
+                   .Append("(")
+                   .AppendJoin(", ", method.GetParameters().Select(p => p.ParameterType.Name))
+                   .Append(")");
+            return builder.ToString();
         }
 
         private static Type FindType(string fullName) {
