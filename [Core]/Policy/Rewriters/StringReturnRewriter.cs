@@ -21,7 +21,7 @@ namespace Unbreakable.Policy.Rewriters {
             if (method.ReturnType.FullName != typeof(string).FullName)
                 return false;
 
-            var getLength = il.Body.Method.Module.Import(
+            var getLength = il.Body.Method.Module.ImportReference(
                 method.ReturnType.Resolve().GetProperty(nameof(string.Length)).GetMethod
             );
             var pop = il.Create(OpCodes.Pop);

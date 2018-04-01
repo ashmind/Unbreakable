@@ -14,7 +14,7 @@ namespace Unbreakable.Policy.Rewriters {
             var method = ((MethodReference)instruction.Operand).Resolve();
             var collectedType = (method.IsConstructor) ? method.DeclaringType : method.ReturnType;
             var collect = new GenericInstanceMethod(context.RuntimeGuardReferences.FlowThroughCollectDisposableMethod) {
-                GenericArguments = { il.Body.Method.Module.Import(collectedType) }
+                GenericArguments = { il.Body.Method.Module.ImportReference(collectedType) }
             };
             il.InsertAfter(instruction,
                 il.CreateLdlocBest(context.RuntimeGuardVariable),

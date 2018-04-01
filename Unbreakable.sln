@@ -15,7 +15,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Build.PolicyReport", "Build
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Policy", "Policy\Policy.csproj", "{6E83EB75-9E18-4DD1-8910-8CB13E702B8F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "[Package]", "[Package]\[Package].csproj", "{F88575F6-D203-4249-B9DE-204BC7272E02}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "[Package]", "[Package]\[Package].csproj", "{F88575F6-D203-4249-B9DE-204BC7272E02}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0278D857-030F-4C39-9185-1512B828871E}"
+	ProjectSection(SolutionItems) = preProject
+		Directory.Build.props = Directory.Build.props
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

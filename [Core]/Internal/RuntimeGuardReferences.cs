@@ -22,16 +22,16 @@ namespace Unbreakable {
 
         public RuntimeGuardReferences(FieldDefinition instanceField, ModuleDefinition module) {
             InstanceField = instanceField;
-            GuardEnterMethod = module.Import(MethodInfos.GuardEnter);
-            GuardEnterStaticConstructorMethod = module.Import(MethodInfos.GuardEnterStaticConstructor);
-            GuardExitStaticConstructorMethod = module.Import(MethodInfos.GuardExitStaticConstructor);
-            GuardJumpMethod = module.Import(MethodInfos.GuardJump);
-            GuardCountMethod = module.Import(MethodInfos.GuardCount);
-            FlowThroughGuardCountIntPtrMethod = module.Import(MethodInfos.FlowThroughGuardCountIntPtr);
-            FlowThroughGuardCountInt32Method = module.Import(MethodInfos.FlowThroughGuardCountInt32);
-            FlowThroughGuardCountInt64Method = module.Import(MethodInfos.FlowThroughGuardCountInt64);
-            FlowThroughGuardEnumerableCollectedMethod = module.Import(MethodInfos.FlowThroughGuardEnumerableCollected);
-            FlowThroughCollectDisposableMethod = module.Import(MethodInfos.FlowThroughCollectDisposable);
+            GuardEnterMethod = module.ImportReference(MethodInfos.GuardEnter);
+            GuardEnterStaticConstructorMethod = module.ImportReference(MethodInfos.GuardEnterStaticConstructor);
+            GuardExitStaticConstructorMethod = module.ImportReference(MethodInfos.GuardExitStaticConstructor);
+            GuardJumpMethod = module.ImportReference(MethodInfos.GuardJump);
+            GuardCountMethod = module.ImportReference(MethodInfos.GuardCount);
+            FlowThroughGuardCountIntPtrMethod = module.ImportReference(MethodInfos.FlowThroughGuardCountIntPtr);
+            FlowThroughGuardCountInt32Method = module.ImportReference(MethodInfos.FlowThroughGuardCountInt32);
+            FlowThroughGuardCountInt64Method = module.ImportReference(MethodInfos.FlowThroughGuardCountInt64);
+            FlowThroughGuardEnumerableCollectedMethod = module.ImportReference(MethodInfos.FlowThroughGuardEnumerableCollected);
+            FlowThroughCollectDisposableMethod = module.ImportReference(MethodInfos.FlowThroughCollectDisposable);
             _module = module;
         }
 

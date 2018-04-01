@@ -42,17 +42,20 @@ namespace Unbreakable {
             var instanceType = new TypeDefinition(
                 "<Unbreakable>", "<RuntimeGuardInstance>",
                 TypeAttributes.Class | TypeAttributes.Abstract | TypeAttributes.Sealed | TypeAttributes.NotPublic,
-                module.Import(typeof(object))
+                module.ImportReference(typeof(object))
             );
             var instanceField = new FieldDefinition(
                 "Instance",
                 FieldAttributes.Assembly | FieldAttributes.Static | FieldAttributes.InitOnly,
-                module.Import(typeof(RuntimeGuard))
+                module.ImportReference(typeof(RuntimeGuard))
             );
             instanceType.Fields.Add(instanceField);
 
-            var constructor = new MethodDefinition(".cctor", MethodAttributes.Private | MethodAttributes.RTSpecialName | MethodAttributes.SpecialName | MethodAttributes.Static, module.Import(typeof(void)));
-            var getGuardInstance = module.Import(typeof(RuntimeGuardInstances).GetMethod(nameof(RuntimeGuardInstances.Get)));
+            var constructor = new MethodDefinition(
+                ".cctor", MethodAttributes.Private | MethodAttributes.RTSpecialName | MethodAttributes.SpecialName | MethodAttributes.Static,
+                module.ImportReference(typeof(void))
+            );
+            var getGuardInstance = module.ImportReference(typeof(RuntimeGuardInstances).GetMethod(nameof(RuntimeGuardInstances.Get)));
             var il = constructor.Body.GetILProcessor();
             il.Emit(OpCodes.Ldstr, id.ToString());
             il.Emit(OpCodes.Call, getGuardInstance);

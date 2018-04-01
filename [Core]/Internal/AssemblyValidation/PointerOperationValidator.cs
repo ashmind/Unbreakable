@@ -54,16 +54,16 @@ namespace Unbreakable.Internal.AssemblyValidation {
 
         private TypeReference GetLdType(Instruction instruction, MethodDefinition method) {
             switch (instruction.OpCode.Code) {
-                case Code.Ldind_I: return method.Module.Import(typeof(IntPtr));
-                case Code.Ldind_I1: return method.Module.Import(typeof(sbyte));
-                case Code.Ldind_I2: return method.Module.Import(typeof(short));
-                case Code.Ldind_I4: return method.Module.Import(typeof(int));
-                case Code.Ldind_I8: return method.Module.Import(typeof(long));
-                case Code.Ldind_R4: return method.Module.Import(typeof(float));
-                case Code.Ldind_R8: return method.Module.Import(typeof(double));
-                case Code.Ldind_U1: return method.Module.Import(typeof(byte));
-                case Code.Ldind_U2: return method.Module.Import(typeof(ushort));
-                case Code.Ldind_U4: return method.Module.Import(typeof(uint));
+                case Code.Ldind_I: return method.Module.ImportReference(typeof(IntPtr));
+                case Code.Ldind_I1: return method.Module.ImportReference(typeof(sbyte));
+                case Code.Ldind_I2: return method.Module.ImportReference(typeof(short));
+                case Code.Ldind_I4: return method.Module.ImportReference(typeof(int));
+                case Code.Ldind_I8: return method.Module.ImportReference(typeof(long));
+                case Code.Ldind_R4: return method.Module.ImportReference(typeof(float));
+                case Code.Ldind_R8: return method.Module.ImportReference(typeof(double));
+                case Code.Ldind_U1: return method.Module.ImportReference(typeof(byte));
+                case Code.Ldind_U2: return method.Module.ImportReference(typeof(ushort));
+                case Code.Ldind_U4: return method.Module.ImportReference(typeof(uint));
                 case Code.Ldind_Ref: return (TypeReference)instruction.Operand;
                 case Code.Ldobj: return (TypeReference)instruction.Operand;
                 default: return null;
@@ -72,13 +72,13 @@ namespace Unbreakable.Internal.AssemblyValidation {
 
         private TypeReference GetStType(Instruction instruction, MethodDefinition method) {
             switch (instruction.OpCode.Code) {
-                case Code.Stind_I: return method.Module.Import(typeof(IntPtr));
-                case Code.Stind_I1: return method.Module.Import(typeof(sbyte));
-                case Code.Stind_I2: return method.Module.Import(typeof(short));
-                case Code.Stind_I4: return method.Module.Import(typeof(int));
-                case Code.Stind_I8: return method.Module.Import(typeof(long));
-                case Code.Stind_R4: return method.Module.Import(typeof(float));
-                case Code.Stind_R8: return method.Module.Import(typeof(double));
+                case Code.Stind_I: return method.Module.ImportReference(typeof(IntPtr));
+                case Code.Stind_I1: return method.Module.ImportReference(typeof(sbyte));
+                case Code.Stind_I2: return method.Module.ImportReference(typeof(short));
+                case Code.Stind_I4: return method.Module.ImportReference(typeof(int));
+                case Code.Stind_I8: return method.Module.ImportReference(typeof(long));
+                case Code.Stind_R4: return method.Module.ImportReference(typeof(float));
+                case Code.Stind_R8: return method.Module.ImportReference(typeof(double));
                 case Code.Stind_Ref: return (TypeReference)instruction.Operand;
                 case Code.Stobj: return (TypeReference)instruction.Operand;
                 default: return null;
