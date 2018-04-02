@@ -46,7 +46,9 @@ namespace Unbreakable.Policy.Internal {
 
         private static void SetupSystem(NamespacePolicy system) {
             system
-                .Type(nameof(Activator), Denied)
+                .Type(nameof(Activator), Neutral,
+                    t => t.Member(nameof(Activator.CreateInstance), Allowed, ActivatorCreateInstanceValidator.Default)
+                )
                 .Type(nameof(AppContext), Denied)
                 .Type(nameof(AppDomain), Denied)
                 .Type(nameof(AppDomainManager), Denied)

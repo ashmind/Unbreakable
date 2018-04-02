@@ -63,7 +63,7 @@ namespace Unbreakable.Internal {
             if (!provider.HasCustomAttributes)
                 return;
             foreach (var attribute in provider.CustomAttributes) {
-                ValidateMemberReference(attribute.AttributeType);
+                ValidateMemberReferenceAndGetPolicy(attribute.AttributeType);
                 // TODO: Validate attribute arguments
             }
         }
@@ -75,10 +75,10 @@ namespace Unbreakable.Internal {
             if (!(instruction.Operand is MemberReference reference))
                 return null;
 
-            return ValidateMemberReference(reference);
+            return ValidateMemberReferenceAndGetPolicy(reference);
         }
 
-        private MemberPolicy ValidateMemberReference(MemberReference reference) {
+        public MemberPolicy ValidateMemberReferenceAndGetPolicy(MemberReference reference) {
             var type = reference.DeclaringType;
             switch (reference) {
                 case MethodReference m: {

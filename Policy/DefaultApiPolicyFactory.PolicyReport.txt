@@ -146,7 +146,15 @@ System
   Action`9: Denied
   ActivationContext: Denied
   ActivationContext+ContextForm: Denied
-  Activator: Denied
+  Activator: Allowed
+     CreateComInstanceFrom: Denied
+     CreateInstance: Allowed (ActivatorCreateInstanceValidator)
+     CreateInstanceFrom: Denied
+     Equals: Denied
+     GetHashCode: Denied
+     GetObject: Denied
+     GetType: Denied
+     ToString: Denied
   AggregateException: Denied
   AppContext: Denied
   AppDomain: Denied

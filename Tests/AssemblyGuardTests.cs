@@ -5,7 +5,7 @@ using Xunit;
 namespace Unbreakable.Tests {
    public class AssemblyGuardTests {
         [Fact]
-        public void AllowsExternMethods() {
+        public void Allows_ExternMethods() {
             // crash, found by Alexandre Mutel‏ (@xoofx)
             var compiled = TestHelper.Compile(@"
                 class C {
@@ -21,7 +21,7 @@ namespace Unbreakable.Tests {
         }
 
         [Fact]
-        public void AllowsAnonymousTypes() {
+        public void Allows_AnonymousTypes() {
             var compiled = TestHelper.Compile(@"
                 class C {
                     object M() {
@@ -34,7 +34,7 @@ namespace Unbreakable.Tests {
         }
 
         [Fact]
-        public void AllowsReasonableAmountOfNullableLocals() {
+        public void Allows_ReasonableAmountOfNullableLocals() {
             var compiled = TestHelper.Compile(@"
                 class C {
                     void M() {
