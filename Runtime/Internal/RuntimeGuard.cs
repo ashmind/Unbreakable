@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using System.Threading;
 
 namespace Unbreakable.Runtime.Internal {
@@ -11,6 +12,7 @@ namespace Unbreakable.Runtime.Internal {
 
         private int _operationCountLimit;
         private long _stackBytesLimit;
+        private long _stackBytesLimitInExceptionHandlers;
         private long _allocatedCountTotalLimit;
         private long _timeLimitStopwatchTicks;
         private Action<IDisposable> _afterForcedDispose;
@@ -87,13 +89,22 @@ namespace Unbreakable.Runtime.Internal {
                 stackBaseline = _stackBaseline;
             }
 
-            if (stackBaseline - stackCurrent > _stackBytesLimit)
-                throw new StackGuardException("Stack limit reached.");
+            var stackBytesCount = stackBaseline - stackCurrent;
+            if (stackBytesCount > _stackBytesLimit) {
+                if (Marshal.GetExceptionCode() == 0)
+                    throw new StackGuardException(stackBaseline, stackCurrent, _stackBytesLimit);
+                if (stackBytesCount > _stackBytesLimitInExceptionHandlers)
+                    throw new StackGuardException(stackBaseline, stackCurrent, _stackBytesLimitInExceptionHandlers);
+            }
         }
 
         private void EnsureTime() {
             if (!_stopwatch.IsRunning)
                 _stopwatch.Start();
+            #if DEBUG
+            if (Debugger.IsAttached)
+                return;
+            #endif
             if (_stopwatch.ElapsedTicks > _timeLimitStopwatchTicks)
                 throw new TimeGuardException("Time limit reached.");
         }
@@ -124,6 +135,7 @@ namespace Unbreakable.Runtime.Internal {
             _active = true;
 
             _stackBytesLimit = settings.StackBytesLimit;
+            _stackBytesLimitInExceptionHandlers = settings.StackBytesLimitInExceptionHandlers;
             _allocatedCountTotalLimit = settings.AllocatedCountTotalLimit;
             _timeLimitStopwatchTicks = (long)(settings.TimeLimit.TotalSeconds * Stopwatch.Frequency);
             _operationCountLimit = settings.OperationCountLimit;

@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Reflection;
+using Pedantic.IO;
 using Unbreakable.Runtime;
 using Xunit;
 
@@ -17,6 +18,21 @@ namespace Unbreakable.Tests {
             ", "C", "M");
             var exception = Assert.Throws<TargetInvocationException>(() => m());
             Assert.IsType<StackGuardException>(exception.InnerException);
+        }
+
+        [Theory]
+        [InlineData("Finally.cs")]
+        public void DoesNotThrowGuardException_IfNoStackOverflow(string resourceName) {
+            var code = EmbeddedResource.ReadAllText(GetType(), "TestCode." + resourceName);
+            var m = TestHelper.RewriteAndGetMethodWrappedInScope(code, "C", "M");
+
+            var exception = Record.Exception(() => m());
+
+            if (exception != null) {
+                var inner = Assert.IsType<TargetInvocationException>(exception).InnerException;
+                Assert.NotNull(inner);
+                Assert.IsNotType<StackGuardException>(inner);
+            }
         }
     }
 }

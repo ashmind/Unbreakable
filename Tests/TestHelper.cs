@@ -48,8 +48,8 @@ namespace Unbreakable.Tests {
         private static Invoke GetInstanceMethod(MemoryStream assemblyStream, string typeName, string methodName) {
             var assembly = Assembly.Load(assemblyStream.ToArray());
             var type = assembly.GetType(typeName);
-            var instance = Activator.CreateInstance(type);
-            var method = type.GetMethod(methodName, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+            var method = type.GetMethod(methodName, BindingFlags.Static | BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+            var instance = !method.IsStatic ? Activator.CreateInstance(type) : null;
 
             return args => method.Invoke(instance, args);
         }

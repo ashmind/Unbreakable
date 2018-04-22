@@ -6,17 +6,11 @@ namespace Unbreakable {
     public class RuntimeGuardSettings : IRuntimeGuardSettings {
         [NotNull] internal static RuntimeGuardSettings Default { get; } = new RuntimeGuardSettings();
 
-        public RuntimeGuardSettings() {
-            StackBytesLimit = 1024;
-            AllocatedCountTotalLimit = 100;
-            TimeLimit = TimeSpan.FromMilliseconds(500);
-            OperationCountLimit = 500;
-        }
-
-        public int StackBytesLimit { get; set; }
-        public long AllocatedCountTotalLimit { get; set; }
-        public TimeSpan TimeLimit { get; set; }
-        public int OperationCountLimit { get; set; }
+        public int StackBytesLimit { get; set; } = 1024;
+        public int StackBytesLimitInExceptionHandlers { get; set; } = 6144;
+        public long AllocatedCountTotalLimit { get; set; } = 100;
+        public TimeSpan TimeLimit { get; set; } = TimeSpan.FromMilliseconds(500);
+        public int OperationCountLimit { get; set; } = 500;
 
         public Action<IDisposable> AfterForcedDispose { get; set; }
     }
