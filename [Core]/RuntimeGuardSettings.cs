@@ -7,7 +7,7 @@ namespace Unbreakable {
         [NotNull] internal static RuntimeGuardSettings Default { get; } = new RuntimeGuardSettings();
 
         public int StackBytesLimit { get; set; } = 1024;
-        public int StackBytesLimitInExceptionHandlers { get; set; } = 6144;
+        public int StackBytesLimitInExceptionHandlers { get; set; } = IntPtr.Size >= 8 ? 14336 : 6144;
         public long AllocatedCountTotalLimit { get; set; } = 100;
         public TimeSpan TimeLimit { get; set; } = TimeSpan.FromMilliseconds(500);
         public int OperationCountLimit { get; set; } = 500;

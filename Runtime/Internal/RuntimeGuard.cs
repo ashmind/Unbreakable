@@ -93,6 +93,7 @@ namespace Unbreakable.Runtime.Internal {
             if (stackBytesCount > _stackBytesLimit) {
                 if (Marshal.GetExceptionCode() == 0)
                     throw new StackGuardException(stackBaseline, stackCurrent, _stackBytesLimit);
+                // https://github.com/ashmind/SharpLab/issues/269#issuecomment-383370318
                 if (stackBytesCount > _stackBytesLimitInExceptionHandlers)
                     throw new StackGuardException(stackBaseline, stackCurrent, _stackBytesLimitInExceptionHandlers);
             }
