@@ -103,6 +103,7 @@ namespace Unbreakable.Internal.AssemblyValidation {
                 case Code.Ldarg_1: return GetParameterOrThisType(method, 1);
                 case Code.Ldarg_2: return GetParameterOrThisType(method, 2);
                 case Code.Ldarg_3: return GetParameterOrThisType(method, 3);
+                case Code.Call: return GetCallReturnType((MethodReference)instruction.Operand);
                 default: return null;
             }
         }
@@ -113,6 +114,14 @@ namespace Unbreakable.Internal.AssemblyValidation {
             if (index == 0)
                 return method.DeclaringType;
             return method.Parameters[index - 1].ParameterType;
+        }
+
+        private TypeReference GetCallReturnType(MethodReference method) {
+            // TODO: Consider generics provided by calling method/type
+            return method.ReturnType.ResolveGenericParameters(
+                method as GenericInstanceMethod,
+                method.DeclaringType as GenericInstanceType
+            );
         }
 
         private bool AllowPointerOperationsInType(TypeDefinition type) {

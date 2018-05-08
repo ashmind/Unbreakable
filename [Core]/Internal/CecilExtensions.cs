@@ -54,6 +54,13 @@ namespace Unbreakable.Internal {
                 return changed ?? type;
             }
 
+            if (type is ByReferenceType reference) {
+                var resolved = reference.ElementType.ResolveGenericParameters(methodInstance, typeInstance);
+                if (resolved == reference.ElementType)
+                    return type;
+                return new ByReferenceType(resolved);
+            }
+
             return type;
         }
 

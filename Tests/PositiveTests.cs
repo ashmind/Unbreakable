@@ -33,5 +33,21 @@ namespace Unbreakable.Tests {
             ", "C", "M");
             Assert.Equal(expected, m());
         }
+
+        [Theory]
+        [InlineData("int M() { ref T G<T>(ref T a) => ref a; var x = 1; return G(ref x); }", 1)]
+        [InlineData("int M() { var span = new SpanStub<int>(new int[1]); return span[0]; }", 0)]
+        public void HandlesGenericReferenceTypes(string code, int expected) {
+            var m = TestHelper.RewriteAndGetMethodWrappedInScope(@"
+                using System;
+                using Unbreakable.Tests.Internal;
+                class C {
+                    " + code + @"
+                }
+            ", "C", "M", new AssemblyGuardSettings {
+                ApiPolicy = ApiPolicy.SafeDefault().Namespace("Unbreakable.Tests.Internal", ApiAccess.Allowed)
+            });
+            Assert.Equal(expected, m());
+        }
     }
 }

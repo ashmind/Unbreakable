@@ -14,12 +14,12 @@ namespace Unbreakable.Tests {
         public static MemoryStream Compile(string code, bool allowUnsafe = false) {
             var compilation = CSharpCompilation.Create(
                 "_",
-                new[] { CSharpSyntaxTree.ParseText(code) },
+                new[] { CSharpSyntaxTree.ParseText(code, new CSharpParseOptions(LanguageVersion.Latest)) },
                 new[] {
                     MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
                     MetadataReference.CreateFromFile(typeof(Stack<>).Assembly.Location),
                     MetadataReference.CreateFromFile(typeof(Enumerable).Assembly.Location),
-                    MetadataReference.CreateFromFile(typeof(TestHelper).Assembly.Location),
+                    MetadataReference.CreateFromFile(typeof(TestHelper).Assembly.Location)
                 },
                 new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, allowUnsafe: allowUnsafe)
             );
