@@ -13,7 +13,7 @@ namespace Unbreakable {
 
         [NotNull]
         public static ApiPolicy SafeDefault() => DefaultFactory.CreateSafeDefaultPolicy();
-        
+
         internal ApiPolicy(TypePolicy compilerGeneratedDelegate) {
             CompilerGeneratedDelegate = compilerGeneratedDelegate;
         }

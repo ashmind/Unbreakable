@@ -1572,7 +1572,7 @@ System
      ToTuple: Allowed
      ToValueTuple: Allowed
   Type: Allowed
-     Equals: Denied
+     Equals: Allowed
      FindInterfaces: Denied
      FindMembers: Denied
      get_Assembly: Denied
@@ -2058,6 +2058,7 @@ System.Collections.Generic
      SymmetricExceptWith: Allowed
      ToString: Allowed
      TrimExcess: Allowed
+     TryGetValue: Allowed
      UnionWith: Allowed (CollectedEnumerableArgumentRewriter)
   HashSet`1+Enumerator: Allowed
      Dispose: Allowed
@@ -2349,6 +2350,7 @@ System.Collections.Generic
      SetEquals: Allowed
      SymmetricExceptWith: Allowed
      ToString: Allowed
+     TryGetValue: Allowed
      UnionWith: Allowed (CollectedEnumerableArgumentRewriter)
   SortedSet`1+Enumerator: Allowed
      Dispose: Allowed
@@ -2916,6 +2918,7 @@ System.Linq
      ThenByDescending: Allowed (CollectedEnumerableArgumentRewriter)
      ToArray: Allowed (CollectedEnumerableArgumentRewriter)
      ToDictionary: Allowed (CollectedEnumerableArgumentRewriter)
+     ToHashSet: Denied
      ToList: Allowed (CollectedEnumerableArgumentRewriter)
      ToLookup: Allowed (CollectedEnumerableArgumentRewriter)
      ToString: Denied
