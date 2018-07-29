@@ -42,7 +42,9 @@ namespace Unbreakable.Tests.Unit {
                 (typeof(Encoding), nameof(Encoding.GetByteCount)),
                 (typeof(Encoding), nameof(Encoding.GetCharCount)),
                 (typeof(Enumerable), nameof(Enumerable.Take)),
-                (typeof(Enumerable), nameof(Enumerable.Skip))
+                (typeof(Enumerable), nameof(Enumerable.Skip)),
+                (typeof(Regex), nameof(Regex.Replace)),
+                (typeof(Regex), nameof(Regex.Split))
             };
             AssertEachMatchingMethodHasRewriterOfType<CountArgumentRewriter>(
                 m => m.GetParameters().Any(p => p.Name == "count" || p.Name == "capacity")

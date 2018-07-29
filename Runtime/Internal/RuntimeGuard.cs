@@ -107,13 +107,13 @@ namespace Unbreakable.Runtime.Internal {
                 return;
             #endif
             if (_stopwatch.ElapsedTicks > _timeLimitStopwatchTicks)
-                throw new TimeGuardException("Time limit reached.");
+                throw new TimeGuardException();
         }
 
         private void EnsureRate() {
             _operationCount += 1;
             if (_operationCount > _operationCountLimit)
-                throw new RateGuardException("Operation limit reached.");
+                throw new RateGuardException();
         }
 
         private void EnsureActive() {
@@ -124,7 +124,7 @@ namespace Unbreakable.Runtime.Internal {
         private void EnsureCount(long count) {
             Interlocked.Add(ref _allocatedCountTotal, count);
             if (_allocatedCountTotal > _allocatedCountTotalLimit)
-                throw new MemoryGuardException("Total allocation limit reached (collections and strings).");
+                throw new MemoryGuardException();
         }
 
         private unsafe long GetCurrentStackOffset() {
@@ -163,6 +163,11 @@ namespace Unbreakable.Runtime.Internal {
                 catch {
                 }
             }
+        }
+
+        public TimeSpan GetTimeUntilLimit() {
+            EnsureTime();
+            return new TimeSpan(_timeLimitStopwatchTicks - _stopwatch.ElapsedTicks);
         }
 
         public static class FlowThrough {

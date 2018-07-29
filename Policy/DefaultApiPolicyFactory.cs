@@ -11,6 +11,7 @@ using Unbreakable.Internal;
 using Unbreakable.Policy.Rewriters;
 
 namespace Unbreakable.Policy.Internal {
+    using System.Text.RegularExpressions;
     using static ApiAccess;
 
     internal class DefaultApiPolicyFactory : IDefaultApiPolicyFactory {
@@ -38,6 +39,7 @@ namespace Unbreakable.Policy.Internal {
                 .Namespace("System.Runtime.InteropServices", Denied)
                 .Namespace("System.Runtime.CompilerServices", Neutral, SetupSystemRuntimeCompilerServices)
                 .Namespace("System.Text", Neutral, SetupSystemText)
+                .Namespace("System.Text.RegularExpressions", Neutral, SetupSystemTextRegularExpressions)
                 .Namespace("System.Threading", Denied)
 
                 .Namespace("Unbreakable", Denied)
@@ -410,6 +412,34 @@ namespace Unbreakable.Policy.Internal {
                           .Getter(nameof(StringBuilder.Length), Allowed)
                           .Getter(nameof(StringBuilder.MaxCapacity), Allowed)
                 );
+        }
+
+        private static void SetupSystemTextRegularExpressions(NamespacePolicy text) {
+            text
+                .Type(nameof(Regex), Neutral,
+                    t => t.Constructor(Allowed, RegexDangerousMethodCallRewriter.Default)
+                          .Getter(nameof(Regex.Options), Allowed)
+                          .Getter(nameof(Regex.RightToLeft), Allowed)
+                          .Member(nameof(Regex.IsMatch), Allowed, RegexDangerousMethodCallRewriter.Default)
+                          .Member(nameof(Regex.Match), Allowed, RegexDangerousMethodCallRewriter.Default)
+                          .Member(nameof(Regex.Matches), Allowed, RegexDangerousMethodCallRewriter.Default)
+                          .Member(nameof(Regex.Replace), Allowed, RegexDangerousMethodCallRewriter.Default, StringReturnRewriter.Default)
+                          .Member(nameof(Regex.Split), Allowed, RegexDangerousMethodCallRewriter.Default, ArrayReturnRewriter.Default)
+                          .Member(nameof(Regex.GetGroupNames), Allowed, ArrayReturnRewriter.Default)
+                          .Member(nameof(Regex.GetGroupNumbers), Allowed, ArrayReturnRewriter.Default)
+                          .Member(nameof(Regex.GroupNameFromNumber), Allowed)
+                          .Member(nameof(Regex.GroupNumberFromName), Allowed)
+                          .Member(nameof(Regex.Escape), Allowed, StringReturnRewriter.Default)
+                          .Member(nameof(Regex.Unescape), Allowed, StringReturnRewriter.Default)
+                          .Member(nameof(Regex.ToString), Allowed, StringReturnRewriter.Default)
+                )
+                .Type(nameof(RegexOptions), Allowed, t => t.Member(nameof(RegexOptions.Compiled), Denied))
+                .Type(nameof(Match), Allowed, t => t.Member(nameof(Match.Synchronized), Denied))
+                .Type(nameof(MatchCollection), Allowed)
+                .Type(nameof(MatchEvaluator), Neutral, t => t.Constructor(Allowed).Member("Invoke", Allowed))
+                .Type(nameof(Capture), Allowed)
+                .Type(nameof(Group), Allowed, t => t.Member(nameof(Group.Synchronized), Denied))
+                .Type(nameof(GroupCollection), Allowed);
         }
 
         private static TypePolicy CreateTypeRuleForCompilerGeneratedDelegate() {

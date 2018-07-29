@@ -1,3 +1,4 @@
+using Mono.Cecil;
 using Mono.Cecil.Cil;
 
 namespace Unbreakable.Policy.Internal {
@@ -13,6 +14,7 @@ namespace Unbreakable.Policy.Internal {
         }
 
         public ILProcessor IL { get; }
+        public ModuleDefinition Module => IL.Body.Method.Module;
         public RuntimeGuardReferences RuntimeGuardReferences { get; }
         public VariableDefinition RuntimeGuardVariable { get; }
     }
