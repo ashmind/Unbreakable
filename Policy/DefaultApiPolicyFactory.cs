@@ -438,6 +438,7 @@ namespace Unbreakable.Policy.Internal {
                 .Type(nameof(MatchCollection), Allowed)
                 .Type(nameof(MatchEvaluator), Neutral, t => t.Constructor(Allowed).Member("Invoke", Allowed))
                 .Type(nameof(Capture), Allowed)
+                .Type(nameof(CaptureCollection), Allowed)
                 .Type(nameof(Group), Allowed, t => t.Member(nameof(Group.Synchronized), Denied))
                 .Type(nameof(GroupCollection), Allowed);
         }
