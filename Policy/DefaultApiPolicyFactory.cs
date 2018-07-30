@@ -7,11 +7,12 @@ using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading;
 using Unbreakable.Internal;
 using Unbreakable.Policy.Rewriters;
 
 namespace Unbreakable.Policy.Internal {
-    using System.Text.RegularExpressions;
     using static ApiAccess;
 
     internal class DefaultApiPolicyFactory : IDefaultApiPolicyFactory {
@@ -40,7 +41,7 @@ namespace Unbreakable.Policy.Internal {
                 .Namespace("System.Runtime.CompilerServices", Neutral, SetupSystemRuntimeCompilerServices)
                 .Namespace("System.Text", Neutral, SetupSystemText)
                 .Namespace("System.Text.RegularExpressions", Neutral, SetupSystemTextRegularExpressions)
-                .Namespace("System.Threading", Denied)
+                .Namespace("System.Threading", Neutral, SetupSystemThreading)
 
                 .Namespace("Unbreakable", Denied)
                 .Namespace("Unbreakable.Runtime", Denied);
@@ -441,6 +442,12 @@ namespace Unbreakable.Policy.Internal {
                 .Type(nameof(CaptureCollection), Allowed)
                 .Type(nameof(Group), Allowed, t => t.Member(nameof(Group.Synchronized), Denied))
                 .Type(nameof(GroupCollection), Allowed);
+        }
+
+        private void SetupSystemThreading(NamespacePolicy threading) {
+            threading
+                // required for user-defined events
+                .Type(nameof(Interlocked), Neutral, t => t.Member(nameof(Interlocked.CompareExchange), Allowed));
         }
 
         private static TypePolicy CreateTypeRuleForCompilerGeneratedDelegate() {
