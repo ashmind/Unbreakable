@@ -1,4 +1,4 @@
-<Project>  
+<Project>
   <ItemDefinitionGroup>
     <Compile>
       <UnbreakablePolicyTypeName></UnbreakablePolicyTypeName>
@@ -9,6 +9,7 @@
   <PropertyGroup>
     <UnbreakablePolicyReportEnabled Condition="'$(UnbreakablePolicyReportEnabled)' == ''">true</UnbreakablePolicyReportEnabled>
     <UnbreakablePolicyReportTaskAssemblyDirectory Condition="'$(UnbreakablePolicyReportTaskAssemblyDirectory)' == ''">$(MSBuildThisFileDirectory)</UnbreakablePolicyReportTaskAssemblyDirectory>
+    <DisableFastUpToDateCheck Condition="'$(UnbreakablePolicyReportEnabled)' == 'true'">true</DisableFastUpToDateCheck>
   </PropertyGroup>
 
   <ItemGroup>
@@ -20,7 +21,7 @@
 
   <Target Name="UnbreakablePolicyFind">
     <ItemGroup>
-      <UnbreakablePolicySource Include="@(Compile)" Condition="'%(UnbreakablePolicyMethodName)' != '' OR '%(UnbreakablePolicyTypeName)' != ''" />      
+      <UnbreakablePolicySource Include="@(Compile)" Condition="'%(UnbreakablePolicyMethodName)' != '' OR '%(UnbreakablePolicyTypeName)' != ''" />
     </ItemGroup>
     <ItemGroup Condition="'@(UnbreakablePolicySource)' != '' AND @(UnbreakablePolicyReport) == ''">
       <UnbreakablePolicyReport Include="_not_created_yet_" />
@@ -28,14 +29,14 @@
   </Target>
   
   <Target Name="UnbreakablePolicyReport"
-          AfterTargets="Build"
+          AfterTargets="AfterBuild"
           DependsOnTargets="UnbreakablePolicyFind"
           Condition="'$(UnbreakablePolicyReportEnabled)' == 'true'"
           Inputs="@(UnbreakablePolicySource)"
           Outputs="@(UnbreakablePolicyReport)">
 
     <PropertyGroup>
-      <_UnbreakablePolicyReportAssemblyTempDirectory>$(MSBuildProjectDirectory)\$(IntermediateOutputPath)Unbreakable\reportbin\</_UnbreakablePolicyReportAssemblyTempDirectory>
+      <_UnbreakablePolicyReportAssemblyTempDirectory>$(MSBuildProjectDirectory)\$(IntermediateOutputPath)Unbreakable\</_UnbreakablePolicyReportAssemblyTempDirectory>
       <_UnbreakablePolicyReportTaskAssemblyFileName>Unbreakable.Build.PolicyReport.dll</_UnbreakablePolicyReportTaskAssemblyFileName>
     </PropertyGroup>
 
@@ -44,10 +45,10 @@
       <_FileToCopyToUnbreakableReportTemp Include="$(TargetPath)" />
       <_FileToCopyToUnbreakableReportTemp Include="$(UnbreakablePolicyReportTaskAssemblyDirectory)*.dll" />
     </ItemGroup>
-    
+
     <MakeDir Directories="$(_UnbreakablePolicyReportAssemblyTempDirectory)" />
-    <Copy DestinationFolder="$(_UnbreakablePolicyReportAssemblyTempDirectory)" SourceFiles="@(_FileToCopyToUnbreakableReportTemp)" />
-    
+    <Copy DestinationFolder="$(_UnbreakablePolicyReportAssemblyTempDirectory)" SourceFiles="@(_FileToCopyToUnbreakableReportTemp)" SkipUnchangedFiles="true" />
+
     <PropertyGroup>
       <_UnbreakablePolicyReportTaskAssemblyTempPath>$(_UnbreakablePolicyReportAssemblyTempDirectory)$(_UnbreakablePolicyReportTaskAssemblyFileName)</_UnbreakablePolicyReportTaskAssemblyTempPath>
       <_TargetTempPathForUnbreakable>$(_UnbreakablePolicyReportAssemblyTempDirectory)$(TargetFileName)</_TargetTempPathForUnbreakable>
