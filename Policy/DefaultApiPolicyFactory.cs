@@ -107,6 +107,10 @@ namespace Unbreakable.Policy.Internal {
                           .Getter(nameof(Exception.Message), Allowed)
                 )
                 .Type(nameof(FlagsAttribute), Allowed)
+                .Type(nameof(FormattableString), Allowed,
+                    t => t.Member(nameof(FormattableString.GetArguments), Allowed, ArrayReturnRewriter.Default)
+                          .Member(nameof(FormattableString.ToString), Allowed, StringReturnRewriter.Default)
+                )
                 .Type(nameof(GC), Neutral, 
                     t => t.Member(nameof(GC.SuppressFinalize), Allowed)
                 )
@@ -379,6 +383,7 @@ namespace Unbreakable.Policy.Internal {
             compilerServices
                 .Type(nameof(CompilerGeneratedAttribute), Allowed)
                 .Type(nameof(ExtensionAttribute), Allowed)
+                .Type(nameof(FormattableStringFactory), Allowed)
                 .Type(nameof(IteratorStateMachineAttribute), Allowed)
                 .Type("IsReadOnlyAttribute", Allowed)
                 .Type(nameof(RuntimeHelpers), Neutral, 
