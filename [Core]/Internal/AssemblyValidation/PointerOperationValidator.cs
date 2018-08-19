@@ -91,6 +91,8 @@ namespace Unbreakable.Internal.AssemblyValidation {
             var produced = InferPushedType(instruction, method);
             if (produced == null)
                 return null;
+            if (produced is RequiredModifierType required)
+                produced = required.ElementType;
             if (!produced.IsByReference)
                 return null;
             return produced.GetElementType();

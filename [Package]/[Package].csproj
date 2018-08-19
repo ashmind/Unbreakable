@@ -4,7 +4,7 @@
     <TargetFramework>net46</TargetFramework>
     <AssemblyName>_</AssemblyName>
     <PackageId>Unbreakable</PackageId>
-    <VersionPrefix>0.11.0-unproven</VersionPrefix>
+    <VersionPrefix>0.12.0-unproven</VersionPrefix>
     <Description>.NET sandboxing framework: rewrites other assemblies to ensure they can't bring down the hosting process.</Description>
     <PackageTags>sandboxing Unbreakable</PackageTags>
     <IncludeBuildOutput>false</IncludeBuildOutput>

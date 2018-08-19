@@ -65,6 +65,18 @@ namespace Unbreakable.Tests {
         }
 
         [Theory]
+        [InlineData("ref readonly int MIn(in int i) => ref i; int M() => MIn(0);")]
+        public void Allows_ReasonablySafePointerOperations(string code) {
+            var compiled = TestHelper.Compile(@"
+                class C {
+                    " + code + @"
+                }
+            ");
+            // Assert.DoesNotThrow
+            AssemblyGuard.Rewrite(compiled, new MemoryStream());
+        }
+
+        [Theory]
         [InlineData("void M() { Console.WriteLine('x'); }")]
         [InlineData("class N { void M() { GC.Collect(); } }")]
         [InlineData("void M() { var x = new IntPtr(0); }")] // crash, found by Alexandre Mutel‏ (@xoofx)
