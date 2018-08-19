@@ -103,11 +103,11 @@ namespace Unbreakable.Internal {
             if (type.IsGenericParameter)
                 return null;
 
-            if (type.IsByReference) {
+            if (type.IsByReference || type.IsRequiredModifier) {
                 EnsureAllowed(type.GetElementType());
                 if (memberName == null)
                     return null;
-                throw new NotSupportedException($"Unsupported reference type member {type.Name}.{memberName}.");
+                throw new NotSupportedException($"Unsupported special type member {type.Name}.{memberName}.");
             }
 
             if ((type is GenericInstanceType generic)) {

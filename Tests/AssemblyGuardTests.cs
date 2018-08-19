@@ -5,7 +5,7 @@ using Xunit;
 namespace Unbreakable.Tests {
    public class AssemblyGuardTests {
         [Fact]
-        public void AllowsExternMethods() {
+        public void Allows_ExternMethods() {
             // crash, found by Alexandre Mutel‏ (@xoofx)
             var compiled = TestHelper.Compile(@"
                 class C {
@@ -21,7 +21,7 @@ namespace Unbreakable.Tests {
         }
 
         [Fact]
-        public void AllowsAnonymousTypes() {
+        public void Allows_AnonymousTypes() {
             var compiled = TestHelper.Compile(@"
                 class C {
                     object M() {
@@ -33,8 +33,23 @@ namespace Unbreakable.Tests {
             AssemblyGuard.Rewrite(compiled, new MemoryStream(), AssemblyGuardSettings.DefaultForCSharpAssembly());
         }
 
+        [Fact] // https://github.com/ashmind/SharpLab/issues/323
+        public void Allows_CallsToRefReadOnlyMethods() {
+            var compiled = TestHelper.Compile(@"
+                class C {
+                    static ref readonly int MRef(ref int i) => ref i;
+                    static void M() {
+                        int x = 0;
+                        ref readonly int r = ref MRef(ref x);
+                    }
+                }
+            ");
+            // Assert.DoesNotThrow
+            AssemblyGuard.Rewrite(compiled, new MemoryStream(), AssemblyGuardSettings.DefaultForCSharpAssembly());
+        }
+
         [Fact]
-        public void AllowsReasonableAmountOfNullableLocals() {
+        public void Allows_ReasonableAmountOfNullableLocals() {
             var compiled = TestHelper.Compile(@"
                 class C {
                     void M() {

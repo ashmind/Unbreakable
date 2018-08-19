@@ -84,7 +84,7 @@ namespace Unbreakable {
             validator.ValidateDefinition(method);
             if (!method.HasBody)
                 return;
-            
+
             if (method.Body.Instructions.Count == 0)
                 return; // weird, but happens with 'extern'
 
