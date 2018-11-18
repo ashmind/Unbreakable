@@ -3,7 +3,7 @@ configuration: Release
 
 environment:
   api_key:
-    secure: L9TTNCYYao5V7WxoXrRpjhf25X9o+yiQD1nTsOEXMFR24JQ20IKwrRoqNDFfV0oQ
+    secure: 7jEF+EPlBwHDARSRTX4gUcDdZEpqjqjMIuuCN3Eez825IuusOeH6RL5iut/DtDwB
 
 before_build:
 - dotnet restore
