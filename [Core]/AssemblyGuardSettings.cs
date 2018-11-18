@@ -36,7 +36,10 @@ namespace Unbreakable {
                 // Array initializers for constant arrays use those
                 AllowExplicitLayoutInTypesMatchingPattern = new Regex("<PrivateImplementationDetails>"),
                 // Anonymous types use pointer operations in ToString()
-                AllowPointerOperationsInTypesMatchingPattern = new Regex("^<>f__AnonymousType.+$")
+                AllowPointerOperationsInTypesMatchingPattern = new Regex("^<>f__AnonymousType.+$"),
+                #pragma warning disable CS0618 // Type or member is obsolete
+                AllowCustomTypesMatchingPatternInSystemNamespaces = new Regex("_TO_BE_REMOVED_")
+                #pragma warning restore CS0618 // Type or member is obsolete
             };
         }
     }
