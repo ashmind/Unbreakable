@@ -1,4 +1,4 @@
-﻿using Mono.Cecil;
+using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Unbreakable.Internal;
 using Unbreakable.Policy.Internal;
@@ -64,9 +64,6 @@ namespace Unbreakable.Policy.Rewriters {
             il.InsertBefore(instruction, il.CreateCall(guardMethodInstance));
         }
 
-        private bool IsIEnumerable(TypeReference type) {
-            return type.Namespace == "System.Collections.Generic"
-                && type.Name == "IEnumerable`1";
-        }
+        private bool IsIEnumerable(TypeReference type) => KnownTypeNames.IEnumerable.Matches(type);
     }
 }

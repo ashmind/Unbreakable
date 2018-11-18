@@ -29,12 +29,9 @@ namespace Unbreakable.Internal {
         }
 
         public void ValidateDefinition([NotNull] TypeDefinition type) {
-            // Ensures we don't have to suspect each System.Int32 (etc) to be a user-defined type
-            if (type.Namespace == "System" || type.Namespace.StartsWith("System.", StringComparison.Ordinal)) {
-                var allowedPattern = _settings.AllowCustomTypesMatchingPatternInSystemNamespaces;
-                if (allowedPattern == null || !allowedPattern.IsMatch(type.FullName))
-                    throw new AssemblyGuardException($"Custom types cannot be defined in system namespace {type.Namespace}.");
-            }
+            // Ensures we don't have to suspect well-known system types of being user-defined
+            if (KnownTypeNames.AllReserved.Contains(new TypeName(type)))
+                throw new AssemblyGuardException($"Type {type} has a reserved name '{type.FullName}' which is not allowed.");
 
             if ((type.Attributes & TypeAttributes.ExplicitLayout) == TypeAttributes.ExplicitLayout) {
                 var allowedPattern = _settings.AllowExplicitLayoutInTypesMatchingPattern;
@@ -50,7 +47,7 @@ namespace Unbreakable.Internal {
                 throw new AssemblyGuardException($"Method {method} uses P/Invoke which is not allowed.");
 
             foreach (var @override in method.Overrides) {
-                if (@override.DeclaringType.FullName == "System.Object" && @override.Name == "Finalize")
+                if (KnownTypeNames.Object.Matches(@override.DeclaringType) && @override.Name == "Finalize")
                     throw new AssemblyGuardException($"Method {method} is a finalizer which is not allowed.");
             }
 
@@ -161,9 +158,9 @@ namespace Unbreakable.Internal {
             var baseType = type.BaseType;
             return baseType != null
                 && (
-                    baseType.FullName == "System.MulticastDelegate"
+                    KnownTypeNames.MulticastDelegate.Matches(baseType)
                     ||
-                    baseType.FullName == "System.Delegate"
+                    KnownTypeNames.Delegate.Matches(baseType)
                 );
         }
     }

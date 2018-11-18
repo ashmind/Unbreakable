@@ -13,6 +13,7 @@
     <VersionPrefix>0.6</VersionPrefix>
     <Description>API policies for https://www.nuget.org/packages/Unbreakable. This library supports the Unbreakable infrastructure and is not intended to be used directly from your code.</Description>
     <PackageTags>sandboxing Unbreakable</PackageTags>
+    <LangVersion>7.2</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>

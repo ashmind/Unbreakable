@@ -8,6 +8,7 @@
     <UseIISExpress>true</UseIISExpress>
     <OutputPath>bin\</OutputPath>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <LangVersion>7.2</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Views\**\*.*" />

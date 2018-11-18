@@ -76,6 +76,27 @@ namespace Unbreakable.Tests {
             AssemblyGuard.Rewrite(compiled, new MemoryStream());
         }
 
+        [Fact]
+        public void DoesNotEnforceApiPolicy_ForUserCode() {
+            var compiled = TestHelper.Compile(@"
+                namespace N {
+                    class C1 {
+                        void M(C2 c2) { c2.M(); }
+                    }
+
+                    class C2 {
+                        public void M() {}
+                    }
+                }
+            ");
+
+            var exception = Record.Exception(() => AssemblyGuard.Rewrite(compiled, new MemoryStream(), new AssemblyGuardSettings {
+                ApiPolicy = ApiPolicy.SafeDefault().Namespace("N", ApiAccess.Denied)
+            }));
+
+            Assert.Null(exception);
+        }
+
         [Theory]
         [InlineData("void M() { Console.WriteLine('x'); }")]
         [InlineData("class N { void M() { GC.Collect(); } }")]
@@ -93,16 +114,18 @@ namespace Unbreakable.Tests {
         }
 
         [Theory]
-        [InlineData("System")]
-        [InlineData("System.Runtime")]
-        public void ThrowsGuardException_ForCustomTypesInSystemNamespaces(string @namespace) {
-            // found by Llewellyn Pritchard (@leppie)
+        [InlineData("System", "Object")]
+        [InlineData("System", "Delegate")]
+        public void ThrowsGuardException_ForCustomTypesWithKnownTypeNames(string @namespace, string name) {
             var compiled = TestHelper.Compile(@"
-                namespace " + @namespace + @" { class C {} }
+                namespace " + @namespace + @" { class @" + name + @" {} }
             ");
-            Assert.Throws<AssemblyGuardException>(
+
+            var exception = Record.Exception(
                 () => AssemblyGuard.Rewrite(compiled, new MemoryStream())
             );
+
+            Assert.IsType<AssemblyGuardException>(exception);
         }
 
         [Theory]

@@ -160,11 +160,5 @@ namespace Unbreakable {
 
             return true;
         }
-
-        private static bool IsCallToUserCode(Instruction instruction, AssemblyDefinition userCodeAssembly) {
-            var code = instruction.OpCode.Code;
-            return (code == Code.Call || code == Code.Calli || code == Code.Callvirt)
-                && ((MethodReference)instruction.Operand).Module.Assembly == userCodeAssembly;
-        }
     }
 }

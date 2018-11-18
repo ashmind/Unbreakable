@@ -9,8 +9,9 @@
     <IncludeBuildOutput>true</IncludeBuildOutput>
     <BuildOutputTargetFolder>build</BuildOutputTargetFolder>
     <VersionPrefix>0.0.11</VersionPrefix>
-    <Description>Build task to create a report for a certain Unbreakable policy (e.g. for source control/policy review).</Description>    
+    <Description>Build task to create a report for a certain Unbreakable policy (e.g. for source control/policy review).</Description>
     <PackageTags>sandboxing MSBuild Unbreakable</PackageTags>
+    <LangVersion>7.2</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>

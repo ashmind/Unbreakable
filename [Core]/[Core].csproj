@@ -6,6 +6,7 @@
     <AssemblyName>Unbreakable</AssemblyName>
     <RootNamespace>Unbreakable</RootNamespace>
     <PackageId>_Core_</PackageId>
+    <LangVersion>7.2</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
