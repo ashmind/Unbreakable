@@ -43,6 +43,9 @@ namespace Unbreakable.Tests.Unit {
                 (typeof(Encoding), nameof(Encoding.GetCharCount)),
                 (typeof(Enumerable), nameof(Enumerable.Take)),
                 (typeof(Enumerable), nameof(Enumerable.Skip)),
+                #if NETCORE
+                (typeof(Dictionary<,>), nameof(Dictionary<object, object>.TrimExcess)),
+                #endif
                 (typeof(Regex), nameof(Regex.Replace)),
                 (typeof(Regex), nameof(Regex.Split))
             };
@@ -56,7 +59,7 @@ namespace Unbreakable.Tests.Unit {
         [Fact]
         public void CreateSafeDefaultPolicy_IncludesDisposableReturnRewriter_ForMethodsReturningIDiposable() {
             AssertEachMatchingMethodHasRewriterOfType<DisposableReturnRewriter>(
-                m => (m.IsConstructor ? m.DeclaringType : ((MethodInfo)m).ReturnType).IsAssignableTo<IDisposable>()
+                m => (m.IsConstructor ? m.DeclaringType : ((MethodInfo)m).ReturnType).GetTypeInfo().IsAssignableTo<IDisposable>()
                   && m.Name != "GetEnumerator"
             );
         }
@@ -121,6 +124,9 @@ namespace Unbreakable.Tests.Unit {
         private static Type[] GetExportedTypesSafe(Assembly assembly) {
             try {
                 return assembly.GetExportedTypes();
+            }
+            catch (NotSupportedException) {
+                return Type.EmptyTypes;
             }
             catch (FileNotFoundException) {
                 return Type.EmptyTypes;

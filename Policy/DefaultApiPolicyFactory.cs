@@ -52,7 +52,7 @@ namespace Unbreakable.Policy.Internal {
                 .Type(nameof(Activator), Denied)
                 .Type(nameof(AppContext), Denied)
                 .Type(nameof(AppDomain), Denied)
-                .Type(nameof(AppDomainManager), Denied)
+                .Type("AppDomainManager", Denied) // can't use nameof as type is not in .NET Standard
                 .Type(typeof(Array), Neutral,
                     t => t.Member(nameof(Array.Copy), Allowed)
                           .Member(nameof(Array.Empty), Allowed)
@@ -200,6 +200,7 @@ namespace Unbreakable.Policy.Internal {
                 .Type(typeof(Comparer<>), Allowed)
                 .Type(typeof(Dictionary<,>), Allowed,
                     t => t.Constructor(Allowed, CountArgumentRewriter.ForCapacity)
+                          .Member("EnsureCapacity", Allowed, CountArgumentRewriter.ForCapacity)
                           .Other(SetupAdd)
                 )
                 .Type(typeof(Dictionary<,>.Enumerator), Allowed)
@@ -208,6 +209,7 @@ namespace Unbreakable.Policy.Internal {
                 .Type(typeof(EqualityComparer<>), Allowed)
                 .Type(typeof(HashSet<>), Allowed,
                     t => t.Constructor(Allowed, CountArgumentRewriter.ForCapacity, CollectedEnumerableArgumentRewriter.Default)
+                          .Member("EnsureCapacity", Allowed, CountArgumentRewriter.ForCapacity)
                           .Other(SetupSetCommon)
                 )
                 .Type(typeof(HashSet<>.Enumerator), Allowed)

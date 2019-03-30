@@ -1,8 +1,8 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="../NuGetPackage.Common.props" />
 
   <PropertyGroup>
-    <TargetFramework>net46</TargetFramework>
+    <TargetFrameworks>net46; netstandard20</TargetFrameworks>
     <AssemblyName>Unbreakable</AssemblyName>
     <RootNamespace>Unbreakable</RootNamespace>
     <PackageId>_Core_</PackageId>
@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Argument" Version="1.0.3" />
+    <PackageReference Include="Argument" Version="1.1.0" />
     <PackageReference Include="JetBrains.Annotations" Version="10.4.0" />
     <PackageReference Include="Mono.Cecil" Version="0.10.0" />
   </ItemGroup>

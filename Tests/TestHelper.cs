@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Xunit;
@@ -15,12 +16,7 @@ namespace Unbreakable.Tests {
             var compilation = CSharpCompilation.Create(
                 "_",
                 new[] { CSharpSyntaxTree.ParseText(code, new CSharpParseOptions(LanguageVersion.Latest)) },
-                new[] {
-                    MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
-                    MetadataReference.CreateFromFile(typeof(Stack<>).Assembly.Location),
-                    MetadataReference.CreateFromFile(typeof(Enumerable).Assembly.Location),
-                    MetadataReference.CreateFromFile(typeof(TestHelper).Assembly.Location)
-                },
+                GetReferencesForCompile(),
                 new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, allowUnsafe: allowUnsafe)
             );
 
@@ -29,6 +25,25 @@ namespace Unbreakable.Tests {
             Assert.True(result.Success, string.Join("\r\n", result.Diagnostics));
             stream.Seek(0, SeekOrigin.Begin);
             return stream;
+        }
+
+        private static IEnumerable<PortableExecutableReference> GetReferencesForCompile() {
+            PortableExecutableReference AssemblyOf(Type type) => MetadataReference.CreateFromFile(type.Assembly.Location);
+
+            yield return AssemblyOf(typeof(object));
+            yield return AssemblyOf(typeof(Stack<>));
+            yield return AssemblyOf(typeof(Enumerable));
+
+            #if NETCORE
+            var trustedAssemblyPaths = ((string)AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES")).Split(Path.PathSeparator);
+            yield return MetadataReference.CreateFromFile(trustedAssemblyPaths.Single(p => p.EndsWith("mscorlib.dll")));
+            yield return MetadataReference.CreateFromFile(trustedAssemblyPaths.Single(p => p.EndsWith("System.Runtime.dll")));
+
+            yield return AssemblyOf(typeof(Console));
+            yield return AssemblyOf(typeof(Regex));
+            #endif
+
+            yield return AssemblyOf(typeof(TestHelper));
         }
 
         public static Invoke RewriteAndGetMethodWrappedInScope(string code, string typeName, string methodName, AssemblyGuardSettings guardSettings = null) {

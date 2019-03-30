@@ -2,7 +2,7 @@
   <Import Project="../NuGetPackage.Common.props" />
 
   <PropertyGroup>
-    <TargetFramework>net45</TargetFramework>
+    <TargetFrameworks>net45; netstandard20</TargetFrameworks>
     <AssemblyName>Unbreakable.Runtime</AssemblyName>
     <RootNamespace>Unbreakable.Runtime</RootNamespace>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>

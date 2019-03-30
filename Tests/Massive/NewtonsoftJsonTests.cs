@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
@@ -67,7 +67,7 @@ namespace Unbreakable.Tests.Massive {
             .Namespace("System.Collections.ObjectModel", Allowed)
             .Namespace("System.Data.SqlTypes", Allowed)
             .Namespace("System.Diagnostics", Neutral,
-                n => n.Type(typeof(TraceLevel), Allowed)
+                n => n.Type(typeof(System.Diagnostics.TraceLevel), Allowed)
             )
             .Namespace("System.IO", Allowed)
             .Namespace("System.Numerics", Allowed)

@@ -1,0 +1,44 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <AssemblyName>Unbreakable.Tests.NetCore</AssemblyName>
+    <RootNamespace>Unbreakable.Tests</RootNamespace>
+    <LangVersion>7.2</LangVersion>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DefineConstants>TRACE;NETCORE</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>TRACE;NETCORE</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\Tests\*.cs" Link="%(Filename)%(Extension)" />
+    <Compile Include="..\Tests\Internal\*.cs" Link="Internal\%(Filename)%(Extension)" />
+    <Compile Include="..\Tests\Massive\*.cs" Link="Massive\%(Filename)%(Extension)" />
+    <Compile Include="..\Tests\Unit\*.cs" Link="Unit\%(Filename)%(Extension)" />
+    <EmbeddedResource Include="..\Tests\TestCode\*.*" Link="TestCode\%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AshMind.Extensions" Version="2.0.0-pre-20180304" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="2.8.0" />
+    <PackageReference Include="Mono.Cecil" Version="0.10.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.0" />
+    <PackageReference Include="Pedantic.IO.EmbeddedResource" Version="0.9.0-pre-02" />
+    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
+    <PackageReference Include="ReflectionMagic" Version="3.0.0" />
+    <PackageReference Include="xunit" Version="2.4.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\[Core]\[Core].csproj" />
+    <ProjectReference Include="..\Policy\Policy.csproj" />
+  </ItemGroup>
+
+</Project>
