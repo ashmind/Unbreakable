@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>net46; netstandard20</TargetFrameworks>
@@ -28,25 +28,35 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="$(OutputPath)Unbreakable.dll">
+    <Content Include="$(OutputPath)net46\Unbreakable.dll">
       <PackagePath>lib\net46</PackagePath>
     </Content>
-    <Content Include="$(OutputPath)Unbreakable.Runtime.dll">
+    <Content Include="$(OutputPath)net46\Unbreakable.Runtime.dll">
       <PackagePath>lib\net46</PackagePath>
+    </Content>
+    <Content Include="$(OutputPath)netstandard20\Unbreakable.dll">
+      <PackagePath>lib\netstandard20</PackagePath>
+    </Content>
+    <Content Include="$(OutputPath)netstandard20\Unbreakable.Runtime.dll">
+      <PackagePath>lib\netstandard20</PackagePath>
     </Content>
   </ItemGroup>
 
   <Target Name="IncludeAssembliesInPackage">
-    <Error Text="$(OutputPath)Unbreakable.dll" />
     <!-- https://github.com/NuGet/Home/issues/3891 -->
     <ItemGroup>
-      <BuildOutputInPackage Include="$(OutputPath)Unbreakable.dll">
-        <FinalOutputPath>$([System.IO.Path]::GetFullPath('$(OutputPath)Unbreakable.dll'))</FinalOutputPath>
+      <BuildOutputInPackage Include="$(OutputPath)net46\Unbreakable.dll">
+        <FinalOutputPath>$([System.IO.Path]::GetFullPath('$(OutputPath)net46\Unbreakable.dll'))</FinalOutputPath>
       </BuildOutputInPackage>
-      <BuildOutputInPackage Include="$(OutputPath)Unbreakable.Runtime.dll">
-        <FinalOutputPath>$([System.IO.Path]::GetFullPath('$(OutputPath)Unbreakable.Runtime.dll'))</FinalOutputPath>
+      <BuildOutputInPackage Include="$(OutputPath)net46\Unbreakable.Runtime.dll">
+        <FinalOutputPath>$([System.IO.Path]::GetFullPath('$(OutputPath)net46\Unbreakable.Runtime.dll'))</FinalOutputPath>
+      </BuildOutputInPackage>
+      <BuildOutputInPackage Include="$(OutputPath)netstandard20\Unbreakable.dll">
+        <FinalOutputPath>$([System.IO.Path]::GetFullPath('$(OutputPath)netstandard20\Unbreakable.dll'))</FinalOutputPath>
+      </BuildOutputInPackage>
+      <BuildOutputInPackage Include="$(OutputPath)netstandard20\Unbreakable.Runtime.dll">
+        <FinalOutputPath>$([System.IO.Path]::GetFullPath('$(OutputPath)netstandard20\Unbreakable.Runtime.dll'))</FinalOutputPath>
       </BuildOutputInPackage>
     </ItemGroup>
   </Target>
-
 </Project>
