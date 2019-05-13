@@ -159,11 +159,6 @@ namespace Unbreakable.Internal {
             }
         }
 
-        private static bool IsBranchOperandLargerThanSByte(Instruction branch) {
-            var operandValue = ((Instruction)branch.Operand).Offset - (branch.Offset + branch.GetSize());
-            return operandValue > sbyte.MaxValue || operandValue < sbyte.MinValue;
-        }
-
         public static void InsertBeforeAndRetargetJumps(this ILProcessor il, Instruction target, Instruction instruction) {
             il.InsertBefore(target, instruction);
             foreach (var other in il.Body.Instructions) {

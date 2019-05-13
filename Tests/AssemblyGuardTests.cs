@@ -66,6 +66,7 @@ namespace Unbreakable.Tests {
 
         [Theory]
         [InlineData("ref readonly int MIn(in int i) => ref i; int M() => MIn(0);")]
+        [InlineData("void M(ref int i) => i++;")] // 
         public void Allows_ReasonablySafePointerOperations(string code) {
             var compiled = TestHelper.Compile(@"
                 class C {
@@ -138,7 +139,7 @@ namespace Unbreakable.Tests {
                 .Namespace("System.Security", ApiAccess.Neutral, n => n.Type(typeof(UnverifiableCodeAttribute), ApiAccess.Allowed));
             var compiled = TestHelper.Compile(@"
                 class X {
-                    unsafe void M() { " + code + @" }
+                    unsafe void M(int a) { " + code + @" }
                 }
             ", allowUnsafe: true);
 

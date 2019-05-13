@@ -1,10 +1,19 @@
 using System;
+using System.Collections.Generic;
 using JetBrains.Annotations;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 
 namespace Unbreakable.Internal.AssemblyValidation {
     public class PointerOperationValidator {
+        private static readonly ISet<StackBehaviour> SafeOneElementPushes = new HashSet<StackBehaviour> {
+            StackBehaviour.Push1,
+            StackBehaviour.Pushi,
+            StackBehaviour.Pushi8,
+            StackBehaviour.Pushr4,
+            StackBehaviour.Pushr8
+        };
+
         private readonly AssemblyGuardSettings _settings;
 
         public PointerOperationValidator([NotNull] AssemblyGuardSettings settings) {
@@ -41,11 +50,11 @@ namespace Unbreakable.Internal.AssemblyValidation {
 
                 var valuePush = instruction.Previous;
                 if (valuePush == null)
-                    return false;
-                if (valuePush.OpCode.StackBehaviourPop != StackBehaviour.Pop0 && valuePush.OpCode.StackBehaviourPush != StackBehaviour.Push1)
-                    return false;
+                    return true;
+                if (!SafeOneElementPushes.Contains(valuePush.OpCode.StackBehaviourPush))
+                    return true;
 
-                var pointerPush = valuePush.Previous;
+                var pointerPush = FindPreviousInstructionStillOnStack(valuePush);
                 return stType.Resolve() != GetElementTypeOfPushedManagedReference(pointerPush, method)?.Resolve();
             }
 
@@ -82,6 +91,35 @@ namespace Unbreakable.Internal.AssemblyValidation {
                 case Code.Stind_Ref: return (TypeReference)instruction.Operand;
                 case Code.Stobj: return (TypeReference)instruction.Operand;
                 default: return null;
+            }
+        }
+
+        private Instruction FindPreviousInstructionStillOnStack(Instruction instruction) {
+            var previous = instruction.Previous;
+            if (previous == null)
+                return null;
+
+            switch (instruction.OpCode.StackBehaviourPop) {
+                case StackBehaviour.Pop0:
+                    return previous;
+                case StackBehaviour.Pop1:
+                case StackBehaviour.Popi:
+                    if (!SafeOneElementPushes.Contains(previous.OpCode.StackBehaviourPush))
+                        return null;
+
+                    return FindPreviousInstructionStillOnStack(instruction.Previous);
+                case StackBehaviour.Pop1_pop1:
+                case StackBehaviour.Popi_popi:
+                    if (!SafeOneElementPushes.Contains(previous.OpCode.StackBehaviourPush))
+                        return null;
+
+                    var otherPush = FindPreviousInstructionStillOnStack(instruction.Previous);
+                    if (!SafeOneElementPushes.Contains(otherPush.OpCode.StackBehaviourPush))
+                        return null;
+
+                    return FindPreviousInstructionStillOnStack(otherPush);
+                default:
+                    return null;
             }
         }
 
