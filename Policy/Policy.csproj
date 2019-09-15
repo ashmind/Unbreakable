@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <UnbreakablePolicyReportTaskAssemblyDirectory>$(MSBuildProjectDirectory)/../Build.PolicyReport/bin/$(Configuration)/</UnbreakablePolicyReportTaskAssemblyDirectory>
@@ -10,7 +10,7 @@
     <TargetFrameworks>net46; netstandard20</TargetFrameworks>
     <AssemblyName>Unbreakable.Policy</AssemblyName>
     <RootNamespace>Unbreakable.Policy</RootNamespace>
-    <VersionPrefix>0.7</VersionPrefix>
+    <VersionPrefix>0.8</VersionPrefix>
     <Description>API policies for https://www.nuget.org/packages/Unbreakable. This library supports the Unbreakable infrastructure and is not intended to be used directly from your code.</Description>
     <PackageTags>sandboxing Unbreakable</PackageTags>
     <LangVersion>7.2</LangVersion>

@@ -378,7 +378,8 @@ namespace Unbreakable.Policy.Internal {
                           .Member(nameof(Enumerable.Where), Allowed)
                           .Member(nameof(Enumerable.Zip), Allowed)
                 )
-                .Type(typeof(IGrouping<,>), Allowed);
+                .Type(typeof(IGrouping<,>), Allowed)
+                .Type(typeof(IOrderedEnumerable<>), Allowed);
         }
 
         private static void SetupSystemRuntimeCompilerServices(NamespacePolicy compilerServices) {

@@ -1018,6 +1018,7 @@ System
      EndNoGCRegion: Denied
      Equals: Denied
      get_MaxGeneration: Denied
+     GetAllocatedBytesForCurrentThread: Denied
      GetGeneration: Denied
      GetHashCode: Denied
      GetTotalMemory: Denied
@@ -2941,7 +2942,8 @@ System.Linq
   IGrouping`2: Allowed
      get_Key: Allowed
   ILookup`2: Denied
-  IOrderedEnumerable`1: Denied
+  IOrderedEnumerable`1: Allowed
+     CreateOrderedEnumerable: Allowed
   IOrderedQueryable: Denied
   IOrderedQueryable`1: Denied
   IQueryable: Denied
@@ -3359,6 +3361,7 @@ System.Threading
      Increment: Denied
      MemoryBarrier: Denied
      Read: Denied
+     SpeculationBarrier: Denied
      ToString: Denied
   IOCompletionCallback: Denied
   LazyInitializer: Denied
