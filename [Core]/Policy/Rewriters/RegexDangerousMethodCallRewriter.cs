@@ -75,7 +75,7 @@ namespace Unbreakable.Policy.Rewriters {
             foreach (var method in methods) {
                 var parameters = method.GetParameters();
 
-                string reasonIfNotAllowed = null;
+                string? reasonIfNotAllowed = null;
                 if (parameters.Any(p => p.Name == MatchTimeoutParameterName))
                     reasonIfNotAllowed = $"Overload of Regex.{method.Name} taking {MatchTimeoutParameterName} is not allowed. Timeout will be provided automatically.";
 
@@ -100,7 +100,7 @@ namespace Unbreakable.Policy.Rewriters {
             return result;
         }
 
-        private static MethodBase FindSameMethodWithTimeout(
+        private static MethodBase? FindSameMethodWithTimeout(
             MethodBase method,
             ParameterInfo[] parameters,
             bool hasRegexOptionsAsLastParameter,
@@ -157,10 +157,10 @@ namespace Unbreakable.Policy.Rewriters {
 
         private class RegexMethodDetails {
             public RegexMethodDetails(
-                MethodBase methodWithTimeout,
+                MethodBase? methodWithTimeout,
                 bool methodWithTimeoutNeedsRegexOptions,
                 bool hasRegexOptionsAsLastParameter,
-                string reasonIfNotAllowed
+                string? reasonIfNotAllowed
             ) {
                 MethodWithTimeout = methodWithTimeout;
                 MethodWithTimeoutNeedsRegexOptions = methodWithTimeoutNeedsRegexOptions;
@@ -168,10 +168,10 @@ namespace Unbreakable.Policy.Rewriters {
                 ReasonIfNotAllowed = reasonIfNotAllowed;
             }
 
-            public MethodBase MethodWithTimeout { get; }
+            public MethodBase? MethodWithTimeout { get; }
             public bool MethodWithTimeoutNeedsRegexOptions { get; }
             public bool HasRegexOptionsAsLastParameter { get; }
-            public string ReasonIfNotAllowed { get; }
+            public string? ReasonIfNotAllowed { get; }
         }
     }
 }

@@ -4,7 +4,6 @@
     <TargetFramework>net471</TargetFramework>
     <AssemblyName>Unbreakable.Tests</AssemblyName>
     <RootNamespace>Unbreakable.Tests</RootNamespace>
-    <LangVersion>7.2</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>

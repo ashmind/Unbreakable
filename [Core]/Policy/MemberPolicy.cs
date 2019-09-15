@@ -7,7 +7,7 @@ using Unbreakable.Policy.Internal;
 namespace Unbreakable.Policy {
     public class MemberPolicy {
         private ApiAccess _access;
-        private IList<IMemberRewriterInternal> _rewriters;
+        private IList<IMemberRewriterInternal>? _rewriters;
 
         internal MemberPolicy(ApiAccess access) {
             Access = access;
@@ -28,7 +28,7 @@ namespace Unbreakable.Policy {
         public IReadOnlyCollection<IMemberRewriter> Rewriters {
             get {
                 EnsureRewriters();
-                return (IReadOnlyCollection<IMemberRewriter>)_rewriters;
+                return (IReadOnlyCollection<IMemberRewriter>)_rewriters!;
             }
         }
 
@@ -39,14 +39,14 @@ namespace Unbreakable.Policy {
         public MemberPolicy AddRewriter([NotNull] IMemberRewriter rewriter) {
             Argument.NotNull("rewriter", rewriter);
             EnsureRewriters();
-            _rewriters.Add(Argument.Cast<IMemberRewriterInternal>(nameof(rewriter), rewriter));
+            _rewriters!.Add(Argument.Cast<IMemberRewriterInternal>(nameof(rewriter), rewriter));
             return this;
         }
 
         [NotNull]
         public MemberPolicy RemoveRewriter([CanBeNull] IMemberRewriter rewriter) {
             EnsureRewriters();
-            _rewriters.Remove((IMemberRewriterInternal)rewriter);
+            _rewriters!.Remove((IMemberRewriterInternal)rewriter);
             return this;
         }
 

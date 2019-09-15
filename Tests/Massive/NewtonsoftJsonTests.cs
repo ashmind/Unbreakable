@@ -90,7 +90,7 @@ namespace Unbreakable.Tests.Massive {
             .Namespace("System.Xml.Linq", Allowed);
 
         private class TestData {
-            public string Name { get; set; }
+            public string? Name { get; set; }
         }
     }
 }

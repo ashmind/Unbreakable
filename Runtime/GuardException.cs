@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Runtime.Serialization;
 
 namespace Unbreakable.Runtime {
@@ -8,7 +8,7 @@ namespace Unbreakable.Runtime {
 
         public GuardException() { }
         public GuardException(string message) : base(message) { }
-        public GuardException(string message, Exception inner) : base(message, inner) { }
+        public GuardException(string message, Exception? inner) : base(message, inner) { }
         protected GuardException(SerializationInfo info, StreamingContext context) : base(info, context) { }
     }
 }

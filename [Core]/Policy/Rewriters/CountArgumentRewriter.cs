@@ -32,7 +32,7 @@ namespace Unbreakable.Policy.Rewriters {
         }
 
         // Unnecessary microoptimization (avoids LINQ allocation)
-        private ParameterDefinition GetCountParameter(MethodReference method) {
+        private ParameterDefinition? GetCountParameter(MethodReference method) {
             foreach (var parameter in method.Parameters) {
                 if (parameter.Name == _countParameterName)
                     return parameter;

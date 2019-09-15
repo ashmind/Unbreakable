@@ -25,11 +25,11 @@ namespace Unbreakable {
 
         public int MethodLocalsSizeLimit { get; set; }
         public int MethodStackPushSizeLimit { get; set; }
-        [CanBeNull] public Regex AllowExplicitLayoutInTypesMatchingPattern { get; set; }
-        [CanBeNull] public Regex AllowPointerOperationsInTypesMatchingPattern { get; set; }
+        public Regex? AllowExplicitLayoutInTypesMatchingPattern { get; set; }
+        public Regex? AllowPointerOperationsInTypesMatchingPattern { get; set; }
 
         [Obsolete("Users are now allowed to create types in System namespace (except for a few well-known types). This property will be removed in the next version.")]
-        [CanBeNull] public Regex AllowCustomTypesMatchingPatternInSystemNamespaces { get; set; }
+        public Regex ?AllowCustomTypesMatchingPatternInSystemNamespaces { get; set; }
 
         public static AssemblyGuardSettings DefaultForCSharpAssembly() {
             return new AssemblyGuardSettings {

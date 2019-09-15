@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
@@ -59,7 +59,9 @@ namespace Unbreakable.Tests.Unit {
         }
 
         [Theory]
+        #pragma warning disable xUnit1019 // xUnit bug when matching nullable referene types
         [MemberData(nameof(GetShortBranchOpCodes))]
+        #pragma warning restore xUnit1019
         public void CorrectBranchSizes_CorrectsOpCodeFromShortOne_IfOffsetDoesNotFitSByte(OpCode opCode) {
             var body = new MethodBody(new MethodDefinition("", 0, new TypeReference("", "", null, null)));
             var il = body.GetILProcessor();

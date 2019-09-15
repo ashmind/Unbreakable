@@ -61,7 +61,7 @@ namespace Unbreakable.Internal.AssemblyValidation {
             return false;
         }
 
-        private TypeReference GetLdType(Instruction instruction, MethodDefinition method) {
+        private TypeReference? GetLdType(Instruction instruction, MethodDefinition method) {
             switch (instruction.OpCode.Code) {
                 case Code.Ldind_I: return method.Module.ImportReference(typeof(IntPtr));
                 case Code.Ldind_I1: return method.Module.ImportReference(typeof(sbyte));
@@ -79,7 +79,7 @@ namespace Unbreakable.Internal.AssemblyValidation {
             }
         }
 
-        private TypeReference GetStType(Instruction instruction, MethodDefinition method) {
+        private TypeReference? GetStType(Instruction instruction, MethodDefinition method) {
             switch (instruction.OpCode.Code) {
                 case Code.Stind_I: return method.Module.ImportReference(typeof(IntPtr));
                 case Code.Stind_I1: return method.Module.ImportReference(typeof(sbyte));
@@ -94,7 +94,7 @@ namespace Unbreakable.Internal.AssemblyValidation {
             }
         }
 
-        private Instruction FindPreviousInstructionStillOnStack(Instruction instruction) {
+        private Instruction? FindPreviousInstructionStillOnStack(Instruction instruction) {
             var previous = instruction.Previous;
             if (previous == null)
                 return null;
@@ -114,7 +114,7 @@ namespace Unbreakable.Internal.AssemblyValidation {
                         return null;
 
                     var otherPush = FindPreviousInstructionStillOnStack(instruction.Previous);
-                    if (!SafeOneElementPushes.Contains(otherPush.OpCode.StackBehaviourPush))
+                    if (!SafeOneElementPushes.Contains(otherPush!.OpCode.StackBehaviourPush))
                         return null;
 
                     return FindPreviousInstructionStillOnStack(otherPush);
@@ -123,7 +123,7 @@ namespace Unbreakable.Internal.AssemblyValidation {
             }
         }
 
-        private TypeReference GetElementTypeOfPushedManagedReference(Instruction instruction, MethodDefinition method) {
+        private TypeReference? GetElementTypeOfPushedManagedReference(Instruction? instruction, MethodDefinition method) {
             if (instruction == null)
                 return null;
             var produced = InferPushedType(instruction, method);
@@ -136,7 +136,7 @@ namespace Unbreakable.Internal.AssemblyValidation {
             return produced.GetElementType();
         }
 
-        private TypeReference InferPushedType(Instruction instruction, MethodDefinition method) {
+        private TypeReference? InferPushedType(Instruction instruction, MethodDefinition method) {
             switch (instruction.OpCode.Code) {
                 case Code.Ldarg: return ((ParameterReference)instruction.Operand).ParameterType;
                 case Code.Ldarg_0: return GetParameterOrThisType(method, 0);

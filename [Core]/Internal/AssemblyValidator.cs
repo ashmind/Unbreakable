@@ -65,7 +65,7 @@ namespace Unbreakable.Internal {
             }
         }
 
-        public MemberPolicy ValidateInstructionAndGetPolicy(Instruction instruction, MethodDefinition method) {
+        public MemberPolicy? ValidateInstructionAndGetPolicy(Instruction instruction, MethodDefinition method) {
             _pointerValidator.ValidateInstruction(instruction, method);
             _stackSizeValidator.ValidateInstruction(instruction, method);
 
@@ -75,8 +75,7 @@ namespace Unbreakable.Internal {
             return ValidateMemberReference(reference);
         }
 
-        private MemberPolicy ValidateMemberReference(MemberReference reference) {
-            var type = reference.DeclaringType;
+        private MemberPolicy? ValidateMemberReference(MemberReference reference) {
             switch (reference) {
                 case MethodReference m: {
                     var memberRule = EnsureAllowed(m.DeclaringType, m.Name);
@@ -96,7 +95,7 @@ namespace Unbreakable.Internal {
             }
         }
 
-        private MemberPolicy EnsureAllowed(TypeReference type, string memberName = null) {
+        private MemberPolicy? EnsureAllowed(TypeReference type, string? memberName = null) {
             if (type.IsGenericParameter)
                 return null;
 
@@ -128,7 +127,7 @@ namespace Unbreakable.Internal {
                 typeKind = ApiFilterTypeKind.CompilerGeneratedDelegate;
             }
 
-            var @namespace = GetNamespace(type);
+            var @namespace = GetNamespace(type)!;
             var typeName = !type.IsNested ? type.Name : (type.FullName.Substring(@namespace.Length + 1).Replace("/", "+"));
             var result = _settings.ApiFilter.Filter(@namespace, typeName, typeKind, memberName);
             switch (result.Kind) {
@@ -145,8 +144,8 @@ namespace Unbreakable.Internal {
             }
         }
 
-        private string GetNamespace(TypeReference type) {
-            string @namespace = null;
+        private string? GetNamespace(TypeReference type) {
+            string? @namespace = null;
             while (string.IsNullOrEmpty(@namespace) && type != null) {
                 @namespace = type.Namespace;
                 type = type.DeclaringType;

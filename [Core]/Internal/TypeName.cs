@@ -4,12 +4,12 @@ using Mono.Cecil;
 namespace Unbreakable.Internal {
     internal readonly struct TypeName : IEquatable<TypeName> {
         public TypeName(Type type)
-            : this(Argument.NotNull(nameof(type), type).Namespace, type?.Name)
+            : this(Argument.NotNull(nameof(type), type).Namespace, type.Name)
         {
         }
 
         public TypeName(TypeReference type)
-            : this(Argument.NotNull(nameof(type), type).Namespace, type?.Name) {
+            : this(Argument.NotNull(nameof(type), type).Namespace, type.Name) {
         }
 
         public TypeName(string @namespace, string name) {

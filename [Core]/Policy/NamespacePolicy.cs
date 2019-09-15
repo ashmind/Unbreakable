@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
 
@@ -10,16 +10,14 @@ namespace Unbreakable.Policy {
             Access = access;
         }
 
-        [NotNull]
-        public NamespacePolicy Type([NotNull] Type type, ApiAccess access, [CanBeNull] Action<TypePolicy> setup = null) {
+        public NamespacePolicy Type([NotNull] Type type, ApiAccess access, Action<TypePolicy>? setup = null) {
             var typeName = type.Name;
             if (type.IsNested)
                 typeName = type.FullName.Substring(type.Namespace.Length + 1);
             return Type(typeName, access, setup);
         }
 
-        [NotNull]
-        public NamespacePolicy Type([NotNull] string typeName, ApiAccess access, [CanBeNull] Action<TypePolicy> setup = null) {
+        public NamespacePolicy Type(string typeName, ApiAccess access, Action<TypePolicy>? setup = null) {
             Argument.NotNullOrEmpty(nameof(typeName), typeName);
             if (Access == ApiAccess.Denied && access != ApiAccess.Denied)
                 throw new InvalidOperationException($"Type access ({access}) cannot exceed namespace access ({Access}).");

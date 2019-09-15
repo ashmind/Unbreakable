@@ -19,7 +19,7 @@ namespace Unbreakable.Build.PolicyReport {
                 .GetReferencedAssemblies()
                 .Select(SafeLoadAssembly)
                 .Where(a => a != null)
-                .ToDictionary(a => a.GetName().Name);
+                .ToDictionary(a => a!.GetName().Name, a => a!);
             SetupAssemblyResolution(assemblies);
             var namespaces = assemblies
                 .Values
@@ -36,7 +36,7 @@ namespace Unbreakable.Build.PolicyReport {
             return true;
         }
 
-        private Assembly SafeLoadAssembly(AssemblyName assemblyName) {
+        private Assembly? SafeLoadAssembly(AssemblyName assemblyName) {
             try {
                 return Assembly.Load(assemblyName);
             }
@@ -63,7 +63,7 @@ namespace Unbreakable.Build.PolicyReport {
         }
 
         private void WriteTypeReport(StreamWriter writer, Type type, string typeName, NamespacePolicy namespacePolicy) {
-            if (!namespacePolicy.Types.TryGetValue(typeName, out var typePolicy))
+            if (!namespacePolicy.Types.TryGetValue(typeName, out TypePolicy? typePolicy))
                 typePolicy = null;
 
             var effectiveTypeAccess = GetEffectiveTypeAccess(typePolicy?.Access, namespacePolicy.Access);
@@ -81,17 +81,19 @@ namespace Unbreakable.Build.PolicyReport {
             }
         }
 
-        private void WriteMethodReport(StreamWriter writer, string methodName, TypePolicy typePolicy, ApiAccess effectiveTypeAccess) {
-            if (!typePolicy.Members.TryGetValue(methodName, out var methodPolicy))
-                methodPolicy = null;
-            var effectiveMethodAccess = GetEffectiveMethodAccess(methodPolicy?.Access, typePolicy.Access, effectiveTypeAccess);
+        private void WriteMethodReport(StreamWriter writer, string methodName, TypePolicy? typePolicy, ApiAccess effectiveTypeAccess) {
+            var methodPolicy = (MemberPolicy?)null;
+            if (typePolicy != null)
+                typePolicy.Members.TryGetValue(methodName, out methodPolicy);
+
+            var effectiveMethodAccess = GetEffectiveMethodAccess(methodPolicy?.Access, typePolicy?.Access, effectiveTypeAccess);
             writer.Write("     ");
             writer.Write(methodName);
             writer.Write(": ");
             writer.Write(effectiveMethodAccess);
             if (methodPolicy?.HasRewriters ?? false) {
                 writer.Write(" (");
-                writer.Write(string.Join(", ", methodPolicy.Rewriters.Cast<IMemberRewriterInternal>().Select(r => r.GetShortName())));
+                writer.Write(string.Join(", ", methodPolicy!.Rewriters.Cast<IMemberRewriterInternal>().Select(r => r.GetShortName())));
                 writer.Write(")");
             }
             writer.WriteLine();
@@ -114,7 +116,7 @@ namespace Unbreakable.Build.PolicyReport {
             if (method == null)
                 throw new Exception($"Method '{PolicyMethodName}' was not found in '{PolicyTypeName}'.");
 
-            var instance = (object)null;
+            var instance = (object?)null;
             if (!method.IsStatic)
                 instance = Activator.CreateInstance(type);
 
@@ -134,10 +136,12 @@ namespace Unbreakable.Build.PolicyReport {
         private ApiAccess GetEffectiveMethodAccess(ApiAccess? methodAccess, ApiAccess? typeAccess, ApiAccess effectiveTypeAccess) {           
             return methodAccess ?? (typeAccess == Allowed ? Allowed : Denied);
         }
-        
+
+        #pragma warning disable CS8618 // Non-nullable field is uninitialized.
         [Required] public string PolicyAssemblyPath { get; set; }
         [Required] public string PolicyTypeName { get; set; }
         [Required] public string PolicyMethodName { get; set; }
         [Required] public string OutputPath { get; set; }
+        #pragma warning restore CS8618 // Non-nullable field is uninitialized.
     }
 }

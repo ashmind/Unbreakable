@@ -46,7 +46,7 @@ namespace Unbreakable.Tests {
             yield return AssemblyOf(typeof(TestHelper));
         }
 
-        public static Invoke RewriteAndGetMethodWrappedInScope(string code, string typeName, string methodName, AssemblyGuardSettings guardSettings = null) {
+        public static Invoke RewriteAndGetMethodWrappedInScope(string code, string typeName, string methodName, AssemblyGuardSettings? guardSettings = null) {
             var assemblySourceStream = Compile(code);
             var assemblyTargetStream = new MemoryStream();
 

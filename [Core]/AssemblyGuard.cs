@@ -9,7 +9,7 @@ using Unbreakable.Runtime.Internal;
 
 namespace Unbreakable {
     public static class AssemblyGuard {
-        public static RuntimeGuardToken Rewrite(Stream assemblySourceStream, Stream assemblyTargetStream, AssemblyGuardSettings settings = null) {
+        public static RuntimeGuardToken Rewrite(Stream assemblySourceStream, Stream assemblyTargetStream, AssemblyGuardSettings? settings = null) {
             Argument.NotNull(nameof(assemblySourceStream), assemblySourceStream);
             Argument.NotNull(nameof(assemblyTargetStream), assemblyTargetStream);
             if (assemblyTargetStream == assemblySourceStream) // Cecil limitation? Causes some weird issues.
@@ -22,7 +22,7 @@ namespace Unbreakable {
             return token;
         }
 
-        internal static RuntimeGuardToken Rewrite(AssemblyDefinition assembly, AssemblyGuardSettings settings = null) {
+        internal static RuntimeGuardToken Rewrite(AssemblyDefinition assembly, AssemblyGuardSettings? settings = null) {
             var id = Guid.NewGuid();
             settings = settings ?? AssemblyGuardSettings.Default;
             var validator = new AssemblyValidator(settings, assembly, new StackSizeValidator(settings), new PointerOperationValidator(settings));

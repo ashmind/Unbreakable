@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="../NuGetPackage.Common.props" />
 
   <PropertyGroup>
@@ -6,7 +6,6 @@
     <AssemblyName>Unbreakable</AssemblyName>
     <RootNamespace>Unbreakable</RootNamespace>
     <PackageId>_Core_</PackageId>
-    <LangVersion>7.2</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,7 +17,6 @@
 
   <ItemGroup>
     <PackageReference Include="Argument" Version="1.1.0" />
-    <PackageReference Include="JetBrains.Annotations" Version="10.4.0" />
     <PackageReference Include="Mono.Cecil" Version="0.10.0" />
   </ItemGroup>
 

@@ -22,7 +22,7 @@ namespace Unbreakable.Policy.Rewriters {
                 return false;
 
             var getLength = il.Body.Method.Module.ImportReference(
-                method.ReturnType.Resolve().GetProperty(nameof(string.Length)).GetMethod
+                method.ReturnType.Resolve().GetProperty(nameof(string.Length))!.GetMethod
             );
             var pop = il.Create(OpCodes.Pop);
             context.IL.InsertAfter(instruction,

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -55,7 +55,7 @@ namespace Unbreakable.Demo.Controllers {
             var rewriteStopwatch = new Stopwatch();
             var executionStopwatch = new Stopwatch();
 
-            ResultViewModel resultModel(string output) => new ResultViewModel(
+            ResultViewModel resultModel(string? output) => new ResultViewModel(
                 output,
                 compilationStopwatch.Elapsed,
                 rewriteStopwatch.Elapsed,
@@ -100,7 +100,7 @@ namespace Unbreakable.Demo.Controllers {
             }
         }
 
-        private static object RemoteRun(MemoryStream assemblyStream, RuntimeGuardToken token) {
+        private static object? RemoteRun(MemoryStream assemblyStream, RuntimeGuardToken token) {
             using (token.Scope()) {
                 var assembly = Assembly.Load(assemblyStream.ToArray());
                 var type = assembly.GetType("Program", true);

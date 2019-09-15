@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using JetBrains.Annotations;
 
 namespace Unbreakable.Policy {
     public class TypePolicy {
-        private IDictionary<string, MemberPolicy> _members;
+        private IDictionary<string, MemberPolicy>? _members;
 
         internal TypePolicy(ApiAccess access = ApiAccess.Neutral) {
             Access = access;
@@ -16,7 +16,7 @@ namespace Unbreakable.Policy {
         public IReadOnlyDictionary<string, MemberPolicy> Members {
             get {
                 EnsureMembers();
-                return (IReadOnlyDictionary<string, MemberPolicy>)_members;
+                return (IReadOnlyDictionary<string, MemberPolicy>)_members!;
             }
         }
 
@@ -60,13 +60,13 @@ namespace Unbreakable.Policy {
             return Member(name, access, rewriters, null);
         }
 
-        private TypePolicy Member(string name, ApiAccess access, IMemberRewriter[] rewriters, Action<MemberPolicy> setup) {
+        private TypePolicy Member(string name, ApiAccess access, IMemberRewriter[]? rewriters, Action<MemberPolicy>? setup) {
             Argument.NotNullOrEmpty(nameof(name), name);
             if (Access == ApiAccess.Denied && access != ApiAccess.Denied)
                 throw new InvalidOperationException($"Member access ({access}) cannot exceed type access ({Access}).");
 
             EnsureMembers();
-            if (!_members.TryGetValue(name, out var member)) {
+            if (!_members!.TryGetValue(name, out var member)) {
                 member = new MemberPolicy(access);
                 _members.Add(name, member);
             }

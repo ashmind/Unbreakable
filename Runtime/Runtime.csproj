@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="../NuGetPackage.Common.props" />
 
   <PropertyGroup>
@@ -6,6 +6,5 @@
     <AssemblyName>Unbreakable.Runtime</AssemblyName>
     <RootNamespace>Unbreakable.Runtime</RootNamespace>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-    <LangVersion>7.2</LangVersion>
   </PropertyGroup>
 </Project>

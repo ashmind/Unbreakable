@@ -9,7 +9,7 @@ namespace Unbreakable.Runtime {
             long stackOffset,
             long stackLimit,
             string message = "Stack limit reached.",
-            Exception inner = null
+            Exception? inner = null
         ) : base(message, inner) {
             StackBaseline = stackBaseline;
             StackOffset = stackOffset;

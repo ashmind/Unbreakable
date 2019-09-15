@@ -18,8 +18,7 @@ namespace Unbreakable {
             CompilerGeneratedDelegate = compilerGeneratedDelegate;
         }
 
-        [NotNull]
-        public ApiPolicy Namespace([NotNull] string @namespace, ApiAccess access, [CanBeNull] Action<NamespacePolicy> setup = null) {
+        public ApiPolicy Namespace(string @namespace, ApiAccess access, Action<NamespacePolicy>? setup = null) {
             Argument.NotNull(nameof(@namespace), @namespace);
 
             if (!_namespaces.TryGetValue(@namespace, out var rule)) {

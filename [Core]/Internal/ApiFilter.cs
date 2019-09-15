@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using JetBrains.Annotations;
 using Unbreakable.Policy;
 
@@ -10,7 +10,7 @@ namespace Unbreakable.Internal {
             Policy = policy;
         }
 
-        public ApiFilterResult Filter([NotNull] string @namespace, [NotNull] string typeName, ApiFilterTypeKind typeKind, [CanBeNull] string memberName = null) {
+        public ApiFilterResult Filter(string @namespace, [NotNull] string typeName, ApiFilterTypeKind typeKind, string? memberName = null) {
             Argument.NotNull(nameof(@namespace), @namespace);
             Argument.NotNullOrEmpty(nameof(typeName), typeName);
 

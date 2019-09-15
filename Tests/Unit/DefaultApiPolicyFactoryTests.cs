@@ -97,7 +97,7 @@ namespace Unbreakable.Tests.Unit {
             );
         }
 
-        private static void AssertNoMethodsMatching(Func<MethodBase, MemberPolicy, bool> matcher) {
+        private static void AssertNoMethodsMatching(Func<MethodBase, MemberPolicy?, bool> matcher) {
             var policy = new DefaultApiPolicyFactory().CreateSafeDefaultPolicy();
             var matched = new HashSet<string>();
 

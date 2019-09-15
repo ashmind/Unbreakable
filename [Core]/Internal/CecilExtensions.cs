@@ -19,7 +19,7 @@ namespace Unbreakable.Internal {
             Code.Stind_Ref
         };
 
-        public static TypeReference ResolveGenericParameters(this TypeReference type, [CanBeNull] GenericInstanceMethod methodInstance, [CanBeNull] GenericInstanceType typeInstance) {
+        public static TypeReference ResolveGenericParameters(this TypeReference type,  GenericInstanceMethod? methodInstance, GenericInstanceType? typeInstance) {
             if (type is GenericParameter genericParameter) {
                 switch (genericParameter.Owner) {
                     case MethodReference ownerMethod: {
@@ -42,7 +42,7 @@ namespace Unbreakable.Internal {
             }
 
             if (type is GenericInstanceType generic) {
-                var changed = (GenericInstanceType)null;
+                var changed = (GenericInstanceType?)null;
                 for (var i = 0; i < generic.GenericArguments.Count; i++) {
                     var argument = generic.GenericArguments[i];
                     var resolved = argument.ResolveGenericParameters(methodInstance, typeInstance);
@@ -216,7 +216,7 @@ namespace Unbreakable.Internal {
             il.InsertAfter(instruction6, instruction7);
         }
 
-        public static PropertyDefinition GetProperty(this TypeDefinition type, string name) {
+        public static PropertyDefinition? GetProperty(this TypeDefinition type, string name) {
             foreach (var property in type.Properties) {
                 if (property.Name == name)
                     return property;

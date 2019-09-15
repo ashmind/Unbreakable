@@ -12,6 +12,6 @@ namespace Unbreakable {
         public TimeSpan TimeLimit { get; set; } = TimeSpan.FromMilliseconds(500);
         public int OperationCountLimit { get; set; } = 500;
 
-        public Action<IDisposable> AfterForcedDispose { get; set; }
+        public Action<IDisposable>? AfterForcedDispose { get; set; }
     }
 }

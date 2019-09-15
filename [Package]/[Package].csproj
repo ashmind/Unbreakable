@@ -1,14 +1,13 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>net46; netstandard20</TargetFrameworks>
     <AssemblyName>_</AssemblyName>
     <PackageId>Unbreakable</PackageId>
-    <VersionPrefix>0.16-unproven</VersionPrefix>
+    <VersionPrefix>0.17-unproven</VersionPrefix>
     <Description>.NET sandboxing framework: rewrites other assemblies to ensure they can't bring down the hosting process.</Description>
     <PackageTags>sandboxing Unbreakable</PackageTags>
     <IncludeBuildOutput>false</IncludeBuildOutput>
-    <LangVersion>7.2</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>

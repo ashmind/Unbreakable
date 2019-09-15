@@ -7,6 +7,6 @@ namespace Unbreakable.Runtime.Internal {
         long AllocatedCountTotalLimit { get; }
         TimeSpan TimeLimit { get; }
         int OperationCountLimit { get; }
-        Action<IDisposable> AfterForcedDispose { get; }
+        Action<IDisposable>? AfterForcedDispose { get; }
     }
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Unbreakable.Internal;
 
 namespace Unbreakable {
@@ -10,7 +10,7 @@ namespace Unbreakable {
 
         internal Guid Guid { get; }
 
-        public IDisposable Scope(RuntimeGuardSettings settings = default(RuntimeGuardSettings)) {
+        public IDisposable Scope(RuntimeGuardSettings? settings = null) {
             return new RuntimeGuardScope(this, settings ?? RuntimeGuardSettings.Default);
         }
     }

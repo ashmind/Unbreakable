@@ -1,6 +1,6 @@
-﻿namespace Unbreakable.Roslyn {
+namespace Unbreakable.Roslyn {
     public static class CSharpRoslynGuard {
-        public static void Validate(string code, RoslynGuardSettings settings = null) {
+        public static void Validate(string code, RoslynGuardSettings? settings = null) {
             settings = settings ?? RoslynGuardSettings.Default;
             if (string.IsNullOrEmpty(code))
                 return;

@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 
 namespace Unbreakable.Demo.Models {
     public class ResultViewModel {
         public ResultViewModel(
-            string output,
+            string? output,
             TimeSpan compilationTime,
             TimeSpan rewriteTime,
             TimeSpan executionTime,
@@ -16,7 +16,7 @@ namespace Unbreakable.Demo.Models {
             TotalTime = totalTime;
         }
 
-        public string Output { get; }
+        public string? Output { get; }
         public TimeSpan CompilationTime { get; }
         public TimeSpan RewriteTime { get; }
         public TimeSpan ExecutionTime { get; }

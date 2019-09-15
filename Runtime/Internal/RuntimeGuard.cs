@@ -15,14 +15,14 @@ namespace Unbreakable.Runtime.Internal {
         private long _stackBytesLimitInExceptionHandlers;
         private long _allocatedCountTotalLimit;
         private long _timeLimitStopwatchTicks;
-        private Action<IDisposable> _afterForcedDispose;
+        private Action<IDisposable>? _afterForcedDispose;
 
         private long _stackBaseline;
         private readonly Stopwatch _stopwatch;
         private int _operationCount;
         private long _allocatedCountTotal;
         [ThreadStatic] private static long _staticConstructorStackBaseline;
-        private HashSet<IDisposable> _disposables;
+        private HashSet<IDisposable>? _disposables;
 
         public RuntimeGuard() {
             _stopwatch = new Stopwatch();
