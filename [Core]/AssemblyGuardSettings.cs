@@ -5,7 +5,7 @@ using Unbreakable.Internal;
 
 namespace Unbreakable {
     public class AssemblyGuardSettings {
-        [NotNull] internal static AssemblyGuardSettings Default { get; } = new AssemblyGuardSettings();
+        internal static AssemblyGuardSettings Default { get; } = new AssemblyGuardSettings();
 
         private ApiFilter _apiFilter;
 
@@ -15,9 +15,8 @@ namespace Unbreakable {
             MethodStackPushSizeLimit = 64;
         }
 
-        [NotNull] public IApiFilter ApiFilter => _apiFilter;
+        public IApiFilter ApiFilter => _apiFilter;
 
-        [NotNull]
         public ApiPolicy ApiPolicy {
             get => _apiFilter.Policy;
             set => _apiFilter.Policy = Argument.NotNull(nameof(value), value);

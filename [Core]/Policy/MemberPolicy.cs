@@ -24,7 +24,6 @@ namespace Unbreakable.Policy {
 
         public bool HasRewriters => _rewriters != null;
 
-        [NotNull]
         public IReadOnlyCollection<IMemberRewriter> Rewriters {
             get {
                 EnsureRewriters();
@@ -32,19 +31,16 @@ namespace Unbreakable.Policy {
             }
         }
 
-        [NotNull]
         internal IReadOnlyCollection<IMemberRewriterInternal> InternalRewriters => (IReadOnlyCollection<IMemberRewriterInternal>)Rewriters;
 
-        [NotNull]
-        public MemberPolicy AddRewriter([NotNull] IMemberRewriter rewriter) {
+        public MemberPolicy AddRewriter(IMemberRewriter rewriter) {
             Argument.NotNull("rewriter", rewriter);
             EnsureRewriters();
             _rewriters!.Add(Argument.Cast<IMemberRewriterInternal>(nameof(rewriter), rewriter));
             return this;
         }
 
-        [NotNull]
-        public MemberPolicy RemoveRewriter([CanBeNull] IMemberRewriter rewriter) {
+        public MemberPolicy RemoveRewriter(IMemberRewriter rewriter) {
             EnsureRewriters();
             _rewriters!.Remove((IMemberRewriterInternal)rewriter);
             return this;

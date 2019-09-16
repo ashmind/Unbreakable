@@ -13,10 +13,10 @@ namespace Unbreakable.Internal {
         private readonly PointerOperationValidator _pointerValidator;
 
         public AssemblyValidator(
-            [NotNull] AssemblyGuardSettings settings,
-            [NotNull] AssemblyDefinition userAssembly,
-            [NotNull] StackSizeValidator stackSizeValidator,
-            [NotNull] PointerOperationValidator pointerValidator
+            AssemblyGuardSettings settings,
+            AssemblyDefinition userAssembly,
+            StackSizeValidator stackSizeValidator,
+            PointerOperationValidator pointerValidator
         ) {
             _settings = Argument.NotNull(nameof(settings), settings);
             _userAssembly = Argument.NotNull(nameof(userAssembly), userAssembly);
@@ -24,11 +24,11 @@ namespace Unbreakable.Internal {
             _pointerValidator = Argument.NotNull(nameof(pointerValidator), pointerValidator);
         }
 
-        public void ValidateDefinition([NotNull] ModuleDefinition module) {
+        public void ValidateDefinition(ModuleDefinition module) {
             ValidateCustomAttributes(module);
         }
 
-        public void ValidateDefinition([NotNull] TypeDefinition type) {
+        public void ValidateDefinition(TypeDefinition type) {
             // Ensures we don't have to suspect well-known system types of being user-defined
             if (KnownTypeNames.AllReserved.Contains(new TypeName(type)))
                 throw new AssemblyGuardException($"Type {type} has a reserved name '{type.FullName}' which is not allowed.");
@@ -42,7 +42,7 @@ namespace Unbreakable.Internal {
             ValidateCustomAttributes(type);
         }
 
-        public void ValidateDefinition([NotNull] MethodDefinition method) {
+        public void ValidateDefinition(MethodDefinition method) {
             if ((method.Attributes & MethodAttributes.PInvokeImpl) == MethodAttributes.PInvokeImpl)
                 throw new AssemblyGuardException($"Method {method} uses P/Invoke which is not allowed.");
 

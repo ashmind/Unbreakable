@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using JetBrains.Annotations;
 
 namespace Unbreakable.Policy {
     public class NamespacePolicy {
@@ -10,7 +9,7 @@ namespace Unbreakable.Policy {
             Access = access;
         }
 
-        public NamespacePolicy Type([NotNull] Type type, ApiAccess access, Action<TypePolicy>? setup = null) {
+        public NamespacePolicy Type(Type type, ApiAccess access, Action<TypePolicy>? setup = null) {
             var typeName = type.Name;
             if (type.IsNested)
                 typeName = type.FullName.Substring(type.Namespace.Length + 1);

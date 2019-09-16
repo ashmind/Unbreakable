@@ -11,7 +11,6 @@ namespace Unbreakable {
         );
         private readonly IDictionary<string, NamespacePolicy> _namespaces = new Dictionary<string, NamespacePolicy>();
 
-        [NotNull]
         public static ApiPolicy SafeDefault() => DefaultFactory.CreateSafeDefaultPolicy();
 
         internal ApiPolicy(TypePolicy compilerGeneratedDelegate) {

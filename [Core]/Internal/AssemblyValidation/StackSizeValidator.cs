@@ -1,5 +1,4 @@
 using System.Runtime.InteropServices;
-using JetBrains.Annotations;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 
@@ -7,7 +6,7 @@ namespace Unbreakable.Internal.AssemblyValidation {
     internal class StackSizeValidator {
         private readonly AssemblyGuardSettings _settings;
 
-        public StackSizeValidator([NotNull] AssemblyGuardSettings settings) {
+        public StackSizeValidator(AssemblyGuardSettings settings) {
             _settings = Argument.NotNull(nameof(settings), settings);
         }
 

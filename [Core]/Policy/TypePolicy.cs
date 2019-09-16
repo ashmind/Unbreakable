@@ -12,7 +12,7 @@ namespace Unbreakable.Policy {
         }
 
         public ApiAccess Access { get; internal set; }
-        [NotNull]
+
         public IReadOnlyDictionary<string, MemberPolicy> Members {
             get {
                 EnsureMembers();
@@ -20,43 +20,35 @@ namespace Unbreakable.Policy {
             }
         }
 
-        [NotNull]
         public TypePolicy Constructor(ApiAccess access, Action<MemberPolicy> setup) {
             return Member(".ctor", access, setup);
         }
 
-        [NotNull]
         public TypePolicy Constructor(ApiAccess access, params IMemberRewriter[] rewriters) {
             return Member(".ctor", access, rewriters);
         }
 
-        [NotNull]
-        public TypePolicy Getter([NotNull] string propertyName, ApiAccess access, Action<MemberPolicy> setup) {
+        public TypePolicy Getter(string propertyName, ApiAccess access, Action<MemberPolicy> setup) {
             return Member("get_" + propertyName, access, setup);
         }
 
-        [NotNull]
-        public TypePolicy Getter([NotNull] string propertyName, ApiAccess access, params IMemberRewriter[] rewriters) {
+        public TypePolicy Getter(string propertyName, ApiAccess access, params IMemberRewriter[] rewriters) {
             return Member("get_" + propertyName, access, rewriters);
         }
 
-        [NotNull]
-        public TypePolicy Setter([NotNull] string propertyName, ApiAccess access, Action<MemberPolicy> setup) {
+        public TypePolicy Setter(string propertyName, ApiAccess access, Action<MemberPolicy> setup) {
             return Member("set_" + propertyName, access, setup);
         }
 
-        [NotNull]
-        public TypePolicy Setter([NotNull] string propertyName, ApiAccess access, params IMemberRewriter[] rewriters) {
+        public TypePolicy Setter(string propertyName, ApiAccess access, params IMemberRewriter[] rewriters) {
             return Member("set_" + propertyName, access, rewriters);
         }
 
-        [NotNull]
-        public TypePolicy Member([NotNull] string name, ApiAccess access, Action<MemberPolicy> setup) {
+        public TypePolicy Member(string name, ApiAccess access, Action<MemberPolicy> setup) {
             return Member(name, access, null, setup);
         }
 
-        [NotNull]
-        public TypePolicy Member([NotNull] string name, ApiAccess access, params IMemberRewriter[] rewriters) {
+        public TypePolicy Member(string name, ApiAccess access, params IMemberRewriter[] rewriters) {
             return Member(name, access, rewriters, null);
         }
 
@@ -82,7 +74,6 @@ namespace Unbreakable.Policy {
             return this;
         }
 
-        [NotNull]
         public TypePolicy Other(params Action<TypePolicy>[] setups) {
             foreach (var setup in setups) {
                 setup(this);

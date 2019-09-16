@@ -16,7 +16,7 @@ namespace Unbreakable.Internal.AssemblyValidation {
 
         private readonly AssemblyGuardSettings _settings;
 
-        public PointerOperationValidator([NotNull] AssemblyGuardSettings settings) {
+        public PointerOperationValidator(AssemblyGuardSettings settings) {
             _settings = Argument.NotNull(nameof(settings), settings);
         }
 
