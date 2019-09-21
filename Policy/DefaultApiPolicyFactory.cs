@@ -120,6 +120,7 @@ namespace Unbreakable.Policy.Internal {
                 .Type(nameof(IConvertible), Allowed)
                 .Type(nameof(IDisposable), Allowed)
                 .Type(nameof(IFormattable), Allowed)
+                .Type("Index", Allowed)
                 .Type(nameof(InvalidCastException), Neutral, t => t.Constructor(Allowed))
                 .Type(nameof(InvalidOperationException), Neutral, t => t.Constructor(Allowed))
                 .Type(nameof(LocalDataStoreSlot), Denied)
@@ -131,6 +132,7 @@ namespace Unbreakable.Policy.Internal {
                 .Type(nameof(ObsoleteAttribute), Allowed)
                 .Type(nameof(OperatingSystem), Denied)
                 .Type(nameof(Random), Allowed)
+                .Type("Range", Allowed)
                 .Type(nameof(String), Allowed,
                     t => t.Constructor(Allowed, CountArgumentRewriter.Default)
                           .Member(nameof(string.ToCharArray), Allowed, ArrayReturnRewriter.Default)

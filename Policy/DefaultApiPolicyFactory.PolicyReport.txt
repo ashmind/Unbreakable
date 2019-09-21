@@ -1065,7 +1065,20 @@ System
   IFormatProvider: Denied
   IFormattable: Allowed
      ToString: Allowed
-  Index: Denied
+  Index: Allowed
+     .ctor: Allowed
+     Equals: Allowed
+     FromEnd: Allowed
+     FromStart: Allowed
+     get_End: Allowed
+     get_IsFromEnd: Allowed
+     get_Start: Allowed
+     get_Value: Allowed
+     GetHashCode: Allowed
+     GetOffset: Allowed
+     GetType: Allowed
+     op_Implicit: Allowed
+     ToString: Allowed
   IndexOutOfRangeException: Denied
   InsufficientExecutionStackException: Denied
   InsufficientMemoryException: Denied
@@ -1305,7 +1318,18 @@ System
      NextBytes: Allowed
      NextDouble: Allowed
      ToString: Allowed
-  Range: Denied
+  Range: Allowed
+     .ctor: Allowed
+     EndAt: Allowed
+     Equals: Allowed
+     get_All: Allowed
+     get_End: Allowed
+     get_Start: Allowed
+     GetHashCode: Allowed
+     GetOffsetAndLength: Allowed
+     GetType: Allowed
+     StartAt: Allowed
+     ToString: Allowed
   RankException: Denied
   ReadOnlyMemory`1: Denied
   ReadOnlySpan`1: Denied

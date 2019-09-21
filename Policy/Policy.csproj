@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net46; netstandard20</TargetFrameworks>
+    <TargetFrameworks>net46; netstandard20; netcoreapp3.0</TargetFrameworks>
     <AssemblyName>Unbreakable.Policy</AssemblyName>
     <RootNamespace>Unbreakable.Policy</RootNamespace>
-    <VersionPrefix>0.9</VersionPrefix>
+    <VersionPrefix>0.10</VersionPrefix>
     <Description>API policies for https://www.nuget.org/packages/Unbreakable. This library supports the Unbreakable infrastructure and is not intended to be used directly from your code.</Description>
     <PackageTags>sandboxing Unbreakable</PackageTags>
   </PropertyGroup>
@@ -19,6 +19,11 @@
   </ItemGroup>
 
   <Target Name="_UpdatePolicyReport" AfterTargets="Build" Inputs="DefaultApiPolicyFactory.cs" Outputs="DefaultApiPolicyFactory.PolicyReport.txt" Condition="'$(TargetFramework)' == 'netstandard20'">
-    <Exec WorkingDirectory="$(OutputPath)" Command="&#xD;&#xA;      dotnet &quot;$(MSBuildThisFileDirectory)../Tools.PolicyReport/bin/$(Configuration)/netcoreapp3.0/dotnet-unbreakable-policy-report.dll&quot; ^&#xD;&#xA;        --assembly &quot;$(TargetPath)&quot; ^&#xD;&#xA;        --factory Unbreakable.Policy.Internal.DefaultApiPolicyFactory ^&#xD;&#xA;        --method CreateSafeDefaultPolicy ^&#xD;&#xA;        --output &quot;$(MSBuildThisFileDirectory)DefaultApiPolicyFactory.PolicyReport.txt&quot;" />
+    <Exec WorkingDirectory="$(OutputPath)" Command="
+      dotnet &quot;$(MSBuildThisFileDirectory)../Tools.PolicyReport/bin/$(Configuration)/netcoreapp3.0/dotnet-unbreakable-policy-report.dll&quot; ^
+          --assembly &quot;$(TargetPath)&quot; ^
+          --factory Unbreakable.Policy.Internal.DefaultApiPolicyFactory ^
+          --method CreateSafeDefaultPolicy ^
+          --output &quot;$(MSBuildThisFileDirectory)DefaultApiPolicyFactory.PolicyReport.txt&quot;" />
   </Target>
 </Project>
