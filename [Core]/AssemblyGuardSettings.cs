@@ -28,7 +28,7 @@ namespace Unbreakable {
         public Regex? AllowPointerOperationsInTypesMatchingPattern { get; set; }
 
         [Obsolete("Users are now allowed to create types in System namespace (except for a few well-known types). This property will be removed in the next version.")]
-        public Regex ?AllowCustomTypesMatchingPatternInSystemNamespaces { get; set; }
+        public Regex? AllowCustomTypesMatchingPatternInSystemNamespaces { get; set; }
 
         public static AssemblyGuardSettings DefaultForCSharpAssembly() {
             return new AssemblyGuardSettings {

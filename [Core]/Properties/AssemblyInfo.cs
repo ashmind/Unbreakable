@@ -1,6 +1,7 @@
 using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("Unbreakable.Build.PolicyReport")]
+[assembly: InternalsVisibleTo("dotnet-unbreakable-policy-report")]
 [assembly: InternalsVisibleTo("Unbreakable.Policy")]
 [assembly: InternalsVisibleTo("Unbreakable.Tests")]
 [assembly: InternalsVisibleTo("Unbreakable.Tests.NetCore")]

@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <PackageId>Unbreakable.Tools.PolicyReport</PackageId>
+    <AssemblyName>dotnet-unbreakable-policy-report</AssemblyName>
+    <RootNamespace>Unbreakable.Tools.PolicyReport</RootNamespace>
+    <VersionPrefix>0.0.1</VersionPrefix>
+    <PackAsTool>true</PackAsTool>
+    <Description>Tool to create a report for a certain Unbreakable policy (e.g. for source control/policy review).</Description>
+    <PackageTags>sandboxing Unbreakable</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Argument" Version="1.1.0" />
+    <PackageReference Include="CommandLineParser" Version="2.6.0" />
+    <PackageReference Include="Mono.Cecil" Version="0.10.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\[Core]\[Core].csproj" />
+  </ItemGroup>
+</Project>
