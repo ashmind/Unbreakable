@@ -34,12 +34,14 @@ namespace Unbreakable.Tools.PolicyReport {
 
         private static void SafeMain(Arguments arguments) {
             var context = new AssemblyLoadContext("Policy");
+            ConfigureAssemblyResolution(context, arguments.PolicyFactoryAssemblyPath);
 
-            var assembly = context.LoadFromAssemblyPath(arguments.PolicyFactoryAssemblyName);
-            var policy = GetPolicy(assembly, arguments.PolicyFactoryTypeName, arguments.PolicyFactoryMethodName);
+            var policyAssembly = context.LoadFromAssemblyPath(arguments.PolicyFactoryAssemblyPath);
+            var assemblies = new HashSet<Assembly> { policyAssembly };
 
-            var assemblies = new HashSet<Assembly> { assembly };
             LoadAllReferencedAssemblies(context, assemblies);
+
+            var policy = GetPolicy(policyAssembly, arguments.PolicyFactoryTypeName, arguments.PolicyFactoryMethodName);
 
             var namespaces = assemblies
                 .SelectMany(a => a.GetExportedTypes())
@@ -51,6 +53,34 @@ namespace Unbreakable.Tools.PolicyReport {
                     WriteNamespaceReport(writer, @namespace.Key, @namespace.Value, policy);
                 }
             }
+        }
+
+        private static void ConfigureAssemblyResolution(AssemblyLoadContext policyContext, string policyFactoryAssemblyPath) {
+            var policyAssemblyPathBase = Path.GetDirectoryName(policyFactoryAssemblyPath);
+            string GetCandidatePath(string assemblyName) {
+                var path = assemblyName + ".dll";
+                if (policyAssemblyPathBase != null)
+                    path = Path.Combine(policyAssemblyPathBase, path);
+                return path;
+            }
+
+            policyContext.Resolving += (sender, assemblyName) => {
+                if (assemblyName.Name == "Unbreakable" || assemblyName.Name == null)
+                    return null;
+
+                var candidatePath = GetCandidatePath(assemblyName.Name);
+                if (File.Exists(candidatePath))
+                    return policyContext.LoadFromAssemblyPath(candidatePath);
+
+                return null;
+            };
+
+            AssemblyLoadContext.Default.Resolving += (sender, assemblyName) => {
+                if (assemblyName.Name == "Unbreakable.Policy")
+                    return policyContext.LoadFromAssemblyPath(GetCandidatePath(assemblyName.Name));
+
+                return null;
+            };
         }
 
         private static void LoadAllReferencedAssemblies(AssemblyLoadContext context, HashSet<Assembly> assemblies) {

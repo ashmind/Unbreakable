@@ -6,7 +6,7 @@
     <PackageId>Unbreakable.Tools.PolicyReport</PackageId>
     <AssemblyName>dotnet-unbreakable-policy-report</AssemblyName>
     <RootNamespace>Unbreakable.Tools.PolicyReport</RootNamespace>
-    <VersionPrefix>0.0.1</VersionPrefix>
+    <VersionPrefix>0.0.2</VersionPrefix>
     <PackAsTool>true</PackAsTool>
     <Description>Tool to create a report for a certain Unbreakable policy (e.g. for source control/policy review).</Description>
     <PackageTags>sandboxing Unbreakable</PackageTags>

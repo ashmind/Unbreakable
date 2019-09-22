@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net46; netstandard20; netcoreapp3.0</TargetFrameworks>
+    <TargetFrameworks>net46; netstandard20; netcoreapp30</TargetFrameworks>
     <AssemblyName>Unbreakable.Policy</AssemblyName>
     <RootNamespace>Unbreakable.Policy</RootNamespace>
     <VersionPrefix>0.10</VersionPrefix>
@@ -18,7 +18,7 @@
     <Compile Update="DefaultApiPolicyFactory.cs" />
   </ItemGroup>
 
-  <Target Name="_UpdatePolicyReport" AfterTargets="Build" Inputs="DefaultApiPolicyFactory.cs" Outputs="DefaultApiPolicyFactory.PolicyReport.txt" Condition="'$(TargetFramework)' == 'netstandard20'">
+  <Target Name="_UpdatePolicyReport" AfterTargets="Build" Inputs="DefaultApiPolicyFactory.cs" Outputs="DefaultApiPolicyFactory.PolicyReport.txt" Condition="'$(TargetFramework)' == 'netcoreapp30'">
     <Exec WorkingDirectory="$(OutputPath)" Command="
       dotnet &quot;$(MSBuildThisFileDirectory)../Tools.PolicyReport/bin/$(Configuration)/netcoreapp3.0/dotnet-unbreakable-policy-report.dll&quot; ^
           --assembly &quot;$(TargetPath)&quot; ^

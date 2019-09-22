@@ -5,7 +5,7 @@ namespace Unbreakable.Tools.PolicyReport {
     public class Arguments {
         #pragma warning disable CS8618 // Non-nullable field is uninitialized.
         [Option("assembly", Required = true)]
-        public string PolicyFactoryAssemblyName { get; set; }
+        public string PolicyFactoryAssemblyPath { get; set; }
 
         [Option("factory", Required = true)]
         public string PolicyFactoryTypeName { get; set; }
