@@ -393,6 +393,7 @@ namespace Unbreakable.Policy.Internal {
                 .Type("IsReadOnlyAttribute", Allowed)
                 .Type(nameof(RuntimeHelpers), Neutral, 
                     t => t.Member(nameof(RuntimeHelpers.InitializeArray), Allowed)
+                          .Member("GetSubArray", Allowed, ArrayReturnRewriter.Default)
                 );
         }
 

@@ -3173,7 +3173,7 @@ System.Runtime.CompilerServices
      get_OffsetToStringData: Denied
      GetHashCode: Denied
      GetObjectValue: Denied
-     GetSubArray: Denied
+     GetSubArray: Allowed (ArrayReturnRewriter)
      GetType: Denied
      GetUninitializedObject: Denied
      InitializeArray: Allowed
