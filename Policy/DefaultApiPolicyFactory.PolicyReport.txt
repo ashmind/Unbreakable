@@ -2993,13 +2993,13 @@ System.Linq
      SkipWhile: Allowed
      Sum: Allowed
      Take: Allowed
-     TakeLast: Denied
+     TakeLast: Allowed
      TakeWhile: Allowed
      ThenBy: Allowed (CollectedEnumerableArgumentRewriter)
      ThenByDescending: Allowed (CollectedEnumerableArgumentRewriter)
      ToArray: Allowed (CollectedEnumerableArgumentRewriter)
      ToDictionary: Allowed (CollectedEnumerableArgumentRewriter)
-     ToHashSet: Denied
+     ToHashSet: Allowed (CollectedEnumerableArgumentRewriter)
      ToList: Allowed (CollectedEnumerableArgumentRewriter)
      ToLookup: Allowed (CollectedEnumerableArgumentRewriter)
      ToString: Denied
