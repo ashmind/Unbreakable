@@ -86,6 +86,7 @@ namespace Unbreakable.Policy.Internal {
                 )
                 .Type(nameof(DateTimeKind), Allowed)
                 .Type(nameof(DateTimeOffset), Allowed)
+                .Type(nameof(DayOfWeek), Allowed)
                 .Type(nameof(DBNull), Allowed)
                 .Type(nameof(Decimal), Allowed,
                     t => t.Member(nameof(Decimal.GetBits), Allowed, ArrayReturnRewriter.Default)
@@ -102,7 +103,7 @@ namespace Unbreakable.Policy.Internal {
                     t => t.Getter(nameof(Environment.CurrentManagedThreadId), Allowed)
                           .Getter(nameof(Environment.NewLine), Allowed)
                 )
-                .Type(nameof(Exception), Neutral, 
+                .Type(nameof(Exception), Neutral,
                     t => t.Constructor(Allowed)
                           .Getter(nameof(Exception.Message), Allowed)
                 )
@@ -111,7 +112,7 @@ namespace Unbreakable.Policy.Internal {
                     t => t.Member(nameof(FormattableString.GetArguments), Allowed, ArrayReturnRewriter.Default)
                           .Member(nameof(FormattableString.ToString), Allowed, StringReturnRewriter.Default)
                 )
-                .Type(nameof(GC), Neutral, 
+                .Type(nameof(GC), Neutral,
                     t => t.Member(nameof(GC.SuppressFinalize), Allowed)
                 )
                 .Type(nameof(Guid), Allowed,
@@ -125,6 +126,7 @@ namespace Unbreakable.Policy.Internal {
                 .Type(nameof(InvalidOperationException), Neutral, t => t.Constructor(Allowed))
                 .Type(nameof(LocalDataStoreSlot), Denied)
                 .Type(nameof(Math), Allowed)
+                .Type("MathF", Allowed)
                 .Type(nameof(NotSupportedException), Neutral, t => t.Constructor(Allowed))
                 .Type(nameof(Nullable), Allowed)
                 .Type(typeof(Nullable<>).Name, Allowed)
@@ -216,10 +218,13 @@ namespace Unbreakable.Policy.Internal {
                 )
                 .Type(typeof(HashSet<>.Enumerator), Allowed)
                 .Type(typeof(ICollection<>), Allowed, SetupAdd)
+                .Type(typeof(IComparable), Allowed)
+                .Type(typeof(IComparable<>), Allowed)
                 .Type(typeof(IComparer<>), Allowed)
                 .Type(typeof(IDictionary<,>), Allowed, SetupAdd)
                 .Type(typeof(IEnumerable<>), Allowed)
                 .Type(typeof(IEnumerator<>), Allowed)
+                .Type(typeof(IEquatable<>), Allowed)
                 .Type(typeof(IEqualityComparer<>), Allowed)
                 .Type(typeof(IList<>), Allowed, SetupInsert)
                 .Type(typeof(IReadOnlyCollection<>), Allowed)
@@ -393,7 +398,7 @@ namespace Unbreakable.Policy.Internal {
                 .Type(nameof(FormattableStringFactory), Allowed)
                 .Type(nameof(IteratorStateMachineAttribute), Allowed)
                 .Type("IsReadOnlyAttribute", Allowed)
-                .Type(nameof(RuntimeHelpers), Neutral, 
+                .Type(nameof(RuntimeHelpers), Neutral,
                     t => t.Member(nameof(RuntimeHelpers.InitializeArray), Allowed)
                           .Member("GetSubArray", Allowed, ArrayReturnRewriter.Default)
                 );
@@ -457,7 +462,7 @@ namespace Unbreakable.Policy.Internal {
                 .Type(nameof(GroupCollection), Allowed);
         }
 
-        private void SetupSystemThreading(NamespacePolicy threading) {
+        private static void SetupSystemThreading(NamespacePolicy threading) {
             threading
                 // required for user-defined events
                 .Type(nameof(Interlocked), Neutral, t => t.Member(nameof(Interlocked.CompareExchange), Allowed));
