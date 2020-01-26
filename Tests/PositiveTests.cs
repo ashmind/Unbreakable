@@ -49,5 +49,20 @@ namespace Unbreakable.Tests {
             });
             Assert.Equal(expected, m());
         }
+
+        [Fact]
+        public void AllowsTypesInEmptyNamespace_IfAllowed() {
+            var m = TestHelper.RewriteAndGetMethodWrappedInScope(@"
+                using System;
+                class C {
+                    public object M() {
+                        return new " + nameof(TestClassWithoutNamespace) + @"();
+                    }
+                }
+            ", "C", "M", new AssemblyGuardSettings {
+                ApiPolicy = ApiPolicy.SafeDefault().Namespace("", ApiAccess.Allowed)
+            });
+            Assert.NotNull(m());
+        }
     }
 }

@@ -12,12 +12,12 @@ namespace Unbreakable.Policy {
         }
 
         public NamespacePolicy Type(Type type, ApiAccess access, Action<TypePolicy>? setup = null) {
-            if (type.Namespace != _namespace)
+            if ((type.Namespace ?? "") != _namespace)
                 throw new ArgumentException($"Type {type} must be configured under {type.Namespace} (and not {_namespace}).");
 
             var typeName = type.Name;
             if (type.IsNested)
-                typeName = type.FullName.Substring(type.Namespace.Length + 1);
+                typeName = type.FullName.Substring((type.Namespace?.Length ?? -1) + 1);
             return Type(typeName, access, setup);
         }
 
