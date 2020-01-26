@@ -29,6 +29,10 @@ after_test:
 artifacts:
 - path: '*.nupkg'
 
-deploy_script:
-  - appveyor DownloadFile https://dist.nuget.org/win-x86-commandline/latest/nuget.exe  
-  - ps: $artifacts.values | ? { ($_.path -like '*.nupkg') -and  !($_.path -like '*.symbols.nupkg') } | % { nuget.exe push $_.path -Source https://www.nuget.org/api/v2/package -ApiKey $env:api_key }
+deploy:
+  - provider: NuGet
+    on:
+      branch: /^master$/
+    api_key:
+      secure: aw9R6ewAkNjKU638SCzGho/fOwZCYecwb16d/cM923pCqb+bJztPsXEMYAdNx/vM
+    artifact: /.*\.nupkg$/
