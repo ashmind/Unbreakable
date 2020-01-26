@@ -605,7 +605,14 @@ System
      TryFormat: Allowed
      TryParse: Allowed
      TryParseExact: Allowed
-  DayOfWeek: Denied
+  DayOfWeek: Allowed
+     CompareTo: Allowed
+     Equals: Allowed
+     GetHashCode: Allowed
+     GetType: Allowed
+     GetTypeCode: Allowed
+     HasFlag: Allowed
+     ToString: Allowed
   DBNull: Allowed
      Equals: Allowed
      GetHashCode: Allowed
@@ -1038,8 +1045,10 @@ System
   IAsyncDisposable: Denied
   IAsyncResult: Denied
   ICloneable: Denied
-  IComparable: Denied
-  IComparable`1: Denied
+  IComparable: Allowed
+     CompareTo: Allowed
+  IComparable`1: Allowed
+     CompareTo: Allowed
   IConvertible: Allowed
      GetTypeCode: Allowed
      ToBoolean: Allowed
@@ -1061,7 +1070,8 @@ System
   ICustomFormatter: Denied
   IDisposable: Allowed
      Dispose: Allowed
-  IEquatable`1: Denied
+  IEquatable`1: Allowed
+     Equals: Allowed
   IFormatProvider: Denied
   IFormattable: Allowed
      ToString: Allowed
@@ -1209,7 +1219,48 @@ System
      Tanh: Allowed
      ToString: Allowed
      Truncate: Allowed
-  MathF: Denied
+  MathF: Allowed
+     Abs: Allowed
+     Acos: Allowed
+     Acosh: Allowed
+     Asin: Allowed
+     Asinh: Allowed
+     Atan: Allowed
+     Atan2: Allowed
+     Atanh: Allowed
+     BitDecrement: Allowed
+     BitIncrement: Allowed
+     Cbrt: Allowed
+     Ceiling: Allowed
+     CopySign: Allowed
+     Cos: Allowed
+     Cosh: Allowed
+     Equals: Allowed
+     Exp: Allowed
+     Floor: Allowed
+     FusedMultiplyAdd: Allowed
+     GetHashCode: Allowed
+     GetType: Allowed
+     IEEERemainder: Allowed
+     ILogB: Allowed
+     Log: Allowed
+     Log10: Allowed
+     Log2: Allowed
+     Max: Allowed
+     MaxMagnitude: Allowed
+     Min: Allowed
+     MinMagnitude: Allowed
+     Pow: Allowed
+     Round: Allowed
+     ScaleB: Allowed
+     Sign: Allowed
+     Sin: Allowed
+     Sinh: Allowed
+     Sqrt: Allowed
+     Tan: Allowed
+     Tanh: Allowed
+     ToString: Allowed
+     Truncate: Allowed
   MemberAccessException: Denied
   Memory`1: Denied
   MemoryExtensions: Denied
