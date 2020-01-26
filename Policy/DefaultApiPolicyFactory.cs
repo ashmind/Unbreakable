@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -35,7 +36,7 @@ namespace Unbreakable.Policy.Internal {
                 .Namespace("System.Globalization", Neutral, SetupSystemGlobalization)
                 .Namespace("System.IO", Denied)
                 .Namespace("System.Linq", Neutral, SetupSystemLinq)
-                .Namespace("System.Reflection", Denied)
+                .Namespace("System.Reflection", Neutral, SetupSystemReflection)
                 .Namespace("System.Runtime", Denied)
                 .Namespace("System.Runtime.InteropServices", Denied)
                 .Namespace("System.Runtime.CompilerServices", Neutral, SetupSystemRuntimeCompilerServices)
@@ -384,6 +385,11 @@ namespace Unbreakable.Policy.Internal {
                 )
                 .Type(typeof(IGrouping<,>), Allowed)
                 .Type(typeof(IOrderedEnumerable<>), Allowed);
+        }
+
+        private static void SetupSystemReflection(NamespacePolicy reflection) {
+            reflection
+                .Type(nameof(DefaultMemberAttribute), Allowed);
         }
 
         private static void SetupSystemRuntimeCompilerServices(NamespacePolicy compilerServices) {
