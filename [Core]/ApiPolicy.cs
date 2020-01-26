@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using JetBrains.Annotations;
 using Unbreakable.Policy;
 using Unbreakable.Policy.Internal;
 
@@ -21,7 +20,7 @@ namespace Unbreakable {
             Argument.NotNull(nameof(@namespace), @namespace);
 
             if (!_namespaces.TryGetValue(@namespace, out var rule)) {
-                rule = new NamespacePolicy();
+                rule = new NamespacePolicy(@namespace);
                 _namespaces.Add(@namespace, rule);
             }
             rule.Access = access;

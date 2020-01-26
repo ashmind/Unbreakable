@@ -4,12 +4,17 @@ using System.Collections.Generic;
 namespace Unbreakable.Policy {
     public class NamespacePolicy {
         private readonly IDictionary<string, TypePolicy> _types = new Dictionary<string, TypePolicy>();
+        private readonly string _namespace;
 
-        internal NamespacePolicy(ApiAccess access = ApiAccess.Neutral) {
+        internal NamespacePolicy(string @namespace, ApiAccess access = ApiAccess.Neutral) {
+            _namespace = @namespace;
             Access = access;
         }
 
         public NamespacePolicy Type(Type type, ApiAccess access, Action<TypePolicy>? setup = null) {
+            if (type.Namespace != _namespace)
+                throw new ArgumentException($"Type {type} must be configured under {type.Namespace} (and not {_namespace}).");
+
             var typeName = type.Name;
             if (type.IsNested)
                 typeName = type.FullName.Substring(type.Namespace.Length + 1);
