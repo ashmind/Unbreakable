@@ -46,14 +46,20 @@ namespace Unbreakable.Tests {
             yield return AssemblyOf(typeof(TestHelper));
         }
 
-        public static Invoke RewriteAndGetMethodWrappedInScope(string code, string typeName, string methodName, AssemblyGuardSettings? guardSettings = null) {
+        public static Invoke RewriteAndGetMethodWrappedInScope(
+            string code, string typeName, string methodName,
+            AssemblyGuardSettings? assemblyGuardSettings = null,
+            RuntimeGuardSettings? runtimeGuardSettings = null
+        ) {
+            runtimeGuardSettings ??= new RuntimeGuardSettings { TimeLimit = TimeSpan.FromMilliseconds(1000) };
+
             var assemblySourceStream = Compile(code);
             var assemblyTargetStream = new MemoryStream();
 
-            var token = AssemblyGuard.Rewrite(assemblySourceStream, assemblyTargetStream, guardSettings);
+            var token = AssemblyGuard.Rewrite(assemblySourceStream, assemblyTargetStream, assemblyGuardSettings);
 
             return args => {
-                using (token.Scope(new RuntimeGuardSettings { TimeLimit = TimeSpan.FromMilliseconds(100) })) {
+                using (token.Scope(runtimeGuardSettings)) {
                     var method = GetInstanceMethod(assemblyTargetStream, typeName, methodName);
                     return method(args);
                 }

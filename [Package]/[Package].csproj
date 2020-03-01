@@ -4,7 +4,7 @@
     <TargetFrameworks>net46; netstandard20</TargetFrameworks>
     <AssemblyName>_</AssemblyName>
     <PackageId>Unbreakable</PackageId>
-    <VersionPrefix>0.18.1-unproven</VersionPrefix>
+    <VersionPrefix>0.18.2-unproven</VersionPrefix>
     <Description>.NET sandboxing framework: rewrites other assemblies to ensure they can't bring down the hosting process.</Description>
     <PackageTags>sandboxing Unbreakable</PackageTags>
     <IncludeBuildOutput>false</IncludeBuildOutput>
@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Argument" Version="1.1.0" />
+    <PackageReference Include="Argument" Version="1.3.1" />
     <PackageReference Include="JetBrains.Annotations" Version="10.4.0" />
     <PackageReference Include="Mono.Cecil" Version="0.10.0" />
   </ItemGroup>

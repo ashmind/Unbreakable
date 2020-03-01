@@ -138,7 +138,12 @@ namespace Unbreakable.Runtime.Internal {
             _stackBytesLimit = settings.StackBytesLimit;
             _stackBytesLimitInExceptionHandlers = settings.StackBytesLimitInExceptionHandlers;
             _allocatedCountTotalLimit = settings.AllocatedCountTotalLimit;
-            _timeLimitStopwatchTicks = (long)(settings.TimeLimit.TotalSeconds * Stopwatch.Frequency);
+
+            var timeLimitStopwatchTicks = (long)(settings.TimeLimit.TotalSeconds * Stopwatch.Frequency);
+            if (timeLimitStopwatchTicks < 0) // overflow, e.g. with TimeSpan.MaxValue
+                timeLimitStopwatchTicks = long.MaxValue;
+            _timeLimitStopwatchTicks = timeLimitStopwatchTicks;
+
             _operationCountLimit = settings.OperationCountLimit;
             _afterForcedDispose = settings.AfterForcedDispose;
 
