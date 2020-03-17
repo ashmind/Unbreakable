@@ -1,4 +1,3 @@
-using JetBrains.Annotations;
 using Unbreakable.Policy;
 
 namespace Unbreakable {
