@@ -407,6 +407,13 @@ namespace Unbreakable.Policy.Internal {
                 .Type(nameof(RuntimeHelpers), Neutral,
                     t => t.Member(nameof(RuntimeHelpers.InitializeArray), Allowed)
                           .Member("GetSubArray", Allowed, ArrayReturnRewriter.Default)
+                )
+                .Type("Unsafe", Neutral,
+                    t => t.Member("AreSame", Allowed)
+                          .Member("ByteOffset", Allowed)
+                          .Member("SizeOf", Allowed)
+                          .Member("IsAddressGreaterThan", Allowed)
+                          .Member("IsAddressLessThan", Allowed)
                 );
         }
 
