@@ -44,7 +44,7 @@ namespace Unbreakable.Tools.PolicyReport {
             var policy = GetPolicy(policyAssembly, arguments.PolicyFactoryTypeName, arguments.PolicyFactoryMethodName);
 
             var namespaces = assemblies
-                .SelectMany(a => a.GetExportedTypes())
+                .SelectMany(GetExportedTypesSafe)
                 .GroupBy(GetNamespace)
                 .ToDictionary(g => g.Key ?? "", g => g.ToList());
 
@@ -102,9 +102,20 @@ namespace Unbreakable.Tools.PolicyReport {
                 return true;
             }
             catch (FileNotFoundException) {
-                Console.WriteLine("[WARN] Could not find assembly '{0}'.", name.FullName);
+                Console.WriteLine($"[WARN] Could not find assembly '{name.FullName}'.");
                 assembly = null;
                 return false;
+            }
+        }
+
+        private static Type[] GetExportedTypesSafe(Assembly assembly) {
+            try {
+                return assembly.GetExportedTypes();
+            }
+            catch (FileNotFoundException ex) {
+                Console.WriteLine($"[WARN] Could not load types from '{assembly.Location}':");
+                Console.WriteLine(ex);
+                return new Type[0];
             }
         }
 
@@ -117,7 +128,7 @@ namespace Unbreakable.Tools.PolicyReport {
 
             var typesWithNames = types.Select(type => new {
                 value = type,
-                name = @namespace.Length > 0 ? type.FullName?.Substring(@namespace.Length + 1) : type.FullName
+                name = @namespace.Length > 0 ? type.FullName!.Substring(@namespace.Length + 1) : type.FullName!
             });
             foreach (var type in typesWithNames.OrderBy(t => t.name)) {
                 WriteTypeReport(writer, type.value, type.name, namespacePolicy);
