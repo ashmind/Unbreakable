@@ -2,12 +2,12 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <PackageId>Unbreakable.Tools.PolicyReport</PackageId>
     <AssemblyName>dotnet-unbreakable-policy-report</AssemblyName>
     <Authors>Andrey Shchekin</Authors>
     <RootNamespace>Unbreakable.Tools.PolicyReport</RootNamespace>
-    <VersionPrefix>0.3</VersionPrefix>
+    <VersionPrefix>0.4</VersionPrefix>
     <PackAsTool>true</PackAsTool>
     <Description>Tool to create a report for a certain Unbreakable policy (e.g. for source control/policy review).</Description>
     <PackageTags>sandboxing Unbreakable</PackageTags>
