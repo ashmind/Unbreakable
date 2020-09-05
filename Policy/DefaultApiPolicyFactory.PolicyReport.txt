@@ -3081,6 +3081,29 @@ System.Linq
   ParallelQuery: Denied
   ParallelQuery`1: Denied
   Queryable: Denied
+System.Numerics
+  BigInteger: Denied
+  BitOperations: Allowed
+     Equals: Allowed
+     GetHashCode: Allowed
+     GetType: Allowed
+     LeadingZeroCount: Allowed
+     Log2: Allowed
+     PopCount: Allowed
+     RotateLeft: Allowed
+     RotateRight: Allowed
+     ToString: Allowed
+     TrailingZeroCount: Allowed
+  Complex: Denied
+  Matrix3x2: Denied
+  Matrix4x4: Denied
+  Plane: Denied
+  Quaternion: Denied
+  Vector: Denied
+  Vector`1: Denied
+  Vector2: Denied
+  Vector3: Denied
+  Vector4: Denied
 System.Reflection
   AmbiguousMatchException: Denied
   Assembly: Denied
