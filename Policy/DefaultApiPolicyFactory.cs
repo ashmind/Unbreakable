@@ -36,6 +36,7 @@ namespace Unbreakable.Policy.Internal {
                 .Namespace("System.Globalization", Neutral, SetupSystemGlobalization)
                 .Namespace("System.IO", Denied)
                 .Namespace("System.Linq", Neutral, SetupSystemLinq)
+                .Namespace("System.Numerics", Neutral, SetupSystemNumerics)
                 .Namespace("System.Reflection", Neutral, SetupSystemReflection)
                 .Namespace("System.Runtime", Denied)
                 .Namespace("System.Runtime.InteropServices", Denied)
@@ -391,6 +392,11 @@ namespace Unbreakable.Policy.Internal {
                 )
                 .Type(typeof(IGrouping<,>), Allowed)
                 .Type(typeof(IOrderedEnumerable<>), Allowed);
+        }
+
+        private static void SetupSystemNumerics(NamespacePolicy reflection) {
+            reflection
+                .Type("BitOperations", Allowed);
         }
 
         private static void SetupSystemReflection(NamespacePolicy reflection) {
