@@ -3,7 +3,7 @@
     <TargetFrameworks>net46; netstandard20; netcoreapp30</TargetFrameworks>
     <AssemblyName>Unbreakable.Policy</AssemblyName>
     <RootNamespace>Unbreakable.Policy</RootNamespace>
-    <VersionPrefix>14</VersionPrefix>
+    <VersionPrefix>15</VersionPrefix>
     <Description>API policies for https://www.nuget.org/packages/Unbreakable. This library supports the Unbreakable infrastructure and is not intended to be used directly from your code.</Description>
     <PackageTags>sandboxing Unbreakable</PackageTags>
   </PropertyGroup>
