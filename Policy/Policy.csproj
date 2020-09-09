@@ -20,7 +20,7 @@
 
   <Target Name="_UpdatePolicyReport" AfterTargets="Build" Inputs="DefaultApiPolicyFactory.cs" Outputs="DefaultApiPolicyFactory.PolicyReport.txt" Condition="'$(TargetFramework)' == 'netcoreapp30'">
     <Exec WorkingDirectory="$(OutputPath)" Command="
-      dotnet &quot;$(MSBuildThisFileDirectory)../Tools.PolicyReport/bin/$(Configuration)/netcoreapp3.0/dotnet-unbreakable-policy-report.dll&quot; ^
+      dotnet &quot;$(MSBuildThisFileDirectory)../Tools.PolicyReport/bin/$(Configuration)/netcoreapp3.1/dotnet-unbreakable-policy-report.dll&quot; ^
           --assembly &quot;$(TargetPath)&quot; ^
           --factory Unbreakable.Policy.Internal.DefaultApiPolicyFactory ^
           --method CreateSafeDefaultPolicy ^
