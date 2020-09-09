@@ -4,4 +4,11 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+  
+  <PropertyGroup>
+    <Authors>Andrey Shchekin</Authors>
+    <PackageProjectUrl>https://github.com/ashmind/Unbreakable</PackageProjectUrl>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/ashmind/Unbreakable.git</RepositoryUrl>
+  </PropertyGroup>
 </Project>
