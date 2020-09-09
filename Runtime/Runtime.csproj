@@ -6,5 +6,6 @@
     <AssemblyName>Unbreakable.Runtime</AssemblyName>
     <RootNamespace>Unbreakable.Runtime</RootNamespace>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
 </Project>
