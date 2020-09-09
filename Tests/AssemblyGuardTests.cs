@@ -65,13 +65,14 @@ namespace Unbreakable.Tests {
         }
 
         [Theory]
-        [InlineData("ref readonly int MIn(in int i) => ref i; int M() => MIn(0);")]
-        [InlineData("void M(ref int i) => i++;")] // 
+        [InlineData("class C { ref readonly int MIn(in int i) => ref i; int M() => MIn(0); }")]
+        [InlineData("class C { void M(ref int i) => i++; }")]
+        [InlineData("record R(int X);")]
         public void Allows_ReasonablySafePointerOperations(string code) {
             var compiled = TestHelper.Compile(@"
-                class C {
-                    " + code + @"
-                }
+                // required for records
+                namespace System.Runtime.CompilerServices { class IsExternalInit {} }
+                " + code + @"
             ");
             // Assert.DoesNotThrow
             AssemblyGuard.Rewrite(compiled, new MemoryStream());

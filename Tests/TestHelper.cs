@@ -15,7 +15,7 @@ namespace Unbreakable.Tests {
         public static MemoryStream Compile(string code, bool allowUnsafe = false) {
             var compilation = CSharpCompilation.Create(
                 "_",
-                new[] { CSharpSyntaxTree.ParseText(code, new CSharpParseOptions(LanguageVersion.Latest)) },
+                new[] { CSharpSyntaxTree.ParseText(code, new CSharpParseOptions(LanguageVersion.Preview)) },
                 GetReferencesForCompile(),
                 new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, allowUnsafe: allowUnsafe)
             );

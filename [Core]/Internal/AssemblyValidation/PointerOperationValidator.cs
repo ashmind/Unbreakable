@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using JetBrains.Annotations;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 
@@ -51,10 +50,10 @@ namespace Unbreakable.Internal.AssemblyValidation {
                 var valuePush = instruction.Previous;
                 if (valuePush == null)
                     return true;
-                if (!SafeOneElementPushes.Contains(valuePush.OpCode.StackBehaviourPush))
-                    return true;
+                if (!IsSafeZeroOrOneElementPush(valuePush, out bool isPush) || !isPush)
+                    return false;
 
-                var pointerPush = FindPreviousInstructionStillOnStack(valuePush);
+                var pointerPush = FindPreviousInstructionStillOnStackIfSafe(valuePush);
                 return stType.Resolve() != GetElementTypeOfPushedManagedReference(pointerPush, method)?.Resolve();
             }
 
@@ -94,33 +93,47 @@ namespace Unbreakable.Internal.AssemblyValidation {
             }
         }
 
-        private Instruction? FindPreviousInstructionStillOnStack(Instruction instruction) {
-            var previous = instruction.Previous;
+        private bool IsSafeZeroOrOneElementPush(Instruction instruction, out bool pushesOneElement) {
+            if (IsMethodCall(instruction, out var method)) {
+                pushesOneElement = method!.ReturnType.MetadataType != MetadataType.Void;
+                return true;
+            }
+
+            pushesOneElement = SafeOneElementPushes.Contains(instruction.OpCode.StackBehaviourPush);
+            return pushesOneElement;
+        }
+
+        private Instruction? FindPreviousInstructionStillOnStackIfSafe(Instruction instruction) {
+            var previous = (Instruction?)instruction.Previous;
             if (previous == null)
                 return null;
 
-            switch (instruction.OpCode.StackBehaviourPop) {
-                case StackBehaviour.Pop0:
-                    return previous;
-                case StackBehaviour.Pop1:
-                case StackBehaviour.Popi:
-                    if (!SafeOneElementPushes.Contains(previous.OpCode.StackBehaviourPush))
-                        return null;
+            var skipPushCount = instruction.OpCode.StackBehaviourPop switch {
+                StackBehaviour.Pop0 => 0,
+                StackBehaviour.Pop1 => 1,
+                StackBehaviour.Popi => 1,
+                StackBehaviour.Pop1_pop1 => 2,
+                StackBehaviour.Popi_popi => 2,
+                StackBehaviour.Varpop => IsMethodCall(instruction, out var method)
+                    ? (method!.Parameters.Count + (method.HasThis ? 1 : 0))
+                    : (int?)null,
+                _ => null
+            };
 
-                    return FindPreviousInstructionStillOnStack(instruction.Previous);
-                case StackBehaviour.Pop1_pop1:
-                case StackBehaviour.Popi_popi:
-                    if (!SafeOneElementPushes.Contains(previous.OpCode.StackBehaviourPush))
-                        return null;
+            if (skipPushCount == null)
+                return null;
 
-                    var otherPush = FindPreviousInstructionStillOnStack(instruction.Previous);
-                    if (!SafeOneElementPushes.Contains(otherPush!.OpCode.StackBehaviourPush))
-                        return null;
-
-                    return FindPreviousInstructionStillOnStack(otherPush);
-                default:
+            var pushCount = 0;
+            while (pushCount < skipPushCount) {
+                if (!IsSafeZeroOrOneElementPush(previous, out var pushed))
+                    return null;
+                if (pushed)
+                    pushCount += 1;
+                previous = FindPreviousInstructionStillOnStackIfSafe(previous);
+                if (previous == null)
                     return null;
             }
+            return previous;
         }
 
         private TypeReference? GetElementTypeOfPushedManagedReference(Instruction? instruction, MethodDefinition method) {
@@ -134,6 +147,15 @@ namespace Unbreakable.Internal.AssemblyValidation {
             if (!produced.IsByReference)
                 return null;
             return produced.GetElementType();
+        }
+
+        private bool IsMethodCall(Instruction instruction, out MethodReference? method) {
+            method = null;
+            if (instruction.OpCode.Code != Code.Call && instruction.OpCode.Code != Code.Callvirt)
+                return false;
+
+            method = instruction.Operand as MethodReference;
+            return method != null;
         }
 
         private TypeReference? InferPushedType(Instruction instruction, MethodDefinition method) {

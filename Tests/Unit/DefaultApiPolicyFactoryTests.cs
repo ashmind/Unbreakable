@@ -25,7 +25,7 @@ namespace Unbreakable.Tests.Unit {
             var excludedTypes = new HashSet<Type> {
                 typeof(DateTime),
                 typeof(DateTimeOffset),
-                typeof(Decimal),
+                typeof(decimal),
                 typeof(string),
                 typeof(TimeSpan)
             };
@@ -44,6 +44,7 @@ namespace Unbreakable.Tests.Unit {
                 (typeof(Enumerable), nameof(Enumerable.Take)),
                 (typeof(Enumerable), nameof(Enumerable.Skip)),
                 #if NETCORE
+                (typeof(Enumerable), nameof(Enumerable.TakeLast)),
                 (typeof(Dictionary<,>), nameof(Dictionary<object, object>.TrimExcess)),
                 #endif
                 (typeof(Regex), nameof(Regex.Replace)),
