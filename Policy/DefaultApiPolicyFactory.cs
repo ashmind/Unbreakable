@@ -437,6 +437,7 @@ namespace Unbreakable.Policy.Internal {
                           .Member(nameof(StringBuilder.AppendLine), Allowed, AddCallRewriter.Default)
                           .Member(nameof(StringBuilder.Clear), Allowed)
                           .Member(nameof(StringBuilder.EnsureCapacity), Allowed, CountArgumentRewriter.ForCapacity)
+                          .Member(nameof(StringBuilder.Equals), Allowed)
                           .Getter(nameof(StringBuilder.Insert), Allowed, AddCallRewriter.Default, CountArgumentRewriter.Default)
                           .Getter(nameof(StringBuilder.Remove), Allowed)
                           .Getter(nameof(StringBuilder.Replace), Allowed)

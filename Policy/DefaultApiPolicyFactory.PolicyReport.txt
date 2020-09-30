@@ -3464,7 +3464,7 @@ System.Text
      Clear: Allowed
      CopyTo: Denied
      EnsureCapacity: Allowed (CountArgumentRewriter(capacity))
-     Equals: Denied
+     Equals: Allowed
      get_Capacity: Denied
      get_Chars: Denied
      get_Length: Allowed
