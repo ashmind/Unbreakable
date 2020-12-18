@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFrameworks>net46; netstandard20</TargetFrameworks>
     <AssemblyName>_</AssemblyName>
