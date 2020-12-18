@@ -1,12 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <AssemblyName>dotnet-unbreakable-policy-report</AssemblyName>
     <Authors>Andrey Shchekin</Authors>
     <RootNamespace>Unbreakable.Tools.PolicyReport</RootNamespace>
-    <PackageId>Unbreakable.Tools.PolicyReport.Net5</PackageId>
+    <PackageId>Unbreakable.Tools.PolicyReport.NetCore31</PackageId>
     <VersionPrefix>0.4</VersionPrefix>
     <PackAsTool>true</PackAsTool>
     <Description>Tool to create a report for a certain Unbreakable policy (e.g. for source control/policy review).</Description>
@@ -21,5 +20,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\[Core]\[Core].csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="../Tools.PolicyReport/*.cs" />
   </ItemGroup>
 </Project>

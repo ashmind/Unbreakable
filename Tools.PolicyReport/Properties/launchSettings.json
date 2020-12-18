@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "Tools.PolicyReport": {
+      "commandName": "Project",
+      "commandLineArgs": "--assembly \"D:\\Development\\VS 2019\\SharpLab\\source\\Server\\bin\\Debug\\netcoreapp30\\SharpLab.Server.dll\" --factory SharpLab.Server.Execution.Unbreakable.ApiPolicySetup --method CreatePolicy --output \"D:\\Development\\VS 2019\\SharpLab\\source\\Server\\Execution\\Unbreakable\\ApiPolicySetup.PolicyReport.txt\"",
+      "workingDirectory": "D:\\Development\\VS 2019\\SharpLab\\source\\Server\\bin\\Debug\\netcoreapp30"
+    }
+  }
+}
