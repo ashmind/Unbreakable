@@ -16,8 +16,12 @@ jobs:
       with:
           dotnet-version: 5.0.x
 
-    - run: dotnet build --configuration Release 
-    - run: dotnet test --no-build --configuration Release 
+    # Normally restore is done by the build, but there seem to be some issues:
+    # https://github.com/actions/setup-dotnet/issues/145
+    # https://github.com/actions/setup-dotnet/issues/155
+    - run: dotnet restore
+    - run: dotnet build --no-restore --configuration Release
+    - run: dotnet test --no-build --configuration Release
     - run: dotnet pack --no-build --output . --configuration Release
 
     - if: github.ref == 'refs/heads/master'
