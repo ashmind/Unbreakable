@@ -10,7 +10,7 @@ using Xunit;
 
 namespace Unbreakable.Tests {
     public static class TestHelper {
-        public delegate object Invoke(params object[] args);
+        public delegate object? Invoke(params object?[] args);
 
         public static MemoryStream Compile(string code, bool allowUnsafe = false) {
             var compilation = CSharpCompilation.Create(
@@ -35,7 +35,7 @@ namespace Unbreakable.Tests {
             yield return AssemblyOf(typeof(Enumerable));
 
             #if NETCORE
-            var trustedAssemblyPaths = ((string)AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES")).Split(Path.PathSeparator);
+            var trustedAssemblyPaths = ((string)AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES")!).Split(Path.PathSeparator);
             yield return MetadataReference.CreateFromFile(trustedAssemblyPaths.Single(p => p.EndsWith("mscorlib.dll")));
             yield return MetadataReference.CreateFromFile(trustedAssemblyPaths.Single(p => p.EndsWith("System.Runtime.dll")));
 
@@ -68,8 +68,8 @@ namespace Unbreakable.Tests {
 
         private static Invoke GetInstanceMethod(MemoryStream assemblyStream, string typeName, string methodName) {
             var assembly = Assembly.Load(assemblyStream.ToArray());
-            var type = assembly.GetType(typeName);
-            var method = type.GetMethod(methodName, BindingFlags.Static | BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+            var type = assembly.GetType(typeName)!;
+            var method = type.GetMethod(methodName, BindingFlags.Static | BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)!;
             var instance = !method.IsStatic ? Activator.CreateInstance(type) : null;
 
             return args => method.Invoke(instance, args);

@@ -30,7 +30,7 @@ namespace Unbreakable.Tests.Unit {
                 typeof(TimeSpan)
             };
             AssertEachMatchingMethodHasRewriterOfType<AddCallRewriter>(
-                m => methodNames.Contains(m.Name) && !excludedTypes.Contains(m.DeclaringType)
+                m => methodNames.Contains(m.Name) && !excludedTypes.Contains(m.DeclaringType!)
             );
         }
 
@@ -52,15 +52,15 @@ namespace Unbreakable.Tests.Unit {
             };
             AssertEachMatchingMethodHasRewriterOfType<CountArgumentRewriter>(
                 m => m.GetParameters().Any(p => p.Name == "count" || p.Name == "capacity")
-                  && !m.GetParameters().Any(p => Regex.IsMatch(p.Name, "^(.+Index|index)$"))
-                  && !excluded.Contains((m.DeclaringType, m.Name))
+                  && !m.GetParameters().Any(p => p.Name != null && Regex.IsMatch(p.Name, "^(.+Index|index)$"))
+                  && !excluded.Contains((m.DeclaringType!, m.Name))
             );
         }
 
         [Fact]
         public void CreateSafeDefaultPolicy_IncludesDisposableReturnRewriter_ForMethodsReturningIDiposable() {
             AssertEachMatchingMethodHasRewriterOfType<DisposableReturnRewriter>(
-                m => (m.IsConstructor ? m.DeclaringType : ((MethodInfo)m).ReturnType).GetTypeInfo().IsAssignableTo<IDisposable>()
+                m => (m.IsConstructor ? m.DeclaringType! : ((MethodInfo)m).ReturnType).GetTypeInfo().IsAssignableTo<IDisposable>()
                   && m.Name != "GetEnumerator"
             );
         }
@@ -73,7 +73,7 @@ namespace Unbreakable.Tests.Unit {
             };
             AssertEachMatchingMethodHasRewriterOfType<ArrayReturnRewriter>(
                 b => b is MethodInfo m && m.ReturnType.IsArray
-                  && !excluded.Contains((m.DeclaringType, m.Name))
+                  && !excluded.Contains((m.DeclaringType!, m.Name))
             );
         }
 
@@ -85,7 +85,7 @@ namespace Unbreakable.Tests.Unit {
             AssertNoMethodsMatching(
                 (m, _) => m.IsStatic
                        && Regex.IsMatch(m.Name, "^(?:set_|Register|Add|Set|Update|Clear)")
-                       && !excluded.Contains((m.DeclaringType, m.Name))
+                       && !excluded.Contains((m.DeclaringType!, m.Name))
             );
         }
 
@@ -136,7 +136,7 @@ namespace Unbreakable.Tests.Unit {
 
         private static string DescribeMethod(MethodBase method) {
             var builder = new StringBuilder();
-            builder.Append(method.DeclaringType.Name)
+            builder.Append(method.DeclaringType!.Name)
                    .Append(".")
                    .Append(method.Name)
                    .Append("(")

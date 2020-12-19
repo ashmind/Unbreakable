@@ -86,7 +86,7 @@ namespace Unbreakable.Tests.Unit {
             var all = typeof(OpCodes)
                 .GetFields(BindingFlags.Static | BindingFlags.Public)
                 .Where(f => f.FieldType == typeof(OpCode))
-                .Select(f => (OpCode)f.GetValue(null));
+                .Select(f => (OpCode)f.GetValue(null)!);
             return all
                 .Where(c => c.OperandType == OperandType.ShortInlineBrTarget)
                 .Select(c => new object[] { c });

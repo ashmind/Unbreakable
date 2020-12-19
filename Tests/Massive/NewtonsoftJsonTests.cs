@@ -23,7 +23,7 @@ namespace Unbreakable.Tests.Massive {
         [Fact(Skip = "WIP")]
         public void RewrittenAssembly_CanParseJson() {
             var rewritten = RewriteNewtonsoftJson();
-            var jsonConvert = rewritten.GetType(typeof(JsonConvert).FullName, true).AsDynamicType();
+            var jsonConvert = rewritten.GetType(typeof(JsonConvert).FullName!, true).AsDynamicType();
             var json = jsonConvert.SerializeObject(new TestData { Name = "Test" });
             var result = jsonConvert.DeserializeObject<TestData>(json);
             Assert.Equal(5, (int)result.a);
@@ -45,7 +45,7 @@ namespace Unbreakable.Tests.Massive {
 
             var assemblyStream = new MemoryStream();
             definition.Write(assemblyStream);
-            definition.Write(Path.Combine(Path.GetDirectoryName(assemblyPath), "Newtonsoft.Json.Rewritten.dll"));
+            definition.Write(Path.Combine(Path.GetDirectoryName(assemblyPath)!, "Newtonsoft.Json.Rewritten.dll"));
             return Assembly.Load(assemblyStream.ToArray());
         }
 

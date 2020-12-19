@@ -55,7 +55,7 @@ namespace Unbreakable.Tests {
             ", "C", "M");
             Assert.Equal(
                 expected,
-                ((MatchCollection)m()).Cast<Match>().Select(x => x.Value).ToArray()
+                ((MatchCollection)m()!).Cast<Match>().Select(x => x.Value).ToArray()
             );
         }
 
@@ -75,7 +75,7 @@ namespace Unbreakable.Tests {
                     public string[] M() => " + code + @";
                 }
             ", "C", "M");
-            Assert.Equal(expected, (string[])m());
+            Assert.Equal(expected, (string[])m()!);
         }
 
         [Theory]
@@ -153,8 +153,8 @@ namespace Unbreakable.Tests {
         [InlineData("Regex.Replace(\"{0}\", @\"{1}\", _ => \"\", RegexOptions.None)")]
         // somehow the "evil" regex does not work for Matches
         public void ThrowsTimeoutException_IfRegexTakesTooLong(string code) {
-            var input = new string('1', 100) + "x";
-            var pattern = @"^(\d+)+$";
+            var input = new string('1', 1000) + "x";
+            var pattern = @"^((\d+)+)+$";
             code = string.Format(code, input, pattern);
 
             var m = TestHelper.RewriteAndGetMethodWrappedInScope(@"
@@ -164,7 +164,9 @@ namespace Unbreakable.Tests {
                 class C {
                     public void M() => " + code + @";
                 }
-            ", "C", "M");
+            ", "C", "M", runtimeGuardSettings: new RuntimeGuardSettings {
+               TimeLimit = TimeSpan.FromMilliseconds(500)
+            });
 
             var ex = Record.Exception(() => m());
 

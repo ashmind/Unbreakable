@@ -30,13 +30,111 @@ System
      GetType: Denied
      Invoke: Allowed
      ToString: Denied
-  Action`10: Denied
-  Action`11: Denied
-  Action`12: Denied
-  Action`13: Denied
-  Action`14: Denied
-  Action`15: Denied
-  Action`16: Denied
+  Action`10: Allowed
+     .ctor: Allowed
+     BeginInvoke: Denied
+     Clone: Denied
+     DynamicInvoke: Denied
+     EndInvoke: Denied
+     Equals: Denied
+     get_Method: Denied
+     get_Target: Denied
+     GetHashCode: Denied
+     GetInvocationList: Denied
+     GetObjectData: Denied
+     GetType: Denied
+     Invoke: Allowed
+     ToString: Denied
+  Action`11: Allowed
+     .ctor: Allowed
+     BeginInvoke: Denied
+     Clone: Denied
+     DynamicInvoke: Denied
+     EndInvoke: Denied
+     Equals: Denied
+     get_Method: Denied
+     get_Target: Denied
+     GetHashCode: Denied
+     GetInvocationList: Denied
+     GetObjectData: Denied
+     GetType: Denied
+     Invoke: Allowed
+     ToString: Denied
+  Action`12: Allowed
+     .ctor: Allowed
+     BeginInvoke: Denied
+     Clone: Denied
+     DynamicInvoke: Denied
+     EndInvoke: Denied
+     Equals: Denied
+     get_Method: Denied
+     get_Target: Denied
+     GetHashCode: Denied
+     GetInvocationList: Denied
+     GetObjectData: Denied
+     GetType: Denied
+     Invoke: Allowed
+     ToString: Denied
+  Action`13: Allowed
+     .ctor: Allowed
+     BeginInvoke: Denied
+     Clone: Denied
+     DynamicInvoke: Denied
+     EndInvoke: Denied
+     Equals: Denied
+     get_Method: Denied
+     get_Target: Denied
+     GetHashCode: Denied
+     GetInvocationList: Denied
+     GetObjectData: Denied
+     GetType: Denied
+     Invoke: Allowed
+     ToString: Denied
+  Action`14: Allowed
+     .ctor: Allowed
+     BeginInvoke: Denied
+     Clone: Denied
+     DynamicInvoke: Denied
+     EndInvoke: Denied
+     Equals: Denied
+     get_Method: Denied
+     get_Target: Denied
+     GetHashCode: Denied
+     GetInvocationList: Denied
+     GetObjectData: Denied
+     GetType: Denied
+     Invoke: Allowed
+     ToString: Denied
+  Action`15: Allowed
+     .ctor: Allowed
+     BeginInvoke: Denied
+     Clone: Denied
+     DynamicInvoke: Denied
+     EndInvoke: Denied
+     Equals: Denied
+     get_Method: Denied
+     get_Target: Denied
+     GetHashCode: Denied
+     GetInvocationList: Denied
+     GetObjectData: Denied
+     GetType: Denied
+     Invoke: Allowed
+     ToString: Denied
+  Action`16: Allowed
+     .ctor: Allowed
+     BeginInvoke: Denied
+     Clone: Denied
+     DynamicInvoke: Denied
+     EndInvoke: Denied
+     Equals: Denied
+     get_Method: Denied
+     get_Target: Denied
+     GetHashCode: Denied
+     GetInvocationList: Denied
+     GetObjectData: Denied
+     GetType: Denied
+     Invoke: Allowed
+     ToString: Denied
   Action`2: Allowed
      .ctor: Allowed
      BeginInvoke: Denied
@@ -142,7 +240,21 @@ System
      GetType: Denied
      Invoke: Allowed
      ToString: Denied
-  Action`9: Denied
+  Action`9: Allowed
+     .ctor: Allowed
+     BeginInvoke: Denied
+     Clone: Denied
+     DynamicInvoke: Denied
+     EndInvoke: Denied
+     Equals: Denied
+     get_Method: Denied
+     get_Target: Denied
+     GetHashCode: Denied
+     GetInvocationList: Denied
+     GetObjectData: Denied
+     GetType: Denied
+     Invoke: Allowed
+     ToString: Denied
   Activator: Denied
   AggregateException: Denied
   AppContext: Denied
@@ -424,13 +536,14 @@ System
   ContextMarshalException: Denied
   ContextStaticAttribute: Denied
   Convert: Allowed
-     ChangeType: Allowed
-     Equals: Allowed
+     ChangeType: Denied
+     Equals: Denied
      FromBase64CharArray: Allowed (ArrayReturnRewriter)
      FromBase64String: Allowed (ArrayReturnRewriter)
-     GetHashCode: Allowed
-     GetType: Allowed
-     GetTypeCode: Allowed
+     FromHexString: Allowed (ArrayReturnRewriter)
+     GetHashCode: Denied
+     GetType: Denied
+     GetTypeCode: Denied
      IsDBNull: Allowed
      ToBase64CharArray: Allowed
      ToBase64String: Allowed (StringReturnRewriter)
@@ -440,12 +553,13 @@ System
      ToDateTime: Allowed
      ToDecimal: Allowed
      ToDouble: Allowed
+     ToHexString: Allowed (StringReturnRewriter)
      ToInt16: Allowed
      ToInt32: Allowed
      ToInt64: Allowed
      ToSByte: Allowed
      ToSingle: Allowed
-     ToString: Allowed
+     ToString: Allowed (StringReturnRewriter)
      ToUInt16: Allowed
      ToUInt32: Allowed
      ToUInt64: Allowed
@@ -671,6 +785,7 @@ System
      ToUInt64: Allowed
      Truncate: Allowed
      TryFormat: Allowed
+     TryGetBits: Allowed
      TryParse: Allowed
   Delegate: Allowed
      Clone: Denied
@@ -749,6 +864,7 @@ System
      get_MachineName: Denied
      get_NewLine: Allowed
      get_OSVersion: Denied
+     get_ProcessId: Denied
      get_ProcessorCount: Denied
      get_StackTrace: Denied
      get_SystemDirectory: Denied
@@ -864,14 +980,126 @@ System
      GetType: Denied
      Invoke: Allowed
      ToString: Denied
-  Func`10: Denied
-  Func`11: Denied
-  Func`12: Denied
-  Func`13: Denied
-  Func`14: Denied
-  Func`15: Denied
-  Func`16: Denied
-  Func`17: Denied
+  Func`10: Allowed
+     .ctor: Allowed
+     BeginInvoke: Denied
+     Clone: Denied
+     DynamicInvoke: Denied
+     EndInvoke: Denied
+     Equals: Denied
+     get_Method: Denied
+     get_Target: Denied
+     GetHashCode: Denied
+     GetInvocationList: Denied
+     GetObjectData: Denied
+     GetType: Denied
+     Invoke: Allowed
+     ToString: Denied
+  Func`11: Allowed
+     .ctor: Allowed
+     BeginInvoke: Denied
+     Clone: Denied
+     DynamicInvoke: Denied
+     EndInvoke: Denied
+     Equals: Denied
+     get_Method: Denied
+     get_Target: Denied
+     GetHashCode: Denied
+     GetInvocationList: Denied
+     GetObjectData: Denied
+     GetType: Denied
+     Invoke: Allowed
+     ToString: Denied
+  Func`12: Allowed
+     .ctor: Allowed
+     BeginInvoke: Denied
+     Clone: Denied
+     DynamicInvoke: Denied
+     EndInvoke: Denied
+     Equals: Denied
+     get_Method: Denied
+     get_Target: Denied
+     GetHashCode: Denied
+     GetInvocationList: Denied
+     GetObjectData: Denied
+     GetType: Denied
+     Invoke: Allowed
+     ToString: Denied
+  Func`13: Allowed
+     .ctor: Allowed
+     BeginInvoke: Denied
+     Clone: Denied
+     DynamicInvoke: Denied
+     EndInvoke: Denied
+     Equals: Denied
+     get_Method: Denied
+     get_Target: Denied
+     GetHashCode: Denied
+     GetInvocationList: Denied
+     GetObjectData: Denied
+     GetType: Denied
+     Invoke: Allowed
+     ToString: Denied
+  Func`14: Allowed
+     .ctor: Allowed
+     BeginInvoke: Denied
+     Clone: Denied
+     DynamicInvoke: Denied
+     EndInvoke: Denied
+     Equals: Denied
+     get_Method: Denied
+     get_Target: Denied
+     GetHashCode: Denied
+     GetInvocationList: Denied
+     GetObjectData: Denied
+     GetType: Denied
+     Invoke: Allowed
+     ToString: Denied
+  Func`15: Allowed
+     .ctor: Allowed
+     BeginInvoke: Denied
+     Clone: Denied
+     DynamicInvoke: Denied
+     EndInvoke: Denied
+     Equals: Denied
+     get_Method: Denied
+     get_Target: Denied
+     GetHashCode: Denied
+     GetInvocationList: Denied
+     GetObjectData: Denied
+     GetType: Denied
+     Invoke: Allowed
+     ToString: Denied
+  Func`16: Allowed
+     .ctor: Allowed
+     BeginInvoke: Denied
+     Clone: Denied
+     DynamicInvoke: Denied
+     EndInvoke: Denied
+     Equals: Denied
+     get_Method: Denied
+     get_Target: Denied
+     GetHashCode: Denied
+     GetInvocationList: Denied
+     GetObjectData: Denied
+     GetType: Denied
+     Invoke: Allowed
+     ToString: Denied
+  Func`17: Allowed
+     .ctor: Allowed
+     BeginInvoke: Denied
+     Clone: Denied
+     DynamicInvoke: Denied
+     EndInvoke: Denied
+     Equals: Denied
+     get_Method: Denied
+     get_Target: Denied
+     GetHashCode: Denied
+     GetInvocationList: Denied
+     GetObjectData: Denied
+     GetType: Denied
+     Invoke: Allowed
+     ToString: Denied
   Func`2: Allowed
      .ctor: Allowed
      BeginInvoke: Denied
@@ -994,6 +1222,8 @@ System
      ToString: Denied
   GC: Allowed
      AddMemoryPressure: Denied
+     AllocateArray: Denied
+     AllocateUninitializedArray: Denied
      CancelFullGCNotification: Denied
      Collect: Denied
      CollectionCount: Denied
@@ -1018,6 +1248,8 @@ System
      WaitForFullGCComplete: Denied
      WaitForPendingFinalizers: Denied
   GCCollectionMode: Denied
+  GCGenerationInfo: Denied
+  GCKind: Denied
   GCMemoryInfo: Denied
   GCNotificationStatus: Denied
   GenericUriParser: Denied
@@ -1040,6 +1272,36 @@ System
      TryParse: Allowed
      TryParseExact: Allowed
      TryWriteBytes: Allowed
+  Half: Allowed
+     CompareTo: Allowed
+     Equals: Allowed
+     get_Epsilon: Allowed
+     get_MaxValue: Allowed
+     get_MinValue: Allowed
+     get_NaN: Allowed
+     get_NegativeInfinity: Allowed
+     get_PositiveInfinity: Allowed
+     GetHashCode: Allowed
+     GetType: Allowed
+     IsFinite: Allowed
+     IsInfinity: Allowed
+     IsNaN: Allowed
+     IsNegative: Allowed
+     IsNegativeInfinity: Allowed
+     IsNormal: Allowed
+     IsPositiveInfinity: Allowed
+     IsSubnormal: Allowed
+     op_Equality: Allowed
+     op_Explicit: Allowed
+     op_GreaterThan: Allowed
+     op_GreaterThanOrEqual: Allowed
+     op_Inequality: Allowed
+     op_LessThan: Allowed
+     op_LessThanOrEqual: Allowed
+     Parse: Allowed
+     ToString: Allowed
+     TryFormat: Allowed
+     TryParse: Allowed
   HashCode: Denied
   HttpStyleUriParser: Denied
   IAsyncDisposable: Denied
@@ -1328,13 +1590,17 @@ System
   ObsoleteAttribute: Allowed
      .ctor: Allowed
      Equals: Allowed
+     get_DiagnosticId: Allowed
      get_IsError: Allowed
      get_Message: Allowed
      get_TypeId: Allowed
+     get_UrlFormat: Allowed
      GetHashCode: Allowed
      GetType: Allowed
      IsDefaultAttribute: Allowed
      Match: Allowed
+     set_DiagnosticId: Allowed
+     set_UrlFormat: Allowed
      ToString: Allowed
   OperatingSystem: Denied
   OperationCanceledException: Denied
@@ -1457,7 +1723,7 @@ System
      CopyTo: Allowed
      Create: Allowed
      EndsWith: Allowed
-     EnumerateRunes: Allowed
+     EnumerateRunes: Allowed (DisposableReturnRewriter)
      Equals: Allowed
      Format: Allowed
      get_Chars: Allowed
@@ -1801,6 +2067,7 @@ System
      HasSameMetadataDefinitionAs: Denied
      InvokeMember: Denied
      IsAssignableFrom: Allowed
+     IsAssignableTo: Allowed
      IsDefined: Denied
      IsEnumDefined: Denied
      IsEquivalentTo: Denied
@@ -2252,6 +2519,14 @@ System.Collections.Generic
      TryGetValue: Allowed
   IReadOnlyList`1: Allowed
      get_Item: Allowed
+  IReadOnlySet`1: Allowed
+     Contains: Allowed
+     IsProperSubsetOf: Allowed
+     IsProperSupersetOf: Allowed
+     IsSubsetOf: Allowed
+     IsSupersetOf: Allowed
+     Overlaps: Allowed
+     SetEquals: Allowed
   ISet`1: Allowed
      Add: Allowed (AddCallRewriter)
      ExceptWith: Allowed
@@ -2332,6 +2607,7 @@ System.Collections.Generic
      get_Next: Allowed
      get_Previous: Allowed
      get_Value: Allowed
+     get_ValueRef: Allowed
      GetHashCode: Allowed
      GetType: Allowed
      set_Value: Allowed
@@ -2415,6 +2691,12 @@ System.Collections.Generic
      GetHashCode: Allowed
      GetType: Allowed
      MoveNext: Allowed
+     ToString: Allowed
+  ReferenceEqualityComparer: Allowed
+     Equals: Allowed
+     get_Instance: Allowed
+     GetHashCode: Allowed
+     GetType: Allowed
      ToString: Allowed
   SortedDictionary`2: Allowed
      .ctor: Allowed (CountArgumentRewriter(capacity))
@@ -2784,8 +3066,18 @@ System.ComponentModel
   Win32Exception: Denied
 System.Diagnostics
   Activity: Denied
+  ActivityContext: Denied
+  ActivityCreationOptions`1: Denied
+  ActivityEvent: Denied
   ActivityIdFormat: Denied
+  ActivityKind: Denied
+  ActivityLink: Denied
+  ActivityListener: Denied
+  ActivitySamplingResult: Denied
+  ActivitySource: Denied
   ActivitySpanId: Denied
+  ActivityTagsCollection: Denied
+  ActivityTagsCollection+Enumerator: Denied
   ActivityTraceFlags: Denied
   ActivityTraceId: Denied
   BooleanSwitch: Denied
@@ -2864,6 +3156,7 @@ System.Diagnostics
   ProcessThread: Denied
   ProcessThreadCollection: Denied
   ProcessWindowStyle: Denied
+  SampleActivity`1: Denied
   SourceFilter: Denied
   SourceLevels: Denied
   SourceSwitch: Denied
@@ -3260,6 +3553,7 @@ System.Runtime.CompilerServices
   ConfiguredValueTaskAwaitable`1+ConfiguredValueTaskAwaiter: Denied
   ConfiguredValueTaskAwaitable+ConfiguredValueTaskAwaiter: Denied
   ContractHelper: Denied
+  CppInlineNamespaceAttribute: Denied
   CustomConstantAttribute: Denied
   DateTimeConstantAttribute: Denied
   DebugInfoGenerator: Denied
@@ -3302,6 +3596,11 @@ System.Runtime.CompilerServices
   IsConst: Denied
   IsCopyConstructed: Denied
   IsExplicitlyDereferenced: Denied
+  IsExternalInit: Allowed
+     Equals: Allowed
+     GetHashCode: Allowed
+     GetType: Allowed
+     ToString: Allowed
   IsImplicitlyDereferenced: Denied
   IsJitIntrinsic: Denied
   IsLong: Denied
@@ -3335,7 +3634,17 @@ System.Runtime.CompilerServices
   MethodCodeType: Denied
   MethodImplAttribute: Denied
   MethodImplOptions: Denied
+  ModuleInitializerAttribute: Denied
   NativeCppClassAttribute: Denied
+  PreserveBaseOverridesAttribute: Allowed
+     .ctor: Allowed
+     Equals: Allowed
+     get_TypeId: Allowed
+     GetHashCode: Allowed
+     GetType: Allowed
+     IsDefaultAttribute: Allowed
+     Match: Allowed
+     ToString: Allowed
   ReadOnlyCollectionBuilder`1: Denied
   ReferenceAssemblyAttribute: Denied
   RequiredAttributeAttribute: Denied
@@ -3343,6 +3652,7 @@ System.Runtime.CompilerServices
   RuntimeCompatibilityAttribute: Denied
   RuntimeFeature: Denied
   RuntimeHelpers: Allowed
+     AllocateTypeAssociatedMemory: Denied
      EnsureSufficientExecutionStack: Denied
      Equals: Denied
      ExecuteCodeWithGuaranteedCleanup: Denied
@@ -3369,6 +3679,7 @@ System.Runtime.CompilerServices
   RuntimeOps: Denied
   RuntimeWrappedException: Denied
   ScopelessEnumAttribute: Denied
+  SkipLocalsInitAttribute: Denied
   SpecialNameAttribute: Denied
   StateMachineAttribute: Denied
   StringFreezingAttribute: Denied
@@ -3406,50 +3717,53 @@ System.Text
   EncoderReplacementFallback: Denied
   EncoderReplacementFallbackBuffer: Denied
   Encoding: Allowed
-     Clone: Allowed
+     Clone: Denied
      Convert: Allowed (ArrayReturnRewriter)
-     Equals: Allowed
+     CreateTranscodingStream: Denied
+     Equals: Denied
      get_ASCII: Allowed
      get_BigEndianUnicode: Allowed
      get_BodyName: Allowed
      get_CodePage: Allowed
-     get_DecoderFallback: Allowed
+     get_DecoderFallback: Denied
      get_Default: Allowed
-     get_EncoderFallback: Allowed
+     get_EncoderFallback: Denied
      get_EncodingName: Allowed
-     get_HeaderName: Allowed
-     get_IsBrowserDisplay: Allowed
-     get_IsBrowserSave: Allowed
-     get_IsMailNewsDisplay: Allowed
-     get_IsMailNewsSave: Allowed
+     get_HeaderName: Denied
+     get_IsBrowserDisplay: Denied
+     get_IsBrowserSave: Denied
+     get_IsMailNewsDisplay: Denied
+     get_IsMailNewsSave: Denied
      get_IsReadOnly: Allowed
      get_IsSingleByte: Allowed
+     get_Latin1: Allowed
      get_Preamble: Allowed
      get_Unicode: Allowed
      get_UTF32: Allowed
-     get_UTF7: Allowed
+     get_UTF7: Denied
      get_UTF8: Allowed
      get_WebName: Allowed
      get_WindowsCodePage: Allowed
-     GetByteCount: Allowed
+     GetByteCount: Denied
      GetBytes: Allowed (ArrayReturnRewriter)
      GetCharCount: Allowed
      GetChars: Allowed (ArrayReturnRewriter)
-     GetDecoder: Allowed
-     GetEncoder: Allowed
+     GetDecoder: Denied
+     GetEncoder: Denied
      GetEncoding: Allowed
      GetEncodings: Allowed (ArrayReturnRewriter)
-     GetHashCode: Allowed
+     GetHashCode: Denied
      GetMaxByteCount: Allowed
      GetMaxCharCount: Allowed
      GetPreamble: Allowed (ArrayReturnRewriter)
      GetString: Allowed (StringReturnRewriter)
-     GetType: Allowed
+     GetType: Denied
      IsAlwaysNormalized: Allowed
      RegisterProvider: Denied
      set_DecoderFallback: Denied
      set_EncoderFallback: Denied
-     ToString: Allowed
+     ToString: Denied
+  EncodingExtensions: Denied
   EncodingInfo: Denied
   EncodingProvider: Denied
   NormalizationForm: Denied
@@ -3610,6 +3924,8 @@ System.Text.RegularExpressions
      GetTypeCode: Allowed
      HasFlag: Allowed
      ToString: Allowed
+  RegexParseError: Denied
+  RegexParseException: Denied
   RegexRunner: Denied
   RegexRunnerFactory: Denied
 System.Threading
@@ -3634,6 +3950,7 @@ System.Threading
   HostExecutionContextManager: Denied
   Interlocked: Allowed
      Add: Denied
+     And: Denied
      CompareExchange: Allowed
      Decrement: Denied
      Equals: Denied
@@ -3643,6 +3960,7 @@ System.Threading
      Increment: Denied
      MemoryBarrier: Denied
      MemoryBarrierProcessWide: Denied
+     Or: Denied
      Read: Denied
      ToString: Denied
   IOCompletionCallback: Denied

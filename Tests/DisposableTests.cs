@@ -15,7 +15,7 @@ namespace Unbreakable.Tests {
                 }
             ", "C", "M", GetGuardSettingsForTestDisposable());
 
-            var disposable = (TestDisposable)m();
+            var disposable = (TestDisposable)m()!;
 
             Assert.True(disposable.Disposed);
         }
