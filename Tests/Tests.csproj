@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net471; netcoreapp2.2; net5.0</TargetFrameworks>
+    <TargetFrameworks>net471; netcoreapp31; net5.0</TargetFrameworks>
     <AssemblyName>Unbreakable.Tests</AssemblyName>
     <RootNamespace>Unbreakable.Tests</RootNamespace>
     <IsPackable>false</IsPackable>
@@ -32,12 +32,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Policy\Policy.csproj" />
-    <ProjectReference Include="..\Runtime\Runtime.csproj">
-      <SetPlatform>Platform=AnyCPU</SetPlatform>
-    </ProjectReference>
-    <ProjectReference Include="..\[Core]\[Core].csproj">
-      <SetPlatform>Platform=AnyCPU</SetPlatform>
-    </ProjectReference>
+    <ProjectReference Include="..\Runtime\Runtime.csproj" />
+    <ProjectReference Include="..\[Core]\[Core].csproj" />
   </ItemGroup>
 
   <ItemGroup>

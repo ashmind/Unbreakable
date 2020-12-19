@@ -1,6 +1,6 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net46; netstandard20; netcoreapp30; net5.0</TargetFrameworks>
+    <TargetFrameworks>net46; netstandard20; netcoreapp31; net5.0</TargetFrameworks>
     <AssemblyName>Unbreakable.Policy</AssemblyName>
     <RootNamespace>Unbreakable.Policy</RootNamespace>
     <VersionPrefix>17.0</VersionPrefix>

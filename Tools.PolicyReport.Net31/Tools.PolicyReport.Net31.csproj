@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>netcoreapp31</TargetFramework>
     <AssemblyName>dotnet-unbreakable-policy-report</AssemblyName>
     <Authors>Andrey Shchekin</Authors>
     <RootNamespace>Unbreakable.Tools.PolicyReport</RootNamespace>
