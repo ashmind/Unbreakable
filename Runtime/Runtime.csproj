@@ -7,15 +7,5 @@
     <RootNamespace>Unbreakable.Runtime</RootNamespace>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <IsPackable>false</IsPackable>
-
-    <!--
-      Unfortunately, NuGet does ot support WarningsNotAsErrors: https://github.com/NuGet/Home/issues/5375.
-      
-      Amnd there is a NuGet warning in the build:
-      NU1603: NETStandard.Library 2.0.3 depends on Microsoft.NETCore.Platforms (>= 1.1.0) but Microsoft.NETCore.Platforms 1.1.0 was not found. An approximate best match of Microsoft.NETCore.Platforms 3.1.0 was resolved.
-
-      I don't see a good way to resolve that warning yet, so for now we have to downgrade all warnings (NoWarn would hide it, but I don't want to hide it either).
-    -->
-    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
   </PropertyGroup>
 </Project>
