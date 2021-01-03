@@ -240,7 +240,9 @@ namespace Unbreakable.Policy.Internal {
                 )
                 .Type(typeof(Dictionary<,>.Enumerator), Allowed)
                 .Type(typeof(Dictionary<,>.KeyCollection), Allowed)
+                .Type(typeof(Dictionary<,>.KeyCollection.Enumerator), Allowed)
                 .Type(typeof(Dictionary<,>.ValueCollection), Allowed)
+                .Type(typeof(Dictionary<,>.ValueCollection.Enumerator), Allowed)
                 .Type(typeof(EqualityComparer<>), Allowed)
                 .Type(typeof(HashSet<>), Allowed,
                     t => t.Constructor(Allowed, CountArgumentRewriter.ForCapacity, CollectedEnumerableArgumentRewriter.Default)
@@ -261,6 +263,7 @@ namespace Unbreakable.Policy.Internal {
                 .Type("IReadOnlySet`1", Allowed)
                 .Type(typeof(ISet<>), Allowed, t => t.Other(SetupSetCommon))
                 .Type(typeof(KeyNotFoundException), Allowed)
+                .Type("KeyValuePair", Allowed)
                 .Type(typeof(KeyValuePair<,>), Allowed)
                 .Type(typeof(LinkedList<>), Allowed,
                     t => t.Constructor(Allowed, CountArgumentRewriter.ForCapacity, CollectedEnumerableArgumentRewriter.Default)

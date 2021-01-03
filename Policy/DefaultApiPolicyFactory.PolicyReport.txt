@@ -2416,7 +2416,14 @@ System.Collections.Generic
      GetHashCode: Allowed
      GetType: Allowed
      ToString: Allowed
-  Dictionary`2+KeyCollection+Enumerator: Denied
+  Dictionary`2+KeyCollection+Enumerator: Allowed
+     Dispose: Allowed
+     Equals: Allowed
+     get_Current: Allowed
+     GetHashCode: Allowed
+     GetType: Allowed
+     MoveNext: Allowed
+     ToString: Allowed
   Dictionary`2+ValueCollection: Allowed
      .ctor: Allowed
      CopyTo: Allowed
@@ -2426,7 +2433,14 @@ System.Collections.Generic
      GetHashCode: Allowed
      GetType: Allowed
      ToString: Allowed
-  Dictionary`2+ValueCollection+Enumerator: Denied
+  Dictionary`2+ValueCollection+Enumerator: Allowed
+     Dispose: Allowed
+     Equals: Allowed
+     get_Current: Allowed
+     GetHashCode: Allowed
+     GetType: Allowed
+     MoveNext: Allowed
+     ToString: Allowed
   EnumEqualityComparer`1: Denied
   EqualityComparer`1: Allowed
      Equals: Allowed
@@ -2558,7 +2572,12 @@ System.Collections.Generic
      set_HResult: Allowed
      set_Source: Allowed
      ToString: Allowed
-  KeyValuePair: Denied
+  KeyValuePair: Allowed
+     Create: Allowed
+     Equals: Allowed
+     GetHashCode: Allowed
+     GetType: Allowed
+     ToString: Allowed
   KeyValuePair`2: Allowed
      .ctor: Allowed
      Deconstruct: Allowed

@@ -14,6 +14,44 @@ using Unbreakable.Policy.Rewriters;
 
 namespace Unbreakable.Tests.Unit {
     public class DefaultApiPolicyFactoryTests {
+        #if LATEST
+        [Fact]
+        public void CreateSafeDefaultPolicy_DoesNotReferenceNonExistentTypesOrMembers_InLatestNet() {
+            // Not in latest .NET
+            var legacyTypeFullNames = new HashSet<string> {
+                "System.AppDomainManager"
+            };
+
+            var policy = new DefaultApiPolicyFactory().CreateSafeDefaultPolicy();
+
+            var missing = new HashSet<string>();
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+            foreach (var namespacePolicy in policy.Namespaces) {
+                foreach (var typePolicy in namespacePolicy.Value.Types) {
+                    var typeFullName = namespacePolicy.Key + "." + typePolicy.Key;
+                    if (legacyTypeFullNames.Contains(typeFullName))
+                        continue;
+
+                    var type = assemblies
+                        .Select(a => a.GetType(typeFullName, throwOnError: false))
+                        .FirstOrDefault(t => t != null);
+                    if (type == null) {
+                        missing.Add("Type: " + typeFullName);
+                        continue;
+                    }
+
+                    foreach (var memberPolicy in typePolicy.Value.Members) {
+                        var memberName = memberPolicy.Key;
+                        if (type.GetMember(memberName) == null)
+                            missing.Add($"Member: {typeFullName}.{memberName}");
+                    }
+                }
+            }
+
+            Assert.Empty(missing);
+        }
+        #endif
+
         [Fact]
         public void CreateSafeDefaultPolicy_IncludesAddCallRewriter_ForMethodsNamedAddInsertEnqueueAndPush() {
             var methodNames = new HashSet<string> {
@@ -43,10 +81,10 @@ namespace Unbreakable.Tests.Unit {
                 (typeof(Encoding), nameof(Encoding.GetCharCount)),
                 (typeof(Enumerable), nameof(Enumerable.Take)),
                 (typeof(Enumerable), nameof(Enumerable.Skip)),
-                #if NETCORE
+#if NETCORE
                 (typeof(Enumerable), nameof(Enumerable.TakeLast)),
                 (typeof(Dictionary<,>), nameof(Dictionary<object, object>.TrimExcess)),
-                #endif
+#endif
                 (typeof(Regex), nameof(Regex.Replace)),
                 (typeof(Regex), nameof(Regex.Split))
             };

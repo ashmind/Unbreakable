@@ -9,6 +9,10 @@
   <PropertyGroup Condition="'$(TargetFramework)' != 'net471'">
     <DefineConstants>$(DefineConstants);NETCORE</DefineConstants>
   </PropertyGroup>
+  
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net5.0'">
+    <DefineConstants>$(DefineConstants);LATEST</DefineConstants>
+  </PropertyGroup>
 
   <ItemGroup>
     <Compile Remove="TestCode\*.*" />
