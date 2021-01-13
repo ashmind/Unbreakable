@@ -121,8 +121,8 @@ namespace Unbreakable.Internal {
         private static void CorrectBranchSizes(ILProcessor il) {
             var offset = 0;
             foreach (var instruction in il.Body.Instructions) {
-                offset += instruction.GetSize();
                 instruction.Offset = offset;
+                offset += instruction.GetSize();
             }
 
             foreach (var instruction in il.Body.Instructions) {
