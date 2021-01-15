@@ -119,23 +119,32 @@ namespace Unbreakable.Internal {
         }
 
         private static void CorrectBranchSizes(ILProcessor il) {
-            var offset = 0;
-            foreach (var instruction in il.Body.Instructions) {
-                instruction.Offset = offset;
-                offset += instruction.GetSize();
-            }
 
-            foreach (var instruction in il.Body.Instructions) {
-                var opCode = instruction.OpCode;
-                if (opCode.OperandType != OperandType.ShortInlineBrTarget)
-                    continue;
+            bool madeAChange;
 
-                var operandValue = ((Instruction)instruction.Operand).Offset - (instruction.Offset + instruction.GetSize());
-                if (operandValue >= sbyte.MinValue && operandValue <= sbyte.MaxValue)
-                    continue;
+            // expanding one short branch can force a previous short branch to be expanded, so we have to do this repeatedly
+            do {
+                madeAChange = false;
 
-                instruction.OpCode = ConvertFromShortBranchOpCode(opCode);
-            }
+                var offset = 0;
+                foreach (var instruction in il.Body.Instructions) {
+                    instruction.Offset = offset;
+                    offset += instruction.GetSize();
+                }
+
+                foreach (var instruction in il.Body.Instructions) {
+                    var opCode = instruction.OpCode;
+                    if (opCode.OperandType != OperandType.ShortInlineBrTarget)
+                        continue;
+
+                    var operandValue = ((Instruction)instruction.Operand).Offset - (instruction.Offset + instruction.GetSize());
+                    if (operandValue >= sbyte.MinValue && operandValue <= sbyte.MaxValue)
+                        continue;
+
+                    instruction.OpCode = ConvertFromShortBranchOpCode(opCode);
+                    madeAChange = true;
+                }
+            } while (madeAChange);
         }
 
         private static OpCode ConvertFromShortBranchOpCode(OpCode opCode) {
