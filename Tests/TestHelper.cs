@@ -2,8 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+#if NETCORE
+using System.Linq.Expressions;
+#endif
 using System.Reflection;
+#if NETCORE
 using System.Text.RegularExpressions;
+#endif
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Xunit;
@@ -34,14 +39,15 @@ namespace Unbreakable.Tests {
             yield return AssemblyOf(typeof(Stack<>));
             yield return AssemblyOf(typeof(Enumerable));
 
-            #if NETCORE
+#if NETCORE
             var trustedAssemblyPaths = ((string)AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES")!).Split(Path.PathSeparator);
             yield return MetadataReference.CreateFromFile(trustedAssemblyPaths.Single(p => p.EndsWith("mscorlib.dll")));
             yield return MetadataReference.CreateFromFile(trustedAssemblyPaths.Single(p => p.EndsWith("System.Runtime.dll")));
 
             yield return AssemblyOf(typeof(Console));
             yield return AssemblyOf(typeof(Regex));
-            #endif
+            yield return AssemblyOf(typeof(Expression));
+#endif
 
             yield return AssemblyOf(typeof(TestHelper));
         }

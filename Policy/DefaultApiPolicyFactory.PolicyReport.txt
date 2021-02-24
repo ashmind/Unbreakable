@@ -1752,7 +1752,7 @@ System
      PadRight: Allowed (CountArgumentRewriter(totalWidth))
      Remove: Allowed (StringReturnRewriter)
      Replace: Allowed (StringReturnRewriter)
-     Split: Denied
+     Split: Allowed (ArrayReturnRewriter)
      StartsWith: Allowed
      Substring: Allowed (StringReturnRewriter)
      ToCharArray: Allowed (ArrayReturnRewriter)

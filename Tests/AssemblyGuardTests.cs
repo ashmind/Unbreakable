@@ -116,6 +116,27 @@ namespace Unbreakable.Tests {
         }
 
         [Theory]
+        [InlineData("Func<string, string[], string> f = string.Join;")]
+        [InlineData("Func<char[], string[]> f = \"a\".Split;")]
+        [InlineData("Expression<Func<string>> e = () => $\"{1}\";")]
+        public void ThrowsGuardException_ForDelegatesCreatedFromMethodsWithRewriters(string code) {
+            var compiled = TestHelper.Compile(@"
+                using System;
+                using System.Linq.Expressions;
+                class C {
+                    void M() { " + code + @" }
+                }"
+            );
+            var policy = ApiPolicy.SafeDefault()
+                .Namespace("System.Linq.Expressions", ApiAccess.Allowed)
+                .Namespace("System.Reflection", ApiAccess.Allowed);
+
+            Assert.Throws<AssemblyGuardException>(
+                () => AssemblyGuard.Rewrite(compiled, new MemoryStream(), new AssemblyGuardSettings { ApiPolicy = policy })
+            );
+        }
+
+        [Theory]
         [InlineData("System", "Object")]
         [InlineData("System", "Delegate")]
         public void ThrowsGuardException_ForCustomTypesWithKnownTypeNames(string @namespace, string name) {
@@ -145,7 +166,7 @@ namespace Unbreakable.Tests {
             ", allowUnsafe: true);
 
             Assert.Throws<AssemblyGuardException>(
-                () => AssemblyGuard.Rewrite(compiled, new MemoryStream(), new AssemblyGuardSettings { ApiPolicy = policy  })
+                () => AssemblyGuard.Rewrite(compiled, new MemoryStream(), new AssemblyGuardSettings { ApiPolicy = policy })
             );
         }
 

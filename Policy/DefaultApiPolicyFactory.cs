@@ -205,6 +205,7 @@ namespace Unbreakable.Policy.Internal {
                           .Member(nameof(string.PadRight), Allowed, new CountArgumentRewriter("totalWidth"))
                           .Member(nameof(string.Remove), Allowed, StringReturnRewriter.Default)
                           .Member(nameof(string.Replace), Allowed, StringReturnRewriter.Default)
+                          .Member(nameof(string.Split), Allowed, ArrayReturnRewriter.Default)
                           .Member(nameof(string.StartsWith), Allowed)
                           .Member(nameof(string.Substring), Allowed, StringReturnRewriter.Default)
                           .Member(nameof(string.ToCharArray), Allowed, ArrayReturnRewriter.Default)

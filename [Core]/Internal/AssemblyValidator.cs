@@ -60,7 +60,7 @@ namespace Unbreakable.Internal {
             if (!provider.HasCustomAttributes)
                 return;
             foreach (var attribute in provider.CustomAttributes) {
-                ValidateMemberReference(attribute.AttributeType);
+                ValidateMemberReference(attribute.AttributeType, null);
                 // TODO: Validate attribute arguments
             }
         }
@@ -69,17 +69,18 @@ namespace Unbreakable.Internal {
             _pointerValidator.ValidateInstruction(instruction, method);
             _stackSizeValidator.ValidateInstruction(instruction, method);
 
-            if (!(instruction.Operand is MemberReference reference))
+            if (instruction.Operand is not MemberReference reference)
                 return null;
 
-            return ValidateMemberReference(reference);
+            return ValidateMemberReference(reference, instruction);
         }
 
-        private MemberPolicy? ValidateMemberReference(MemberReference reference) {
+        private MemberPolicy? ValidateMemberReference(MemberReference reference, Instruction? instruction) {
             switch (reference) {
                 case MethodReference m: {
                     var memberRule = EnsureAllowed(m.DeclaringType, m.Name);
                     EnsureAllowed(m.ReturnType);
+                    EnsureNoRewritersInDelegateContext(m, memberRule, instruction);
                     return memberRule;
                 }
                 case FieldReference f: {
@@ -142,6 +143,19 @@ namespace Unbreakable.Internal {
                 default:
                     throw new NotSupportedException($"Unknown filter result {result}.");
             }
+        }
+
+        private void EnsureNoRewritersInDelegateContext(MethodReference method, MemberPolicy? memberRule, Instruction? instruction) {
+            if (memberRule == null || instruction == null)
+                return;
+
+            if (!memberRule.HasRewriters)
+                return;
+
+            if (instruction.OpCode.Code != Code.Ldftn && instruction.OpCode.Code != Code.Ldtoken)
+                return;
+
+            throw new AssemblyGuardException($"Member {method.FullName}.{method.Name} is not allowed in delegate context.");
         }
 
         private string? GetNamespace(TypeReference type) {
