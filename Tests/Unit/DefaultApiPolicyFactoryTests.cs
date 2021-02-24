@@ -96,6 +96,26 @@ namespace Unbreakable.Tests.Unit {
         }
 
         [Fact]
+        public void CreateSafeDefaultPolicy_IncludesCountArgumentRewriter_WithCorrectArgumentName() {
+            var methodGroupsWithCountRewriter = GetAllAllowedMethods()
+                .Where(m => m.rule?.Rewriters.OfType<CountArgumentRewriter>().Any() ?? false)
+                .GroupBy(m => m.rule)
+                .Select(g => (
+                    name: g.First().method.Name,
+                    rewriters: g.Key.Rewriters.OfType<CountArgumentRewriter>().ToList(),
+                    methods: g.Select(m => m.method).ToList()
+                ));
+
+            Assert.All(methodGroupsWithCountRewriter,
+                g => Assert.All(g.rewriters,
+                    r => Assert.Contains(r.CountParameterName,
+                        g.methods.SelectMany(m => m.GetParameters().Select(p => p.Name)).Distinct()                      
+                    )
+                )
+            );
+        }
+
+        [Fact]
         public void CreateSafeDefaultPolicy_IncludesDisposableReturnRewriter_ForMethodsReturningIDiposable() {
             AssertEachMatchingMethodHasRewriterOfType<DisposableReturnRewriter>(
                 m => (m.IsConstructor ? m.DeclaringType! : ((MethodInfo)m).ReturnType).GetTypeInfo().IsAssignableTo<IDisposable>()
@@ -118,9 +138,9 @@ namespace Unbreakable.Tests.Unit {
         [Fact]
         public void CreateSafeDefaultPolicy_DoesNotAllowStaticMembers_IfTheyLookDangerous() {
             var excluded = new HashSet<(Type, string)> {
-                (typeof(Decimal), nameof(Decimal.Add))
+                (typeof(decimal), nameof(decimal.Add))
             };
-            AssertNoMethodsMatching(
+            AssertNoAllowedMethodsMatching(
                 (m, _) => m.IsStatic
                        && Regex.IsMatch(m.Name, "^(?:set_|Register|Add|Set|Update|Clear)")
                        && !excluded.Contains((m.DeclaringType!, m.Name))
@@ -130,15 +150,25 @@ namespace Unbreakable.Tests.Unit {
         private static void AssertEachMatchingMethodHasRewriterOfType<TApiMemberRewriter>(Func<MethodBase, bool> matcher)
             where TApiMemberRewriter : IMemberRewriter
         {
-            AssertNoMethodsMatching(
+            AssertNoAllowedMethodsMatching(
                 (method, rule) => matcher(method)
                                && !(rule?.Rewriters.OfType<TApiMemberRewriter>().Any() ?? false)
             );
         }
 
-        private static void AssertNoMethodsMatching(Func<MethodBase, MemberPolicy?, bool> matcher) {
-            var policy = new DefaultApiPolicyFactory().CreateSafeDefaultPolicy();
+        private static void AssertNoAllowedMethodsMatching(Func<MethodBase, MemberPolicy?, bool> matcher) {
             var matched = new HashSet<string>();
+
+            foreach (var (method, rule) in GetAllAllowedMethods()) {
+                if (matcher(method, rule))
+                    matched.Add(DescribeMethod(method));
+            }
+
+            Assert.Empty(matched);
+        }
+
+        private static IEnumerable<(MethodBase method, MemberPolicy? rule)> GetAllAllowedMethods() {
+            var policy = new DefaultApiPolicyFactory().CreateSafeDefaultPolicy();
 
             var filter = new ApiFilter(policy);
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies()) {
@@ -151,13 +181,10 @@ namespace Unbreakable.Tests.Unit {
                         if (result.Kind != ApiFilterResultKind.Allowed)
                             continue;
 
-                        if (matcher(method, result.MemberRule))
-                            matched.Add(DescribeMethod(method));
+                        yield return (method, result.MemberRule);
                     }
                 }
             }
-
-            Assert.Empty(matched);
         }
 
         private static Type[] GetExportedTypesSafe(Assembly assembly) {

@@ -1719,51 +1719,51 @@ System
      CompareTo: Allowed
      Concat: Allowed (CollectedEnumerableArgumentRewriter)
      Contains: Allowed
-     Copy: Allowed
+     Copy: Allowed (StringReturnRewriter)
      CopyTo: Allowed
-     Create: Allowed
+     Create: Allowed (StringReturnRewriter)
      EndsWith: Allowed
      EnumerateRunes: Allowed (DisposableReturnRewriter)
      Equals: Allowed
-     Format: Allowed
+     Format: Allowed (StringReturnRewriter)
      get_Chars: Allowed
      get_Length: Allowed
      GetEnumerator: Allowed
      GetHashCode: Allowed
-     GetPinnableReference: Allowed
+     GetPinnableReference: Denied
      GetType: Allowed
      GetTypeCode: Allowed
      IndexOf: Allowed
      IndexOfAny: Allowed
-     Insert: Allowed
-     Intern: Allowed
-     IsInterned: Allowed
+     Insert: Allowed (StringReturnRewriter)
+     Intern: Denied
+     IsInterned: Denied
      IsNormalized: Allowed
      IsNullOrEmpty: Allowed
      IsNullOrWhiteSpace: Allowed
      Join: Allowed (CollectedEnumerableArgumentRewriter)
      LastIndexOf: Allowed
      LastIndexOfAny: Allowed
-     Normalize: Allowed
+     Normalize: Allowed (StringReturnRewriter)
      op_Equality: Allowed
      op_Implicit: Allowed
      op_Inequality: Allowed
-     PadLeft: Allowed
-     PadRight: Allowed
-     Remove: Allowed
-     Replace: Allowed
-     Split: Allowed (ArrayReturnRewriter)
+     PadLeft: Allowed (CountArgumentRewriter(totalWidth))
+     PadRight: Allowed (CountArgumentRewriter(totalWidth))
+     Remove: Allowed (StringReturnRewriter)
+     Replace: Allowed (StringReturnRewriter)
+     Split: Denied
      StartsWith: Allowed
-     Substring: Allowed
+     Substring: Allowed (StringReturnRewriter)
      ToCharArray: Allowed (ArrayReturnRewriter)
-     ToLower: Allowed
-     ToLowerInvariant: Allowed
+     ToLower: Allowed (StringReturnRewriter)
+     ToLowerInvariant: Allowed (StringReturnRewriter)
      ToString: Allowed
-     ToUpper: Allowed
-     ToUpperInvariant: Allowed
-     Trim: Allowed
-     TrimEnd: Allowed
-     TrimStart: Allowed
+     ToUpper: Allowed (StringReturnRewriter)
+     ToUpperInvariant: Allowed (StringReturnRewriter)
+     Trim: Allowed (StringReturnRewriter)
+     TrimEnd: Allowed (StringReturnRewriter)
+     TrimStart: Allowed (StringReturnRewriter)
   StringComparer: Denied
   StringComparison: Denied
   StringNormalizationExtensions: Denied

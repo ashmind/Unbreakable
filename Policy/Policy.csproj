@@ -1,9 +1,9 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>net46; netstandard20; netcoreapp31; net5.0</TargetFrameworks>
     <AssemblyName>Unbreakable.Policy</AssemblyName>
     <RootNamespace>Unbreakable.Policy</RootNamespace>
-    <VersionPrefix>18.0</VersionPrefix>
+    <VersionPrefix>19.0</VersionPrefix>
     <Description>API policies for https://www.nuget.org/packages/Unbreakable. This library is released more often than the main Unbreakable, and can be referenced and updated explicily to get the latest ones.</Description>
     <PackageTags>sandboxing Unbreakable</PackageTags>
   </PropertyGroup>

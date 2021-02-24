@@ -15,6 +15,8 @@ namespace Unbreakable.Policy.Rewriters {
             _countParameterName = countParameterName;
         }
 
+        public string CountParameterName => _countParameterName;
+
         string IMemberRewriterInternal.GetShortName() => $"{nameof(CountArgumentRewriter)}({_countParameterName})";
 
         bool IMemberRewriterInternal.Rewrite(Instruction instruction, MemberRewriterContext context) {
