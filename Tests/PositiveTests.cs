@@ -64,5 +64,56 @@ namespace Unbreakable.Tests {
             });
             Assert.NotNull(m());
         }
+
+        [Fact]
+        public void ComputesIlOffsetsCorrectly() {
+            var m = TestHelper.RewriteAndGetMethodWrappedInScope(@"
+                class Program {
+                    void M() {
+                        bool cond = true;
+                        if (cond)
+                        {
+                            M2();
+                            // produce as many nops as necessary
+                            ;;;;;;;;;; ;;;;;;;;;;
+                            ;;;;;;;;;; ;;;;;;;;;;
+                            ;;;;;;;;;; ;;;;;;;;;;
+                            ;;;;;;;;;; ;;;;;;;;;;
+                            ;;;;;;;;;; ;;;;;;;;;;
+                            ;;;;;;;;;; ;;;
+                        }
+                    }
+                    void M2() {}
+                }
+            ", "Program", "M");
+            m();
+        }
+
+        [Fact]
+        public void ComputesIlOffsetsCorrectly2() {
+            var m = TestHelper.RewriteAndGetMethodWrappedInScope(@"
+                class Program {
+                    void M() {
+                        bool cond = true;
+                        if (cond)
+                            goto l1;
+                        if (cond)
+                            goto l2;
+                        M2();
+                        // produce as many nops as necessary
+                        ;;;;;;;;;; ;;;;;;;;;;
+                        ;;;;;;;;;; ;;;;;;;;;;
+                        ;;;;;;;;;; ;;;;;;;;;;
+                        ;;;;;;;;;; ;;;;;;;;;;
+                        ;;;;;;;;;; ;;;;;;;;;;
+                        ;;;;;;;
+                    l1: ;;;;;;;
+                    l2: ;
+                    }
+                    void M2() {}
+                }
+            ", "Program", "M");
+            m();
+        }
     }
 }
