@@ -155,7 +155,7 @@ namespace Unbreakable.Internal {
             if (instruction.OpCode.Code != Code.Ldftn && instruction.OpCode.Code != Code.Ldtoken)
                 return;
 
-            throw new AssemblyGuardException($"Member {method.FullName}.{method.Name} is not allowed in delegate context.");
+            throw new AssemblyGuardException($"Member {method.DeclaringType.FullName}.{method.Name} is not allowed in delegate context.");
         }
 
         private string? GetNamespace(TypeReference type) {
