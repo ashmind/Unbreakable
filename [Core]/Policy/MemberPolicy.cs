@@ -1,11 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using JetBrains.Annotations;
 using Unbreakable.Policy.Internal;
 
 namespace Unbreakable.Policy {
     public class MemberPolicy {
+        // Strict mode that blocks read access to Rewriters without call to HasRewriters.
+        // This is only used in test mode for now.
+        internal static bool MustVerifyRewritersAllocations { get; set; }
+
         private ApiAccess _access;
         private IList<IMemberRewriterInternal>? _rewriters;
 
@@ -22,11 +25,11 @@ namespace Unbreakable.Policy {
             }
         }
 
-        public bool HasRewriters => _rewriters != null;
+        public bool HasRewriters => _rewriters != null && _rewriters.Count > 0;
 
         public IReadOnlyCollection<IMemberRewriter> Rewriters {
             get {
-                EnsureRewriters();
+                EnsureRewriters(read: true);
                 return (IReadOnlyCollection<IMemberRewriter>)_rewriters!;
             }
         }
@@ -46,9 +49,12 @@ namespace Unbreakable.Policy {
             return this;
         }
 
-        private void EnsureRewriters() {
-            if (_rewriters == null)
+        private void EnsureRewriters(bool read = false) {
+            if (_rewriters == null) {
+                if (read && MustVerifyRewritersAllocations)
+                    throw new InvalidOperationException($"Detected read access to {nameof(Rewriters)} without check for {nameof(HasRewriters)}.");
                 Interlocked.CompareExchange(ref _rewriters, new List<IMemberRewriterInternal>(), null);
+            }
         }
     }
 }

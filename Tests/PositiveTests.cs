@@ -64,5 +64,23 @@ namespace Unbreakable.Tests {
             });
             Assert.NotNull(m());
         }
+
+
+        [Fact]
+        public void HandlesDelegatesToMethodsWithoutRewriters_IfMethodWasUsedBefore() {
+            var m = TestHelper.RewriteAndGetMethodWrappedInScope(@"
+                using System;
+                using Unbreakable.Tests.Internal;
+                class C {
+                    public bool M() {
+                        string.IsNullOrEmpty("""");
+
+                        Func<string, bool> isNullOrEmpty = string.IsNullOrEmpty;
+                        return isNullOrEmpty("""");
+                    }
+                }
+            ", "C", "M");
+            Assert.True((bool?)m());
+        }
     }
 }

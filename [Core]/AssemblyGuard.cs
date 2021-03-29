@@ -112,7 +112,7 @@ namespace Unbreakable {
                     continue;
                 }
 
-                if (memberRule != null && memberRule.Rewriters.Count > 0) {
+                if (memberRule != null && memberRule.HasRewriters) {
                     var instructionCountBefore = instructions.Count;
                     var rewritten = false;
                     var context = new MemberRewriterContext(il, guardVariable, guard);

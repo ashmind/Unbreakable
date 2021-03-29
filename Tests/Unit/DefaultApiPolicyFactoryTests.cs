@@ -98,7 +98,8 @@ namespace Unbreakable.Tests.Unit {
         [Fact]
         public void CreateSafeDefaultPolicy_IncludesCountArgumentRewriter_WithCorrectArgumentName() {
             var methodGroupsWithCountRewriter = GetAllAllowedMethods()
-                .Where(m => m.rule?.Rewriters.OfType<CountArgumentRewriter>().Any() ?? false)
+                .Where(m => m.rule != null)
+                .Where(m => m.rule!.HasRewriters && m.rule.Rewriters.OfType<CountArgumentRewriter>().Any())
                 .GroupBy(m => m.rule)
                 .Select(g => (
                     name: g.First().method.Name,
