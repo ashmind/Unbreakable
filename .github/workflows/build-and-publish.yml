@@ -13,21 +13,9 @@ jobs:
       with:
           dotnet-version: 5.0.x
 
-    # Normally restore is done by the build, but there seem to be some issues:
-    # https://github.com/actions/setup-dotnet/issues/145
-    # https://github.com/actions/setup-dotnet/issues/155
-    # Also it seems that it only works in a certain order
-    - run: dotnet restore Runtime
-    - run: dotnet restore [Package]
-    - run: dotnet restore [Core]
-    - run: dotnet restore Tools.PolicyReport.Net31
-    - run: dotnet restore Tools.PolicyReport
-    - run: dotnet restore Demo
-    - run: dotnet restore Policy
-    - run: dotnet restore Tests
-    # End restores
-    
-    - run: dotnet build --no-restore --configuration Release
+    # https://github.com/actions/setup-dotnet/issues/155#issuecomment-748452076
+    - run: dotnet nuget locals all --clear    
+    - run: dotnet build --configuration Release
     - run: dotnet test --no-build --configuration Release
     - run: dotnet pack --no-build --output . --configuration Release
 
