@@ -100,7 +100,7 @@ namespace Unbreakable.Tests.Unit {
             var methodGroupsWithCountRewriter = GetAllAllowedMethods()
                 .Where(m => m.rule != null)
                 .Where(m => m.rule!.HasRewriters && m.rule.Rewriters.OfType<CountArgumentRewriter>().Any())
-                .GroupBy(m => m.rule)
+                .GroupBy(m => m.rule!)
                 .Select(g => (
                     name: g.First().method.Name,
                     rewriters: g.Key.Rewriters.OfType<CountArgumentRewriter>().ToList(),
