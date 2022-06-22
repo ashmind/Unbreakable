@@ -28,7 +28,7 @@
     <PackageReference Include="Mono.Cecil" Version="0.10.0" />
     <PackageReference Include="Pedantic.IO.EmbeddedResource" Version="0.9.0-pre-02" />
     <PackageReference Include="System.IO.FileSystem" Version="4.3.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="ReflectionMagic" Version="3.0.0" />
     <PackageReference Include="xunit" Version="2.4.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0" />
